@@ -1,0 +1,78 @@
+/* @import url(./root.css); */
+
+.sui__layout{
+   display: flex;
+   align-items: center;
+   width: 100%;
+   padding-bottom: 5em;
+}
+.sui__holder{
+   width: 100%;
+   height: 100%;
+   padding: 0 0.5em;
+   row-gap: 1em;
+}
+
+.suiu__info-holder{
+   justify-content: space-between;
+   
+}
+
+/* left-holder  */
+.uih__left-holder{
+    column-gap: 1em;
+}
+.uih__context-holder{
+    row-gap: 0.625em;
+    align-self: center;
+    height: fit-content;
+}
+
+.uihc__h-username{
+    display: inherit;
+}
+.uihc__h-title{
+    display: inherit;
+}
+.uihc__h-tag{
+    display: inherit;
+    column-gap: 1.25em;
+}
+.uihc__h-category{
+    color: var(--secondary-color);
+}
+.uihc__h-category:hover {
+    cursor: pointer;
+}
+.uihc__h-tag__holder{
+    column-gap: 1.25em;
+}
+
+/* right-holder */
+.uih__right-holder{
+    row-gap: 1.25em;
+    
+}
+.uihr__btn-holder{
+    flex-direction: row-reverse;
+    column-gap: 0.5em;
+}
+
+.uihr__view-holder{
+    align-items: center;
+    column-gap: 0.5em;
+}
+.uihr__view-count{
+    text-align: center;
+}
+
+/* desc */
+.user__about-holder{
+    row-gap: 0.5em;
+}
+.uah__context-holder{
+    background-color: #465255;
+    padding: 0.7em;
+    border-radius: var(--radius-scale);
+    row-gap: 1em;
+}

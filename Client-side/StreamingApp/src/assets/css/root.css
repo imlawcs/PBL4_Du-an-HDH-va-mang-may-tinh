@@ -1,0 +1,371 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
+:root{
+    /* color */
+    --primary-color: #252525;
+    --secondary-color: #47FFD3;
+    --lighter-primary-color: #3E4547;
+    --bg-color: #2E3435;
+    --border-color: #434C4E;
+    /* size */
+    --icon-box-size: 1.875em;
+    --radius-scale: 0.3125em;
+    --btn-radius-scale: 0.1875em;
+    --sidebar-width: 16em;
+    --regular-font-size: 1em;
+    --font-2x: 1.2em;
+    --border-line-cof: 0.16em var(--border-color) solid;
+
+
+}
+.hide__scroll-bar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide__scroll-bar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+/* font */
+.league-spartan-bold {
+    font-family: "League Spartan", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+}
+.league-spartan-semibold {
+    font-family: "League Spartan", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+}
+.league-spartan-regular {
+    font-family: "League Spartan", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+.league-spartan-light {
+    font-family: "League Spartan", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 200;
+    font-style: normal;
+}
+.ta__center{
+    text-align: center;
+}
+.ta__left{
+    text-align: left;
+}
+.ta__right{
+    text-align: right;
+}
+/* webkit */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* font-size */
+.fs__title-1{
+    font-size: 2.2em;
+}
+.fs__title-2{
+    font-size: 2.3em;
+}
+.fs__title-3{
+    font-size: 2.4em;
+}
+.fs__title-4{
+    font-size: 2.5em;
+}
+.fs__title-5{
+    font-size: 3em;
+}
+.fs__normal-1{
+    font-size: 1em;
+}
+.fs__normal-2{
+    font-size: 1.2em;
+}
+.fs__normal-3{
+    font-size: 1.4em;
+}
+
+.fs__small-1{
+    font-size: 0.6em;
+}
+.fs__small-2{
+    font-size: 0.7em;
+}
+.fs__small-3{
+    font-size: 0.8em;
+}
+
+.fs__large-1{
+    font-size: 1.6em;
+}
+.fs__large-2{
+    font-size: 1.8em;
+}
+.fs__large-3{
+    font-size: 2em;
+}
+.tbox-1{
+    border: #252525 solid;
+    background-color: transparent;
+}
+
+
+/* sidebar */
+.bg__color-vid{
+    background-color: #25292B;
+}
+.bg__color-1{
+    background-color: var(--primary-color);
+}
+.bg__color-2{
+    background-color: var(--bg-color);
+}
+.bg__color-00{
+    background-color: #000;
+}
+.fill__container{
+    width: 100%;
+}
+.fill__y{
+    height: 100%;
+}
+.fit__content{
+    width: fit-content;
+}
+.obj-cover{
+    object-fit: cover;
+}
+.citizenship{
+    color: white;
+}
+.no__bg{
+    background: transparent;
+}
+.def-pad-2em{
+    padding: 2em;
+}
+.def-pad-1{
+    padding: 1em;
+}
+.def-pad-2{
+    padding: 0.5em;
+}
+.def-pad-3{
+    padding: 0.25em;
+}
+.def-pad-4{
+    padding: 0.125em;
+}
+.no__padding-lr{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+.no__padding-tb{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+
+/* flex */
+.rr__flex-row{
+    display: flex;
+    flex-direction: row;
+}
+.rr__flex-col{
+    display: flex;
+    flex-direction: column;
+}
+.rr__flex-row-reverse{
+    display: flex;
+    flex-direction: row-reverse;
+}
+.rr__flex-col-reverse{
+    display: flex;
+    flex-direction: column-reverse;
+}
+.rrf__col-tiny {
+    column-gap: 0.25em;
+}
+.rrf__col-small {
+    column-gap: 0.5em;
+}
+.rrf__col-normal {
+    column-gap: 1em;
+}
+.rrf__col-large {
+    column-gap: 1.5em;
+}
+.rrf__col-xlarge {
+    column-gap: 2em;
+}
+.rrf__col-xxlarge {
+    column-gap: 3em;
+}
+.rrf__col-huge {
+    column-gap: 4em;
+}
+.rrf__row-tiny {
+    row-gap: 0.25em;
+}
+.rrf__row-small {
+    row-gap: 0.5em;
+}
+.rrf__row-normal {
+    row-gap: 1em;
+}
+.rrf__row-large {
+    row-gap: 1.5em;
+}
+.rrf__row-xlarge {
+    row-gap: 2em;
+}
+.rrf__row-xxlarge {
+    row-gap: 3em;
+}
+.rrf__row-huge {
+    row-gap: 4em;
+}
+.rrf__jc-center{
+    justify-content: center;
+}
+.rrf__jc-space-around{
+    justify-content: space-around;
+}
+.rrf__jc-space-between{
+    justify-content: space-between;
+}
+.rrf__jc-space-evenly{
+    justify-content: space-evenly;
+}
+.rrf__ai-center{
+    align-items: center;
+}
+
+
+.mx-auto{
+    align-self: center;
+}
+.no__flex-size{
+    flex: 0;
+}
+
+.rr__icon-btn{
+
+    width: 2em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0.3em;
+    border-radius: var(--radius-scale);
+}
+.rr__icon-btn:hover {
+    background-color: var(--lighter-primary-color);
+    cursor: pointer;
+}
+.emoji-btn{
+    border-radius: 0 var(--radius-scale) var(--radius-scale) 0 !important;
+    border: 0.13em solid #FFF;
+    height: 1.55em;
+    border-left: none;
+}
+
+/* img  */
+.avatar__2x{
+    border-radius: 4.5em;
+    border: 2px solid var(--secondary-color);
+    width: 6.25em;
+    height: 6.25em;
+}
+
+.border__r{
+    border-right: 0.16em var(--border-color) solid;
+    height: 100%;
+    overflow: scroll;
+    scrollbar-width: none;
+}
+.no__user-select{
+    user-select: none;
+}
+
+.ta__no-resize{
+    resize: none !important;
+}
+
+/* Bootstrap colors with rr__ prefix */
+.rr__primary {
+    color: #007bff;
+}
+
+.rr__secondary {
+    color: #6c757d;
+}
+
+.rr__success {
+    color: #28a745;
+}
+
+.rr__danger {
+    color: #dc3545;
+}
+
+.rr__warning {
+    color: #ffc107;
+}
+
+.rr__info {
+    color: #17a2b8;
+}
+
+.rr__light {
+    color: #f8f9fa;
+}
+
+.rr__dark {
+    color: #343a40;
+}
+
+.rr__bg-primary {
+    background-color: #007bff;
+}
+
+.rr__bg-secondary {
+    background-color: #6c757d;
+}
+
+.rr__bg-success {
+    background-color: #28a745;
+}
+
+.rr__bg-danger {
+    background-color: #dc3545;
+}
+
+.rr__bg-warning {
+    background-color: #ffc107;
+}
+
+.rr__bg-info {
+    background-color: #17a2b8;
+}
+
+.rr__bg-light {
+    background-color: #f8f9fa;
+}
+
+.rr__bg-dark {
+    background-color: #343a40;
+}
+
+.rr__color-secondary{
+    color: var(--secondary-color);
+}
+.cur__pointer{
+    cursor: pointer;
+}
