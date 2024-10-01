@@ -428,26 +428,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ACER\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Users\\DELL\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\StreamingApp.csproj",
+      "projectUniqueName": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
       "projectName": "StreamingApp",
-      "projectPath": "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\StreamingApp.csproj",
-      "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
-      "outputPath": "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\obj\\",
+      "projectPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
+      "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
+      "outputPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -468,6 +465,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -498,7 +500,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
