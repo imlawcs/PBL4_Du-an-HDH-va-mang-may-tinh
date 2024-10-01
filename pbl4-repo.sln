@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server-side", "Server-side", "{7EE00607-E59C-4716-A0DD-5CD36ABEE6EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StreamingApp", "Server-side\StreamingApp\StreamingApp.csproj", "{7FE43E34-A901-4F52-93FF-D2F173C4EB08}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7FE43E34-A901-4F52-93FF-D2F173C4EB08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE43E34-A901-4F52-93FF-D2F173C4EB08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FE43E34-A901-4F52-93FF-D2F173C4EB08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FE43E34-A901-4F52-93FF-D2F173C4EB08}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7FE43E34-A901-4F52-93FF-D2F173C4EB08} = {7EE00607-E59C-4716-A0DD-5CD36ABEE6EC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A84749C8-E109-4174-80B3-B398518FA0A4}
+	EndGlobalSection
+EndGlobal
