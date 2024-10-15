@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Server_side.Models
+namespace StreamingApp.Models
 {
     public class Category
     {

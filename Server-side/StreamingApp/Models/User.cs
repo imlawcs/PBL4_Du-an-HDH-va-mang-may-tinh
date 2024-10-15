@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server_side.Models
+namespace StreamingApp.Models
 {
     public class User
     {
@@ -9,7 +9,7 @@ namespace Server_side.Models
         [Required]
         public int UserId { get; set; }
         public int RoleId { get; set; }
-        public string UserName { get; set; }
+        public string Username { get; set; }
         public string Password { get; set; }
         public string FullName { get; set; }
         public string Bio { get; set; }

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server_side.Models
+namespace StreamingApp.Models
 {
     public class Stream
     {

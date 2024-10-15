@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server_side.Models
+namespace StreamingApp.Models
 {
-    public class UserBlock
+    public class Blocked
     {
         [Key, Column(Order = 0)]
         [Required]

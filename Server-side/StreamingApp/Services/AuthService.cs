@@ -1,28 +1,61 @@
-namespace StreamingApp.Services {
-    public class AuthService {
-        public int Login(string username, string password) {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) {
-            throw new ArgumentException("Username or password cannot be empty.");
-            }
+using BCrypt.Net;
 
-            // Simulate a login check
-            if (username == "admin" && password == "password") {
-            return 200; // OK
-            } else {
-            return 401; // Unauthorized
-            }
+public class AuthService : IAuthService
+{
+    private readonly AppDbContext _context;
+
+    public AuthService(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public UserModel AuthenticateUser(LoginModel login)
+    {
+        // Truy vấn cơ sở dữ liệu để tìm người dùng
+        var user = _context.Users.FirstOrDefault(u => u.Username == login.Username);
+
+        if (user != null && BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
+        {
+            return new UserModel { Username = user.Username };
         }
 
-        public bool Register(string username, string password) {
+        return null;
+    }
 
+    public UserModel GetUserByUsername(string username)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.Username == username);
+        if (user == null)
+        {
+            return null;
+        }
+        return new UserModel { Username = user.Username, Password = user.Password, Email = user.Email };
+    }
+
+    public UserModel RegisterUser(RegisterModel registerModel)
+    {
+        // Kiểm tra xem username có tồn tại hay không
+        if (_context.Users.Any(u => u.Username == registerModel.Username))
+        {
+            throw new Exception("Username already exists");
         }
 
-        public bool Logout() {
+        // Tạo một người dùng mới
+        var user = new StreamingApp.Models.User
+        {
+            Username = registerModel.Username,
+            Password = BCrypt.Net.BCrypt.HashPassword(registerModel.Password), // Hash mật khẩu
+            Email = registerModel.Email
+        };
 
-        }
+        _context.Users.Add(user);
+        _context.SaveChanges();
 
-        public bool ForgotPassword(string username) {
-
-        }
+        return new UserModel
+        {
+            Username = user.Username,
+            Password = user.Password,
+            Email = user.Email
+        };
     }
 }

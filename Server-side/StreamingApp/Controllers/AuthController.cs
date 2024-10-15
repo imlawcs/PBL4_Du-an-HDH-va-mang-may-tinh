@@ -1,56 +1,91 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace StreamingApp.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IConfiguration _config;
+        private readonly IAuthService _authService;
 
-        public AuthController(AuthService authService)
+        public AuthController(IConfiguration config, IAuthService authService)
         {
+            _config = config;
             _authService = authService;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest loginRequest)
+        public IActionResult Login([FromBody] LoginModel loginModel)
         {
-            if (!ModelState.IsValid)
+            var user = _authService.AuthenticateUser(loginModel);
+
+            if (user != null)
             {
-                return BadRequest(ModelState);
+                var token = GenerateToken(user);
+                return Ok(new { token });
             }
 
-            var result = _authService.Login(loginRequest);
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result.Message);
-            }
+            return Unauthorized();
         }
-    }
 
-    public class LoginRequest
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class AuthService
-    {
-        public AuthResult Login(LoginRequest request)
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] RegisterModel registerModel)
         {
-            // Implement your login logic here
-            return new AuthResult { Success = true };
-        }
-    }
+            // Kiểm tra xem username đã tồn tại hay chưa
+            var existingUser = _authService.GetUserByUsername(registerModel.Username);
+            if (existingUser != null)
+            {
+                return BadRequest(new { message = "Username already exists" });
+            }
 
-    public class AuthResult
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
+            // Tạo người dùng mới
+            var newUser = _authService.RegisterUser(registerModel);
+            if (newUser != null)
+            {
+                return Ok(new { message = "User registered successfully" });
+            }
+
+            return BadRequest(new { message = "User registration failed" });
+        }
+
+        private string GenerateToken(UserModel user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
+                _config["Jwt:Issuer"],
+                claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        [HttpGet("profile")]
+        public IActionResult GetUserProfile()
+        {
+            var userId = HttpContext.Items["User"];
+            if (userId == null)
+            {
+                return Unauthorized(new { message = "Unauthorized" });
+            }
+
+            // Trả về thông tin người dùng (ví dụ userId hoặc profile)
+            return Ok(new { userId });
+        }
     }
 }
