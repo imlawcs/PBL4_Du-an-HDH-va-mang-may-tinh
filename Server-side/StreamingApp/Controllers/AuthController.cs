@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using StreamingApp.Models.Entities;
 
 namespace StreamingApp.Controllers
 {
@@ -53,7 +54,7 @@ namespace StreamingApp.Controllers
             return BadRequest(new { message = "User registration failed" });
         }
 
-        private string GenerateToken(UserModel user)
+        private string GenerateToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

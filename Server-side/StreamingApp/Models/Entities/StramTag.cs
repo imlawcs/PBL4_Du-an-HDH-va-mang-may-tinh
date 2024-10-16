@@ -1,18 +1,20 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace StreamingApp.Models
+namespace StreamingApp.Models.Entities
 {
     public class StreamTag
     {
-        [Key, Column(Order = 0)]
-        [Required]
+        [Key] [Required]
         public int StreamId { get; set; }
-        [Key, Column(Order = 1)]
+
+        [Key] [Required]
         public int TagId { get; set; }
+
         [ForeignKey("StreamId")]
-        public virtual Stream Stream { get; set; }
+        public virtual Stream? Stream { get; set; }
+
         [ForeignKey("TagId")]
-        public virtual Tag Tag { get; set; }
-    }
+        public virtual Tag? Tag { get; set; }
+       }
 }

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using StreamingApp.Models;
+using StreamingApp.Models.Entities;
 
 
 public class AppDbContext : DbContext
@@ -13,7 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<StreamTag> StreamTags { get; set; }
-    public DbSet<StreamingApp.Models.Stream> Streams { get; set; }
+    public DbSet<StreamingApp.Models.Entities.Stream> Streams { get; set; }
     public DbSet<StreamCategory> StreamCategories { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<User> Users { get; set; }
