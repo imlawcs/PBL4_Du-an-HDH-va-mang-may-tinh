@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using StreamingApp.Models;
+using StreamingApp.Models.Entities;
 
 namespace StreamingApp.Managers
 {
