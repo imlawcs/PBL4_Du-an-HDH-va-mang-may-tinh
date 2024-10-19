@@ -23,7 +23,7 @@ namespace StreamingApp.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
-            var user = _authService.AuthenticateUser(loginModel);
+            var user = _authService.LoginUser(loginModel);
 
             if (user != null)
             {
@@ -37,20 +37,12 @@ namespace StreamingApp.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
-            // Kiểm tra xem username đã tồn tại hay chưa
-            var existingUser = _authService.GetUserByUsername(registerModel.Username);
-            if (existingUser != null)
-            {
-                return BadRequest(new { message = "Username already exists" });
-            }
-
             // Tạo người dùng mới
             var newUser = _authService.RegisterUser(registerModel);
             if (newUser != null)
             {
                 return Ok(new { message = "User registered successfully" });
             }
-
             return BadRequest(new { message = "User registration failed" });
         }
 
@@ -61,7 +53,7 @@ namespace StreamingApp.Controllers
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

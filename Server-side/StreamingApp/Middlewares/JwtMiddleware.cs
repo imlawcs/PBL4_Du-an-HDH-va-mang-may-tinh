@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using StreamingApp.Exceptions;
 
 public class JwtMiddleware
 {
@@ -25,6 +26,11 @@ public class JwtMiddleware
 
         if (token != null)
             AttachUserToContext(context, token);
+        else
+            throw new CustomException{
+                ErrorCode = 401,
+                Message = "Invalid token"
+            };
 
         await _next(context);
     }
@@ -54,19 +60,22 @@ public class JwtMiddleware
         }
         catch
         {
-            // Do nothing if JWT validation fails
+            throw new CustomException{
+                ErrorCode = 401,
+                Message = "Invalid token"
+            };
         }
     }
 
-    private void Authorization (HttpContext context) {
-        var user = context.Items["User"];
-        if (user == null)
-        {
-            context.Response.StatusCode = 401;
-            context.Response.WriteAsync("Unauthorized");
+    // private void Authorization (HttpContext context) {
+    //     var user = context.Items["User"];
+    //     if (user == null)
+    //     {
+    //         context.Response.StatusCode = 401;
+    //         context.Response.WriteAsync("Unauthorized");
 
-            return;
+    //         return;
         
-        }
-    }
+    //     }
+    // }
 }

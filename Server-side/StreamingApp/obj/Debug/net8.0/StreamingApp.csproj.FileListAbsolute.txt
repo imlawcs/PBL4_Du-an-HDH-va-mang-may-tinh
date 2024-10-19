@@ -1,0 +1,8 @@
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.csproj.AssemblyReference.cache
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.GeneratedMSBuildEditorConfig.editorconfig
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.AssemblyInfoInputs.cache
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.AssemblyInfo.cs
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.csproj.CoreCompileInputs.cache
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.MvcApplicationPartsAssemblyInfo.cs
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.MvcApplicationPartsAssemblyInfo.cache
+E:\SCHOOL\CODE\HK5\PBL4\final\PBL4_Du-an-HDH-va-mang-may-tinh\Server-side\StreamingApp\obj\Debug\net8.0\StreamingApp.sourcelink.json
