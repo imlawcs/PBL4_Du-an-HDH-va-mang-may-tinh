@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StreamingApp.Managers;
-using StreamingApp.Models;
+using StreamingApp.Models.Entities;
 // using WebSocketSharp;
 
 namespace StreamingApp.Hubs

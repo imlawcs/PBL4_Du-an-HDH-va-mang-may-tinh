@@ -1,6 +1,7 @@
 using System;
 
 namespace StreamingApp.Models.Entities
+
 {
     public class RoomInfo
     {

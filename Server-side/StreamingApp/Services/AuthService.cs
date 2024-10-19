@@ -13,11 +13,11 @@ public class AuthService : IAuthService
     public User AuthenticateUser(LoginModel login)
     {
         // Truy vấn cơ sở dữ liệu để tìm người dùng
-        var user = _context.Users.FirstOrDefault(u => u.Username == login.Username);
+        var user = _context.Users.FirstOrDefault(u => u.UserName == login.Username);
 
         if (user != null && BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
         {
-            return new User { Username = user.Username };
+            return new User { UserName = user.UserName };
         }
 
         return null;
@@ -25,26 +25,26 @@ public class AuthService : IAuthService
 
     public User GetUserByUsername(string username)
     {
-        var user = _context.Users.FirstOrDefault(u => u.Username == username);
+        var user = _context.Users.FirstOrDefault(u => u.UserName == username);
         if (user == null)
         {
             return null;
         }
-        return new User { Username = user.Username, Password = user.Password, Email = user.Email };
+        return new User { UserName = user.UserName, Password = user.Password, Email = user.Email };
     }
 
     public User RegisterUser(RegisterModel registerModel)
     {
-        // Kiểm tra xem username có tồn tại hay không
-        if (_context.Users.Any(u => u.Username == registerModel.Username))
+        // Kiểm tra xem UserName có tồn tại hay không
+        if (_context.Users.Any(u => u.UserName == registerModel.Username))
         {
-            throw new Exception("Username already exists");
+            throw new Exception("UserName already exists");
         }
 
         // Tạo một người dùng mới
         var user = new User
         {
-            Username = registerModel.Username,
+            UserName = registerModel.Username,
             Password = BCrypt.Net.BCrypt.HashPassword(registerModel.Password), // Hash mật khẩu
             Email = registerModel.Email
         };
@@ -54,7 +54,7 @@ public class AuthService : IAuthService
 
         return new User
         {
-            Username = user.Username,
+            UserName = user.UserName,
             Password = user.Password,
             Email = user.Email
         };

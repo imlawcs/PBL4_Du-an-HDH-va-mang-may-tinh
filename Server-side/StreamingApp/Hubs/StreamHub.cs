@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using StreamingApp.Managers;
-using StreamingApp.Models;
+using StreamingApp.Models.Entities;
 
 namespace StreamingApp.Hubs
 {
