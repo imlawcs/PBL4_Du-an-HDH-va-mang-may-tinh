@@ -14,11 +14,11 @@ namespace StreamingApp.Models.Entities
                 [MaxLength(100)]
                 public string Password { get; set; }
                 [MaxLength(100)]
-                public string displayName { get; set; }
+                public string DisplayName { get; set; }
                 [MaxLength(100)]
                 public string Bio { get; set; }
                 [MaxLength(100)]
-                public string profilePic { get; set; }
+                public string ProfilePic { get; set; }
                 public DateTime RegisterDate { get; set; }
         
                 [MaxLength(100)]
