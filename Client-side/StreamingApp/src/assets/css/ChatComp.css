@@ -1,0 +1,12 @@
+/* @import url(./root.css); */
+.chat__comp {
+    width: 100%;
+    text-wrap: wrap;
+    padding: 0.3em 0;
+    transition: background-color 0.3s ease, border-radius 0.3s ease;
+}
+.chat__comp:hover {
+    background-color: var(--lighter-primary-color);
+    border-radius: var(--radius-scale);
+    cursor: pointer;
+}

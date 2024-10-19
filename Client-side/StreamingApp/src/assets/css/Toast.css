@@ -1,0 +1,44 @@
+@import url(./root.css);
+
+.toast {
+    position: fixed;
+    top: 100px;
+    right: -100%; /* Start off-screen to the right */
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    transition: right 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+    from {
+        right: -100%;
+    }
+    to {
+        right: 20px;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        right: 20px;
+    }
+    to {
+        right: -100%;
+    }
+}
+
+.toast.show {
+    animation: slideIn 0.3s forwards;
+}
+
+.toast.dispose {
+    animation: slideOut 0.3s forwards;
+}
+
+.toast:hover {
+    background-color: var(--lighter-primary-color);
+}
