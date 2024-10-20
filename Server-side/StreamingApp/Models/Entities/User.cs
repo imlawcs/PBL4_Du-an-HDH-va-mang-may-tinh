@@ -16,17 +16,17 @@ namespace StreamingApp.Models.Entities
                 [MaxLength(100)]
                 public string DisplayName { get; set; }
                 [MaxLength(100)]
-                public string Bio { get; set; }
+                public string? Bio { get; set; }
                 [MaxLength(100)]
-                public string ProfilePic { get; set; }
+                public string? ProfilePic { get; set; }
                 public DateTime RegisterDate { get; set; }
         
                 [MaxLength(100)]
                 public string Email { get; set; }
                 [MaxLength(100)]
                 public string PhoneNumber { get; set; }
-                public bool UserStatus { get; set; }
-                public bool IsEmailNoti { get; set; }
+                public bool? UserStatus { get; set; }
+                public bool? IsEmailNoti { get; set; }
 
                 [ForeignKey("RoleId")]
                 public virtual Role Role { get; set; }
