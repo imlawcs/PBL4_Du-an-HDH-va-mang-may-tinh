@@ -4,6 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using StreamingApp.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
+using StreamingApp.Exceptions;
 
 namespace StreamingApp.Controllers
 {
@@ -21,49 +23,83 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
-            var user = _authService.LoginUser(loginModel);
-
-            if (user != null)
+            try
             {
-                var token = GenerateToken(user);
-                return Ok(new { token });
-            }
+                var user = _authService.LoginUser(loginModel);
 
-            return Unauthorized();
+                if (user != null)
+                {
+                    var token = GenerateToken(user);
+                    return Ok(new { token });
+                }
+
+                return Unauthorized();
+            }
+            catch (CustomException ex)
+            {
+                return BadRequest(new { error = ex.Message }); // Trả về thông điệp lỗi cụ thể
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Internal server error", details = ex.Message }); // Trả về thông điệp lỗi chung
+            }
         }
+
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
-            // Tạo người dùng mới
-            var newUser = _authService.RegisterUser(registerModel);
-            if (newUser != null)
+            if (registerModel == null)
             {
-                return Ok(new { message = "User registered successfully" });
+                return BadRequest(new { message = "Invalid registration data." });
             }
-            return BadRequest(new { message = "User registration failed" });
+
+            try
+            {
+                // Tạo người dùng mới
+                var newUser = _authService.RegisterUser(registerModel);
+                if (newUser != null)
+                {
+                    return Ok(new { message = "User registered successfully" });
+                }
+
+                return BadRequest(new { message = "User registration failed" });
+            }
+            catch (CustomException ex)
+            {
+                // Trả về lỗi cụ thể từ CustomException
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi chung nếu có lỗi khác
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
         }
 
-        private string GenerateToken(User user)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+        public string GenerateToken(User user)
+        {
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // Thêm claim NameIdentifier
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.RoleId.ToString()) // Thêm các claim khác nếu cần
             };
 
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
-                _config["Jwt:Issuer"],
-                _config["Jwt:Issuer"],
-                claims,
+                issuer: null, // Bạn có thể đặt issuer nếu cần
+                audience: null, // Bạn có thể đặt audience nếu cần
+                claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credentials
-            );
+                signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

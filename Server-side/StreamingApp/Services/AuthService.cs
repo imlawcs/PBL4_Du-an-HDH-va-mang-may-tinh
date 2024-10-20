@@ -1,6 +1,8 @@
 using BCrypt.Net;
 using StreamingApp.Models.Entities;
 using StreamingApp.Exceptions;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 public class AuthService : IAuthService
 {
@@ -13,43 +15,47 @@ public class AuthService : IAuthService
 
     public User LoginUser(LoginModel login)
     {
-        try {
-            // Truy vấn cơ sở dữ liệu để tìm người dùng
-            var user = _context.Users.FirstOrDefault(u => u.Username == login.Username);
+        // Truy vấn cơ sở dữ liệu để tìm người dùng
+        var user = _context.Users.FirstOrDefault(u => u.Username == login.Username);
 
-            if (user != null && BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
-            {
-                return new User { Username = user.Username };
-            }
-            else {
-                return null;
-            }
-        }
-        catch (Exception ex)
+        // Kiểm tra người dùng có tồn tại không
+        if (user == null)
         {
-            throw new CustomException {
-                ErrorCode = 500,
+            throw new CustomException
+            {
+                ErrorCode = 401, // Unauthorized
                 Message = "Invalid username or password"
             };
         }
+
+        // Kiểm tra mật khẩu
+        if (!BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
+        {
+            throw new CustomException
+            {
+                ErrorCode = 401, // Unauthorized
+                Message = "Invalid username or password"
+            };
+        }
+
+        // Kiểm tra các thuộc tính có thể null
+        return new User
+        {
+            Username = user.Username,
+            Email = user.Email ?? string.Empty, // Tránh lỗi null
+            PhoneNumber = user.PhoneNumber ?? string.Empty // Tránh lỗi null
+            // Không trả về Password vì lý do bảo mật
+        };
     }
 
-    // public User GetUserByUsername(string username)
-    // {
-    //     var user = _context.Users.FirstOrDefault(u => u.Username == username);
-    //     if (user == null)
-    //     {
-    //         return null;
-    //     }
-    //     return new User { Username = user.Username, Password = user.Password, Email = user.Email };
-    // }
 
     public User RegisterUser(RegisterModel registerModel)
     {
         // Kiểm tra xem username có tồn tại hay không
         if (_context.Users.Any(u => u.Username == registerModel.Username))
         {
-            throw new CustomException {
+            throw new CustomException
+            {
                 ErrorCode = 400,
                 Message = "Username already exists"
             };
@@ -63,20 +69,31 @@ public class AuthService : IAuthService
             Email = registerModel.Email,
             PhoneNumber = registerModel.PhoneNumber,
             DisplayName = registerModel.DisplayName,
-            RegisterDate = DateTime.Now
+            RegisterDate = DateTime.Now,
+            RoleId = 2
         };
 
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        try
+        {
+            // Thêm người dùng vào context và lưu thay đổi
+            _context.Users.Add(user);
+            _context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving user: {ex.Message}");
+            throw; // Hoặc xử lý lỗi theo cách khác nếu cần
+        }
 
         return new User
         {
             Username = user.Username,
-            Password = user.Password,
+            Password = user.Password, // Mật khẩu không nên được trả về
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
             DisplayName = user.DisplayName,
-            RegisterDate = user.RegisterDate
+            RegisterDate = user.RegisterDate,
+            RoleId = user.RoleId
         };
     }
 }
