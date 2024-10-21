@@ -16,7 +16,7 @@ public class AuthService : IAuthService
     public User LoginUser(LoginModel login)
     {
         // Truy vấn cơ sở dữ liệu để tìm người dùng
-        var user = _context.Users.FirstOrDefault(u => u.Username == login.Username);
+        var user = _context.Users.FirstOrDefault(u => u.UserName == login.Username);
 
         // Kiểm tra người dùng có tồn tại không
         if (user == null)
@@ -41,7 +41,7 @@ public class AuthService : IAuthService
         // Kiểm tra các thuộc tính có thể null
         return new User
         {
-            Username = user.Username,
+            UserName = user.UserName,
             Email = user.Email ?? string.Empty, // Tránh lỗi null
             PhoneNumber = user.PhoneNumber ?? string.Empty // Tránh lỗi null
             // Không trả về Password vì lý do bảo mật
@@ -52,7 +52,7 @@ public class AuthService : IAuthService
     public User RegisterUser(RegisterModel registerModel)
     {
         // Kiểm tra xem username có tồn tại hay không
-        if (_context.Users.Any(u => u.Username == registerModel.Username))
+        if (_context.Users.Any(u => u.UserName == registerModel.Username))
         {
             throw new CustomException
             {
@@ -64,7 +64,7 @@ public class AuthService : IAuthService
         // Tạo một người dùng mới
         var user = new User
         {
-            Username = registerModel.Username,
+            UserName = registerModel.Username,
             Password = BCrypt.Net.BCrypt.HashPassword(registerModel.Password), // Hash mật khẩu
             Email = registerModel.Email,
             PhoneNumber = registerModel.PhoneNumber,
@@ -87,7 +87,7 @@ public class AuthService : IAuthService
 
         return new User
         {
-            Username = user.Username,
+            UserName = user.UserName,
             Password = user.Password, // Mật khẩu không nên được trả về
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
