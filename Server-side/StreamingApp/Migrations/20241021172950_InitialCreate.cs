@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -284,14 +284,14 @@ namespace StreamingApp.Migrations
                 column: "StreamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StreamTags_StreamId",
-                table: "StreamTags",
-                column: "StreamId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Streams_UserId",
                 table: "Streams",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StreamTags_StreamId",
+                table: "StreamTags",
+                column: "StreamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",

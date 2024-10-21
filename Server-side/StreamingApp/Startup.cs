@@ -1,13 +1,9 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using StreamingApp.Managers;
 using StreamingApp.Middlewares;
+using StreamingApp.Services;
 
 namespace StreamingApp
 {
@@ -31,7 +27,8 @@ namespace StreamingApp
 
             // Đăng ký dịch vụ AuthService
             services.AddScoped<IAuthService, AuthService>();
-            
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<UserManager>();
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>
             {
