@@ -1,25 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\StreamingApp.csproj": {}
+    "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj": {}
   },
   "projects": {
-    "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\StreamingApp.csproj": {
+    "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\StreamingApp.csproj",
+        "projectUniqueName": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
         "projectName": "StreamingApp",
-        "projectPath": "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\StreamingApp.csproj",
-        "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
-        "outputPath": "D:\\Huukhoa\\NAM_3\\KI 1\\PBL4\\pbl4-repo\\Server-side\\StreamingApp\\obj\\",
+        "projectPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
+        "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
+        "outputPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -40,15 +38,62 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.AspNetCore.Authorization": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.1.2, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
+            },
+            "System.Globalization": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.1.2, )"
             }
           },
           "imports": [
@@ -70,7 +115,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
