@@ -4583,24 +4583,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Nguyet\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\DELL\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\sem5\\pbl4_web\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
+      "projectUniqueName": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
       "projectName": "StreamingApp",
-      "projectPath": "D:\\sem5\\pbl4_web\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
-      "packagesPath": "C:\\Users\\Nguyet\\.nuget\\packages\\",
-      "outputPath": "D:\\sem5\\pbl4_web\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\obj\\",
+      "projectPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
+      "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
+      "outputPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Nguyet\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4698,7 +4697,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
