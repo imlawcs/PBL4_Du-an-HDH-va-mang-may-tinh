@@ -257,7 +257,7 @@ namespace StreamingApp.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsEmailNoti")
+                    b.Property<bool?>("IsEmailNoti")
                         .HasColumnType("bit");
 
                     b.Property<string>("Password")
@@ -271,23 +271,22 @@ namespace StreamingApp.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ProfilePic")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("RegisterDate")
+                    b.Property<DateTime?>("RegisterDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
+                    b.Property<bool?>("UserStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("UserStatus")
-                        .HasColumnType("bit");
 
                     b.HasKey("UserId");
 
