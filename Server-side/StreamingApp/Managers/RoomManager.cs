@@ -42,6 +42,7 @@ namespace StreamingApp.Managers
             }
         }
 
+
         public void DeleteRoom(int roomId)
         {
             rooms.TryRemove(roomId, out _);

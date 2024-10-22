@@ -1,23 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj": {}
+    "D:\\Huukhoa\\Nam3\\Ki1\\PBL4\\repo\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj": {}
   },
   "projects": {
-    "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj": {
+    "D:\\Huukhoa\\Nam3\\Ki1\\PBL4\\repo\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
+        "projectUniqueName": "D:\\Huukhoa\\Nam3\\Ki1\\PBL4\\repo\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
         "projectName": "StreamingApp",
-        "projectPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
-        "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-        "outputPath": "E:\\SCHOOL\\CODE\\HK5\\PBL4\\final\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\obj\\",
+        "projectPath": "D:\\Huukhoa\\Nam3\\Ki1\\PBL4\\repo\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\StreamingApp.csproj",
+        "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Huukhoa\\Nam3\\Ki1\\PBL4\\repo\\PBL4_Du-an-HDH-va-mang-may-tinh\\Server-side\\StreamingApp\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -61,6 +58,10 @@
               "target": "Package",
               "version": "[8.0.10, )"
             },
+            "Microsoft.AspNetCore.SignalR.Client": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.10, )"
@@ -83,6 +84,10 @@
               "target": "Package",
               "version": "[13.0.3, )"
             },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[112.1.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
@@ -94,6 +99,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.1.2, )"
+            },
+            "WebSocketSharp": {
+              "target": "Package",
+              "version": "[1.0.3-rc11, )"
             }
           },
           "imports": [

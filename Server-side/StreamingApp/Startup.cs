@@ -1,4 +1,5 @@
 using System.Text;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using StreamingApp.Hubs;
 using StreamingApp.Middlewares;
 
 namespace StreamingApp
@@ -28,10 +30,26 @@ namespace StreamingApp
 
             // Đăng ký các dịch vụ
             services.AddControllers();
+            // Đăng ký SignalR
+            services.AddSignalR();
+            // Đăng ký CORS
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("ClientPermission", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .SetIsOriginAllowedToAllowWildcardSubdomains()
+                        .WithExposedHeaders("Access-Control-Allow-Origin")
+                        .WithExposedHeaders("Access-Control-Allow-Credentials");
+                });
+            });
             // Đăng ký dịch vụ AuthService
             services.AddScoped<IAuthService, AuthService>();
-            
+
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>
             {
@@ -40,8 +58,8 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
+                // options.RequireHttpsMetadata = false;
+                // options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -49,12 +67,38 @@ namespace StreamingApp
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Key"]))
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    // IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Key"]))
+                    //Khoa - test
+                    // ValidIssuer = Configuration["Jwt:Issuer"],
+                    // ValidAudience = Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // If the request is for our hub...
+                        var path = context.HttpContext.Request.Path;
+                        Console.WriteLine($"Path: {path}");
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            path.StartsWithSegments("/"))
+                        {
+                            // Read the token out of the query string
+                            Console.WriteLine($"Token received: {accessToken}");
+
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
             // Đăng ký Swagger cho API Documentation
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
         }
@@ -68,10 +112,11 @@ namespace StreamingApp
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseCors("ClientPermission");
             // Sử dụng Authentication trước khi Authorization
             app.UseAuthentication();
 
@@ -82,9 +127,14 @@ namespace StreamingApp
             // Sử dụng Authorization sau Authentication
             app.UseAuthorization();
 
+            //cross-origin cho client
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                //map signalR hub
+                endpoints.MapHub<TestHub>("/webrtc")
+                .RequireCors("ClientPermission");
             });
         }
     }

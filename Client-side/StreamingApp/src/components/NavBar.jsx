@@ -18,7 +18,7 @@ export default function NavBar(props) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastPosition, setToastPosition] = useState("-100%");
-
+  const [token, setToken] = useState(null);
   useEffect(() => {
     let timer;
     if (showToast) {
@@ -29,14 +29,22 @@ export default function NavBar(props) {
         setTimeout(() => setShowToast(false), 300); // Wait for slide out animation
       }, 3000);
     }
+    if(token) {
+      setIsLoggedIn(true);
+    }
     return () => clearTimeout(timer);
-  }, [showToast]);
+  }, [showToast, token]);
 
   const handleShowToast = (message) => {
     setToastMessage(message);
     setShowToast(true);
   };
-
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setIsLoggedIn(false);
+    navigate("/");
+  }
   if (route == "AS") {
     return (
       <>
@@ -58,10 +66,7 @@ export default function NavBar(props) {
             <ProfileMenu
               userName="Resolved"
               imgLink="https://i.imgur.com/neHVP5j.jpg"
-              logout={() => {
-                setIsLoggedIn(false);
-                navigate("/");
-              }}
+              logout={handleLogout}
             />
           </div>
         </div>
@@ -90,8 +95,7 @@ export default function NavBar(props) {
               userName="Resolved"
               imgLink="https://i.imgur.com/neHVP5j.jpg"
               logout={() => {
-                setIsLoggedIn(false);
-                navigate("/");
+                handleLogout();
               }}
             />
           </div>
@@ -151,8 +155,7 @@ export default function NavBar(props) {
               userName="Resolved"
               imgLink="https://i.imgur.com/neHVP5j.jpg"
               logout={() => {
-                setIsLoggedIn(false);
-                navigate("/");
+                handleLogout();
               }}
             />
           ) : (
@@ -169,8 +172,9 @@ export default function NavBar(props) {
           <CustomModal
             type="login"
             login={() => {
-              setIsLoggedIn(true);
-              setIsModalOpen(0);
+                setIsLoggedIn(true);
+                setIsModalOpen(0);
+                handleShowToast("Login successful");
             }}
             offModal={() => setIsModalOpen(0)}
             switchModal={() => setIsModalOpen(2)}
