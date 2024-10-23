@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,20 +31,13 @@ public class JwtMiddleware
             return;
         }
 
-        // if (context.Request.Path.StartsWithSegments("/webrtc"))
-        // {
-        //     token = context.Request.Query["access_token"].FirstOrDefault()?.Split(" ").Last();
-        //     if (token != null)
-        //     {
-        //         await AttachUserToContext(context, token);
-        //         if (context.Response.HasStarted)
-        //         {
-        //             return; // Nếu phản hồi đã bắt đầu, dừng xử lý
-        //         }
-        //     }
-        //     else Console.WriteLine("Token is null");
-        //     return;
-        // }
+        if (context.Request.Path.StartsWithSegments("/webrtc"))
+        {
+            token = context.Request.Query["access_token"].FirstOrDefault()?.Split(" ").Last();
+            Console.WriteLine("Token: " + token);
+            await _next(context);
+            return;
+        }
 
         if (token != null)
         {
@@ -61,10 +56,47 @@ public class JwtMiddleware
 
         await _next(context);
     }
+    private async Task SignalRAuthenAsync(HttpContext context, string token)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+
+            // Kiểm tra xem claim có tồn tại không
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                context.Response.StatusCode = 401; // Unauthorized
+                await context.Response.WriteAsync("Invalid token: Missing NameIdentifier claim");
+                return; // Ngăn không cho tiếp tục xử lý request
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            // Nếu token không hợp lệ, trả về mã lỗi 401 và thông báo
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync($"Invalid token: {ex.Message}");
+            return; // Ngăn không cho tiếp tục xử lý request
+        }
+    }
     private async Task AttachUserToContext(HttpContext context, string token)
     {
         try
         {
+            Console.WriteLine("AttachUserToContext");
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
 

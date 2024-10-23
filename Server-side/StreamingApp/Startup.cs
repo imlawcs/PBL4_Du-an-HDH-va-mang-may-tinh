@@ -55,9 +55,10 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
+                //Khoa - test
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
-                options.Authority = "http://localhost:5173";
+                // options.Authority = "http://localhost:5173";
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
@@ -67,7 +68,6 @@ namespace StreamingApp
                     ValidIssuer = Configuration["Jwt:Issuer"],
                     ValidAudience = Configuration["Jwt:Audience"],
                     // IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Key"]))
-                    //Khoa - test
                     // ValidIssuer = Configuration["Jwt:Issuer"],
                     // ValidAudience = Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
@@ -90,6 +90,7 @@ namespace StreamingApp
                         return Task.CompletedTask;
                     }
                 };
+                //Khoa - test
             });
 
             // Đăng ký Swagger cho API Documentation
@@ -116,8 +117,8 @@ namespace StreamingApp
             app.UseAuthentication();
 
             // Thêm middleware tùy chỉnh của bạn (nếu cần thiết)
-            // app.UseMiddleware<JwtMiddleware>();
-            // app.UseMiddleware<ValidateMiddleware>();
+            app.UseMiddleware<JwtMiddleware>();
+            app.UseMiddleware<ValidateMiddleware>();
 
             // Sử dụng Authorization sau Authentication
             app.UseAuthorization();
