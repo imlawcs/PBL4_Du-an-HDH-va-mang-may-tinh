@@ -23,10 +23,6 @@ namespace StreamingApp
             // Đăng ký DbContext với chuỗi kết nối từ appsettings.json
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            // Đăng ký các dịch vụ
-            services.AddControllers();
-            services.AddSignalR();
             // Đăng ký CORS
 
             services.AddCors(options =>
@@ -39,6 +35,10 @@ namespace StreamingApp
                         .AllowCredentials();
                 });
             });
+            // Đăng ký các dịch vụ
+            services.AddControllers();
+            services.AddSignalR();
+
             // Đăng ký dịch vụ AuthService
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
@@ -51,6 +51,7 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
+                options.Authority = "https://localhost:5173";
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -101,8 +102,8 @@ namespace StreamingApp
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
+
             app.UseCors("ClientPermission");
 
             // Sử dụng Authentication trước khi Authorization

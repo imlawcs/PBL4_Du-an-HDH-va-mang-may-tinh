@@ -10,7 +10,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import smBackground from "../assets/img/background_sm-home.png";
-import sidetracked from "../assets/videos/sidetracked.mp4";
+// import sidetracked from "../assets/videos/sidetracked.mp4";
 import Button from "./Button";
 import Toast from "./Toast";
 import ChannelComp from "./ChannelComp";
