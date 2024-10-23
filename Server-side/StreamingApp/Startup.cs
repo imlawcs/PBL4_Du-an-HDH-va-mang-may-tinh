@@ -41,10 +41,7 @@ namespace StreamingApp
                     policy.WithOrigins("http://localhost:5173")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials()
-                        .SetIsOriginAllowedToAllowWildcardSubdomains()
-                        .WithExposedHeaders("Access-Control-Allow-Origin")
-                        .WithExposedHeaders("Access-Control-Allow-Credentials");
+                        .AllowCredentials();
                 });
             });
             // Đăng ký dịch vụ AuthService
@@ -58,12 +55,13 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
-                // options.RequireHttpsMetadata = false;
-                // options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.Authority = "http://localhost:5173";
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
@@ -83,13 +81,10 @@ namespace StreamingApp
 
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
-                        Console.WriteLine($"Path: {path}");
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            path.StartsWithSegments("/"))
+                            (path.StartsWithSegments("/webrtc")))
                         {
                             // Read the token out of the query string
-                            Console.WriteLine($"Token received: {accessToken}");
-
                             context.Token = accessToken;
                         }
                         return Task.CompletedTask;
@@ -121,8 +116,8 @@ namespace StreamingApp
             app.UseAuthentication();
 
             // Thêm middleware tùy chỉnh của bạn (nếu cần thiết)
-            app.UseMiddleware<JwtMiddleware>();
-            app.UseMiddleware<ValidateMiddleware>();
+            // app.UseMiddleware<JwtMiddleware>();
+            // app.UseMiddleware<ValidateMiddleware>();
 
             // Sử dụng Authorization sau Authentication
             app.UseAuthorization();

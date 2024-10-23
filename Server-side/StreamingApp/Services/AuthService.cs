@@ -3,16 +3,43 @@ using StreamingApp.Models.Entities;
 using StreamingApp.Exceptions;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
+    private readonly IConfiguration _config;
 
-    public AuthService(AppDbContext context)
+    public AuthService(AppDbContext context, IConfiguration config)
     {
         _context = context;
+        _config = config;
     }
+    
+    public string GenerateJwtToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Username.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                Audience = _config["Jwt:Audience"], // Set the audience
+                Issuer = _config["Jwt:Issuer"], // Set the issuer
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
 
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     public User LoginUser(LoginModel login)
     {
         // Truy vấn cơ sở dữ liệu để tìm người dùng

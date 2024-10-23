@@ -29,12 +29,20 @@ public class JwtMiddleware
             return;
         }
 
-        if (context.Request.Path.StartsWithSegments("/webrtc"))
-        {
-            token = context.Request.Query["access_token"];
-            Console.WriteLine($"11111Token received: {token}");
-            return;
-        }
+        // if (context.Request.Path.StartsWithSegments("/webrtc"))
+        // {
+        //     token = context.Request.Query["access_token"].FirstOrDefault()?.Split(" ").Last();
+        //     if (token != null)
+        //     {
+        //         await AttachUserToContext(context, token);
+        //         if (context.Response.HasStarted)
+        //         {
+        //             return; // Nếu phản hồi đã bắt đầu, dừng xử lý
+        //         }
+        //     }
+        //     else Console.WriteLine("Token is null");
+        //     return;
+        // }
 
         if (token != null)
         {
@@ -53,7 +61,6 @@ public class JwtMiddleware
 
         await _next(context);
     }
-
     private async Task AttachUserToContext(HttpContext context, string token)
     {
         try
