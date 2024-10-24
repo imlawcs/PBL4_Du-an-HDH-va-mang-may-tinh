@@ -18,7 +18,7 @@ export default function NavBar(props) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastPosition, setToastPosition] = useState("-100%");
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
   useEffect(() => {
     let timer;
     if (showToast) {

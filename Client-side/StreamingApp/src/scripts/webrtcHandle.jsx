@@ -71,7 +71,12 @@ export const WebRTCHandle = {
     },
     async startStream() {
         try {
-            localStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+            localStream = await navigator.mediaDevices.getDisplayMedia(
+                { 
+                    video: true, 
+                    audio: true 
+                }
+            );
             document.getElementById('localVideo').srcObject = localStream;
         } catch (err) {
             console.error("Error: " + err);

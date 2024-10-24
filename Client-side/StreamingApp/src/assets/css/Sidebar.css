@@ -105,9 +105,8 @@
 /* video */
 .vd__holder{
     /* max-height: 44em; */
-    width: 40em;
-    height: 20em;
-    padding: 2em;
+    width: 44em;
+    height: 24em;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-scale);

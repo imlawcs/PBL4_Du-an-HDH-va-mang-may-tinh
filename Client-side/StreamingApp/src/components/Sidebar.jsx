@@ -83,10 +83,15 @@ export default function Sidebar(props) {
                 <div className="sh__content-holder rr__flex-row">
                   <div className="rr__flex-col rrf__row-normal">
                     <div className="vd__holder bg__color-2 rr__flex-col">
-                      <video id="localVideo"></video>
-                      <span className="fs__title-3 league-spartan-semibold citizenship">
-                        Offline
-                      </span>
+                    <video style={{
+                      display: "none",
+                      width: "100%",
+                      height: "100%",
+                    }} id="localVideo" autoPlay playsInline controls={false}></video>
+                        <span id="offline_label" className="fs__title-3 league-spartan-semibold citizenship">
+                          Offline
+                        </span>
+                      
                     </div>
                     <CustomModal type={"SMdesc__setting"} />
                   </div>
