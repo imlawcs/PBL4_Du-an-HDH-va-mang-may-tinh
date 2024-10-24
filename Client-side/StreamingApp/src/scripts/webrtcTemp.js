@@ -11,11 +11,13 @@ import * as signalR from '@microsoft/signalr'
 //[HOST] stream
 let localStream;
 //[CLIENT] stream 
-let remoteStream;
+let remoteStream = [];
 
-
+//[CLIENT]
+let hostConnectionId;
 //[HOST] peer
-
+let remoteConnectionId = [];
+let hostPeerConnection = [];
 //[CLIENT] peer
 //[ALL]
 let isServerOn = false;
@@ -47,30 +49,38 @@ connection.on("ready", async => {
 connection.on("roomCreated", async (hostName) => {
     console.log("Room created by: " + hostName);
     console.log("Waiting for client to join...");
+
+
 });
 //[HOST]roomJoined by client
 /*
     Khi client join room, host sẽ bắt đầu gửi offer cho client
 */
-connection.on("roomJoined", async (hostId) => {
-    console.log("Room joined by: " + hostId);
-    await makeCall(); //send offer to client
+connection.on("roomJoined", async (room, viewerConnectionId) => {
+    console.log("Room joined by: " + room);
+    remoteConnectionId.push(viewerConnectionId);
+    hostPeerConnection[viewerConnectionId] = new RTCPeerConnection(servers);
+    await makeCall(hostPeerConnection[viewerConnectionId], viewerConnectionId); //send offer to client[viewerConnectionId]
+});
+connection.on("clientJoinedRoom", async (room, host) => {
+    console.log("joined: " + room);
+    hostConnectionId = host;
 });
 /*
     Client nhận offer từ host và gửi lại answer cho host
 */
 //[CLIENT]received offer
 connection.on("receivedOffer", async (offer) => {
-    console.log("Received Offer");
+    console.log("Received Offer from" + hostConnectionId);
     await PeerHandler.handleOffer(offer);
 });
 /*
     Host nhận answer và tiền hành xử lí
 */
 //[HOST]received answer
-connection.on("receivedAnswer", async (answer) => {
-    console.log("Received Answer");
-    await PeerHandler.handleAnswer(answer);
+connection.on("receivedAnswer", async (answer, client) => {
+    console.log("Received Answer from" + client);
+    await PeerHandler.handleAnswer(answer, client);
 });
 connection.on("sendMessage", async (message, sender) => {
     console.log("Message from " + sender + ": " + message);
@@ -80,11 +90,11 @@ connection.on("sendMessage", async (message, sender) => {
 */
 
 //[ALL]start ice candidates
-connection.on("startIceCandidates", async () => {
+connection.on("startIceCandidate", async (clientConnectionId) => {
     console.log("Start Ice Candidates");
     peerConnection.onicecandidate = event => {
         if (event.candidate) {
-            connection.invoke("sendIceCandidate", event.candidate);
+            connection.invoke("sendIceCandidate", event.candidate, clientConnectionId);
         }
     };
 });
@@ -150,20 +160,27 @@ export const SignalRTest = {
             }
         },
         //[HOST]make call (init peer and create offer)
-        async makeCall() {
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-            await PeerHandler.makeOffer(peerConnection);
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-            connection.invoke("sendOffer", offer);
+        async makeCall(toViewerPeer, clientConnectionId) {
+            localStream.getTracks().forEach(track => toViewerPeer.addTrack(track, localStream));
+            await PeerHandler.makeOffer(toViewerPeer);
+            const offer = await toViewerPeer.createOffer();
+            await toViewerPeer.setLocalDescription(offer);
+            connection.invoke("sendOffer", offer, clientConnectionId);
         },
         //[CLIENT]join room
-        async joinRoom(joiner ,hostName) {
+        async joinRoom(hostName) {
             await this.serverOn(); //Turn server on
             if(isServerOn){
-                connection.invoke("joinRoom", joiner, hostName); //Join room and send offer
+                connection.invoke("joinRoom", hostName); //Join room and send offer
             }
             else alert("Server is off");
+        },
+        async leaveRoom(leaver) {
+            peerConnection.close();
+            peerConnection = null;
+            remoteStream.getTracks().forEach(track => track.stop());
+            remoteStream = null;
+            connection.invoke("leaveRoom", leaver, hostConnectionId);
         }
 
 }
@@ -174,13 +191,13 @@ const PeerHandler = {
         peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
-        connection.invoke("sendAnswer", answer); //gửi answer cho host
+        connection.invoke("sendAnswer", answer, hostConnectionId); //gửi answer cho host
     },
-    async handleAnswer(answer) {
+    async handleAnswer(answer, clientConnectionId) {
         
         const remoteDesc = new RTCSessionDescription(answer);
-        peerConnection.setRemoteDescription(remoteDesc);
-        connection.invoke("doneAnwser");
+        peerConnection[clientConnectionId].setRemoteDescription(remoteDesc);
+        connection.invoke("doneAnswer", clientConnectionId);
     },
     async handleIceCandidate(candidate) {
         try{
