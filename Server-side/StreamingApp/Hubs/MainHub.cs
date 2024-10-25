@@ -8,7 +8,6 @@ using StreamingApp.Models.Entities;
 
 namespace StreamingApp.Hubs
 {
-    [Authorize]
     public class MainHub : Hub
     {
         public static StreamRoomManager streamRoomManager { get; set; }
@@ -17,8 +16,8 @@ namespace StreamingApp.Hubs
         {
             streamRoomManager = new StreamRoomManager();
         }
-        public async Task SendMessage(string user, string message)
-            => await Clients.All.SendAsync("SendMessage", user, message);
+        public async Task SendMessage(string user, string message, string hostConnectionId)
+            => await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
 
         public async Task Ready()
         => await Clients.Caller.SendAsync("Ready");
@@ -28,8 +27,12 @@ namespace StreamingApp.Hubs
             //dùng connectionId của ng gọi để tạo room -> [HOST]
             var room = streamRoomManager.CreateRoom(hostName, Context.ConnectionId);
             if (room != null)
+            {
                 //trả về room cho [HOST]
                 await Clients.Caller.SendAsync("RoomCreated", JsonConvert.SerializeObject(room));
+                await Groups.AddToGroupAsync(Context.ConnectionId, Context.ConnectionId);
+            }
+
             else await Clients.Caller.SendAsync("Error", "Error occurred when creating a new room.");
         }
         public async Task JoinRoom(string username, string hostName)
@@ -46,16 +49,18 @@ namespace StreamingApp.Hubs
                     StreamId = room.StreamId
                 };
                 var add = streamRoomManager.AddJoinerToRoom(streamJoiner, room.HostConnectionId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, room.HostConnectionId);
                 await Clients.Client(room.HostConnectionId).SendAsync("RoomJoined", JsonConvert.SerializeObject(add), Context.ConnectionId);
                 await Clients.Caller.SendAsync("ClientJoinedRoom", JsonConvert.SerializeObject(room), room.HostConnectionId); //thông báo về [Client]
             }
             else await Clients.Caller.SendAsync("Error", "Room not found or the streamer is offline.");
 
         }
-        public async Task LeaveRoom(string username, string hostConnectionId)
+        public async Task LeaveRoom(string hostConnectionId)
         {
 
             var room = streamRoomManager.RemoveJoinerFromRoom(hostConnectionId, Context.ConnectionId);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostConnectionId);
             await Clients.Client(hostConnectionId).SendAsync("RoomLeft", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
         public async Task SendOffer(object offer, string ClientConnectionId)
@@ -80,14 +85,14 @@ namespace StreamingApp.Hubs
         {
             await Clients.Client(connectionId).SendAsync("ReceiveAnswer", answer, Context.ConnectionId);
         }
-        public async Task SendIceCandidate(object candidate, string connectionId)
+        public async Task SendIceCandidate(object candidate, string connectionId, string type)
         {
-            await Clients.Client(connectionId).SendAsync("ReceiveIceCandidate", candidate);
+            await Clients.Client(connectionId).SendAsync("ReceiveIceCandidate", candidate, Context.ConnectionId, type);
         }
 
         public async Task DoneAnswer(string ClientConnectionId)
         {
-            await Clients.Caller.SendAsync("StartIceCandidate", ClientConnectionId);
+            await Clients.Clients(ClientConnectionId, Context.ConnectionId).SendAsync("DoneAnswer");
         }
     }
 }
