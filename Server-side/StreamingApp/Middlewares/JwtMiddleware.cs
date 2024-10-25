@@ -22,15 +22,10 @@ public class JwtMiddleware
     {
         var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
-        // Bỏ qua middleware cho các yêu cầu đến login và register
-        if (context.Request.Path.StartsWithSegments("/api/auth/login") || context.Request.Path.StartsWithSegments("/api/auth/register"))
+        // Bỏ qua middleware cho các yêu cầu đến login, register và webrtc
+        if (context.Request.Path.StartsWithSegments("/api/auth/login") || context.Request.Path.StartsWithSegments("/api/auth/register") || context.Request.Path.StartsWithSegments("/webrtc"))
         {
             await _next(context); // Bỏ qua middleware cho yêu cầu đến login và register
-            return;
-        }
-        if (context.Request.Path.StartsWithSegments("/webrtc"))
-        {
-            await _next(context);
             return;
         }
         if (token != null)

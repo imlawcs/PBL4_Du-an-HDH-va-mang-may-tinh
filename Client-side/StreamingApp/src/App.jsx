@@ -15,7 +15,7 @@ function App() {
         <Route index element={<Home />}/>
         <Route path="category" element={<Category />} />
         <Route path="streamManager" element={<StreamManager />} />
-        <Route path="userName" element={<UserNamePage />} />
+        <Route path="/user/:username" element={<UserNamePage />} />
         <Route path="following" element={<Following />} />
         <Route path="browsing" element={<Browsing />} />
         <Route path="accountSetting" element={<AccountSetting />} />

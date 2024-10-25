@@ -42,6 +42,7 @@ namespace StreamingApp
             // Đăng ký dịch vụ AuthService
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>
@@ -68,23 +69,23 @@ namespace StreamingApp
                     // IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Key"]))
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                 };
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        var accessToken = context.Request.Query["access_token"];
+                // options.Events = new JwtBearerEvents
+                // {
+                //     OnMessageReceived = context =>
+                //     {
+                //         var accessToken = context.Request.Query["access_token"];
 
-                        // If the request is for our hub...
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/webrtc")))
-                        {
-                            // Read the token out of the query string
-                            context.Token = accessToken;
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
+                //         // If the request is for our hub...
+                //         var path = context.HttpContext.Request.Path;
+                //         if (!string.IsNullOrEmpty(accessToken) &&
+                //             (path.StartsWithSegments("/webrtc")))
+                //         {
+                //             // Read the token out of the query string
+                //             context.Token = accessToken;
+                //         }
+                //         return Task.CompletedTask;
+                //     }
+                // };
             });
 
             // Đăng ký Swagger cho API Documentation

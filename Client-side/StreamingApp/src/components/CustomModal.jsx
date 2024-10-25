@@ -318,12 +318,21 @@ export default function CustomModal(props) {
                       odit, commodi voluptatem ea quos nostrum alias expedita
                       velit doloremque perferendis soluta vitae!
                     </pre>
-                    <Button type="default" text={"Start"} onClick={() => {
-                      //  WebRTCHandle.start();
-                      SignalRTest.start();
-                      //  WebRTCHandle.startStream();
-                      //  WebRTCHandle.CreateRoom('1', '1');
-                    }}/>
+                    <div className="fill__container rr__flex-row rrf__col-small">
+                      <Button type="default" text={"Preview Stream"} onClick={() => {
+                        //  WebRTCHandle.start();
+                        SignalRTest.preview();
+                        document.getElementById('offline_label').style.display = 'none';
+                        //  WebRTCHandle.startStream();
+                        //  WebRTCHandle.CreateRoom('1', '1');
+                      }}/>
+                      <Button type="default" text={"Start"} onClick={() => {
+                        //  WebRTCHandle.start();
+                        SignalRTest.start("hello");
+                        //  WebRTCHandle.startStream();
+                        //  WebRTCHandle.CreateRoom('1', '1');
+                      }}/>
+                    </div>
                   </>
                 ) : (
                   <>

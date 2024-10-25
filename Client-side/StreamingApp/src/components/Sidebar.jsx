@@ -19,7 +19,7 @@ import JWPlayer from "@jwplayer/jwplayer-react";
 import VideoContent from "./VideoContent";
 import StreamChat from "./StreamChat";
 import StreamUserInfo from "./StreamUserInfo";
-import { useState, useRef, lazy, Suspense } from "react";
+import { useState, useRef, lazy, Suspense, useEffect } from "react";
 import CategoryComp from "./CategoryComp";
 import CustomModal from "./CustomModal";
 import StatBox from "./StatBox";
@@ -27,6 +27,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import IconCard from "./IconCard";
 import { faFacebook, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { useNavigate } from "react-router-dom";
+import { SignalRTest } from "../scripts/webrtcTemp";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -83,10 +84,15 @@ export default function Sidebar(props) {
                 <div className="sh__content-holder rr__flex-row">
                   <div className="rr__flex-col rrf__row-normal">
                     <div className="vd__holder bg__color-2 rr__flex-col">
-                      <video id="localVideo"></video>
-                      <span className="fs__title-3 league-spartan-semibold citizenship">
-                        Offline
-                      </span>
+                    <video style={{
+                      display: "none",
+                      width: "100%",
+                      height: "100%",
+                    }} id="localVideo" autoPlay playsInline controls={false}></video>
+                        <span id="offline_label" className="fs__title-3 league-spartan-semibold citizenship">
+                          Offline
+                        </span>
+                      
                     </div>
                     <CustomModal type={"SMdesc__setting"} />
                   </div>
@@ -1185,7 +1191,11 @@ export default function Sidebar(props) {
       </>
     );
   } else {
-    const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
+    // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
+    useEffect(() => async () => {
+      console.log("Start loading stream...");
+      await SignalRTest.joinRoom("randomUser", props.userRoute);
+    }, []);
     return (
       <>
         <div className="main__position">
@@ -1197,6 +1207,7 @@ export default function Sidebar(props) {
                 </div>
                 <div className="cn__holder-comps">
                   {/* map user here */}
+                  
                   <ChannelComp
                     isOffline={false}
                     profilePic="https://i.imgur.com/neHVP5j.jpg"
@@ -1320,16 +1331,17 @@ export default function Sidebar(props) {
                 {/* <span className="fs__title-5 league-spartan-regular citizenship ta__center fill__container">
                   Stream is offline
                 </span> */}
-                
+
                   <video style={{
-                    width: "500px",
-                    height: "500px",
-                  }} id="remote__stream" control autoplay muted></video>
+                      width: "100%",
+                      height: "100%",
+                    }
+                  } id="remote__stream" autoPlay playsInline controls={false}></video>
                 
               </div>
 
               <StreamUserInfo
-                userName="Resolved"
+                userName={props.userRoute}
                 title="Hello guys"
                 category="osu!"
                 profilePic="https://i.imgur.com/neHVP5j.jpg"
