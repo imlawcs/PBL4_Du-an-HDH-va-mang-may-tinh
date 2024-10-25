@@ -47,14 +47,15 @@ namespace StreamingApp.Hubs
             else await Clients.Caller.SendAsync("Error", "Room not found or the streamer is offline.");
 
         }
-        public async Task LeaveRoom(string hostConnectionId)
+        public async Task LeaveRoom(string username,string hostConnectionId)
         {
             var room = streamRoomManager.GetRoomByHostConnectionId(hostConnectionId);
             streamRoomManager.RemoveJoinerFromRoom(hostConnectionId, Context.ConnectionId);
-            await Clients.Client(hostConnectionId).SendAsync("RoomLeft", room);
+            await Clients.Client(hostConnectionId).SendAsync("RoomLeft", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
         public async Task SendOffer(string offer, string ClientConnectionId)
         {
+            //send offer tới client
             await Clients.Client(ClientConnectionId).SendAsync("ReceiveOffer", offer);
         }
         public async Task SendAnswer(string answer, string connectionId)

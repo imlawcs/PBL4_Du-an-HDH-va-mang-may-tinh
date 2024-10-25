@@ -45,13 +45,17 @@ connection.on("ready", async => {
     console.log("SignalR ready");
     isServerOn = true;
 });
+
 //[HOST]room created
 connection.on("roomCreated", async (hostName) => {
     console.log("Room created by: " + hostName);
     console.log("Waiting for client to join...");
-
-
 });
+connection.on("roomLeft", async (room, clientId) => {
+    console.log("Client left: " + clientId);
+    hostPeerConnection[clientId].close();
+    hostPeerConnection[clientId] = null;
+})
 //[HOST]roomJoined by client
 /*
     Khi client join room, host sẽ bắt đầu gửi offer cho client
@@ -59,18 +63,21 @@ connection.on("roomCreated", async (hostName) => {
 connection.on("roomJoined", async (room, viewerConnectionId) => {
     console.log("Room joined by: " + room);
     remoteConnectionId.push(viewerConnectionId);
+    console.log("Viewer Connection Id: " + remoteConnectionId.find(viewerConnectionId));
     hostPeerConnection[viewerConnectionId] = new RTCPeerConnection(servers);
-    await makeCall(hostPeerConnection[viewerConnectionId], viewerConnectionId); //send offer to client[viewerConnectionId]
+    await SignalRTest.makeCall(hostPeerConnection[viewerConnectionId], viewerConnectionId); //send offer to client[viewerConnectionId]
 });
+//[CLIENT] noti to client that he has joined room
 connection.on("clientJoinedRoom", async (room, host) => {
     console.log("joined: " + room);
     hostConnectionId = host;
+    console.log("Host Connection Id: " + hostConnectionId);
 });
 /*
     Client nhận offer từ host và gửi lại answer cho host
 */
 //[CLIENT]received offer
-connection.on("receivedOffer", async (offer) => {
+connection.on("receiveOffer", async (offer) => {
     console.log("Received Offer from" + hostConnectionId);
     await PeerHandler.handleOffer(offer);
 });
@@ -78,8 +85,8 @@ connection.on("receivedOffer", async (offer) => {
     Host nhận answer và tiền hành xử lí
 */
 //[HOST]received answer
-connection.on("receivedAnswer", async (answer, client) => {
-    console.log("Received Answer from" + client);
+connection.on("receiveAnswer", async (answer, client) => {
+    console.log("Received Answer from" + remoteConnectionId.find(client));
     await PeerHandler.handleAnswer(answer, client);
 });
 connection.on("sendMessage", async (message, sender) => {
@@ -99,7 +106,7 @@ connection.on("startIceCandidate", async (clientConnectionId) => {
     };
 });
 //[ALL]received ice candidates
-connection.on("receivedIceCandidate", async (candidate) => {
+connection.on("receiveIceCandidate", async (candidate) => {
     console.log("Received Ice Candidate");
     await PeerHandler.handleIceCandidate(candidate);
 });
@@ -188,6 +195,7 @@ export const SignalRTest = {
 //Message handler (Offer, Answer, IceCandidate)
 const PeerHandler = {
     async handleOffer(offer) {
+        //tiến hành set remote description bên client và tạo answer
         peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
