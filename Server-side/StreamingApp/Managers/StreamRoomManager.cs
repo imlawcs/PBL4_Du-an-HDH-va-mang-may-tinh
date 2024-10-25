@@ -1,10 +1,11 @@
+using Newtonsoft.Json;
 using StreamingApp.Models.Entities;
 
 namespace StreamingApp.Managers
 {
     public class StreamRoomManager
     {
-        public ICollection<StreamRoom>? StreamRooms { get; set; }
+        public List<StreamRoom>? StreamRooms { get; set; }
 
         public StreamRoomManager()
         {
@@ -14,7 +15,7 @@ namespace StreamingApp.Managers
         /// Get all rooms
         /// </summary>
         /// <returns>ICollection<StreamRoom> StreamRooms</returns>
-        public ICollection<StreamRoom> GetAllRooms()
+        public List<StreamRoom> GetAllRooms()
         {
             return StreamRooms;
         }
@@ -26,8 +27,8 @@ namespace StreamingApp.Managers
         public object? CreateRoom(string hostName, string connectionId)
         {
             var temp = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(connectionId));
-            if (temp != null) 
-            return null;
+            if (temp != null)
+                return null;
             var room = new StreamRoom
             {
                 HostConnectionId = connectionId,
@@ -37,21 +38,35 @@ namespace StreamingApp.Managers
                 CreatedAt = DateTime.Now,
                 StreamJoiners = []
             };
-            StreamRooms.Add(room);
-            return room;
+            this.StreamRooms.Add(room);
+            foreach (var room1 in StreamRooms)
+            {
+                Console.WriteLine("Room in list: " + room1.RoomName);
+            }
+            // UpdateRooms(StreamRooms);
+            return GetRoomByHostConnectionId(connectionId);
         }
 
         public object? GetRoomById(int id)
         {
-            return StreamRooms.FirstOrDefault(room => room.StreamId.Equals(id));
+            return this.StreamRooms.FirstOrDefault(room => room.StreamId.Equals(id));
 
         }
         public object? GetRoomByHostConnectionId(string HostConnectionId)
         {
-            return StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId));
+            return this.StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId));
         }
-        public object? GetRoomByName(string name)
+        public StreamRoom GetRoomByName(string name)
         {
+            if (StreamRooms == null)
+            {
+                Console.WriteLine("StreamRooms list is null.");
+                return null;
+            }
+            foreach (var room in StreamRooms)
+            {
+                Console.WriteLine("Room in list: " + room.RoomName);
+            }
             return StreamRooms.FirstOrDefault(room => room.RoomName.Equals(name, StringComparison.Ordinal));
         }
 
@@ -60,20 +75,22 @@ namespace StreamingApp.Managers
             var room = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId, StringComparison.Ordinal));
             room.StreamJoiners.Add(joiner);
             room.Viewers += 1;
-            return room;
+            var update = UpdateRoomByHostConnectionId(HostConnectionId, room);
+            return update;
         }
         public object? RemoveJoinerFromRoom(string HostConnectionId, string joinerConnectionId)
         {
             var room = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId, StringComparison.Ordinal));
             room.StreamJoiners.Remove(room.StreamJoiners.FirstOrDefault(joiner => joiner.ConnectionId.Equals(joinerConnectionId, StringComparison.Ordinal)));
             room.Viewers -= 1;
-            return room;
+            var update = UpdateRoomByHostConnectionId(HostConnectionId, room);
+            return update;
         }
 
         public object? DeleteRoomByStreamId(int id)
         {
             var room = StreamRooms.FirstOrDefault(room => room.StreamId.Equals(id));
-            StreamRooms.Remove(room);
+            this.StreamRooms.Remove(room);
             return room;
         }
         public object? DeleteRoomByHostConnectionId(int HostConnectionId)
@@ -85,7 +102,7 @@ namespace StreamingApp.Managers
         public object? DeleteRoomByName(string name)
         {
             var room = StreamRooms.FirstOrDefault(room => room.RoomName.Equals(name, StringComparison.Ordinal));
-            StreamRooms.Remove(room);
+            this.StreamRooms.Remove(room);
             return room;
         }
 
@@ -104,11 +121,16 @@ namespace StreamingApp.Managers
             roomToUpdate = room;
             return roomToUpdate;
         }
-        public object UpdateRoomByHostConnectionId(int HostConnectionId, StreamRoom room)
+        public object UpdateRoomByHostConnectionId(string HostConnectionId, StreamRoom room)
         {
             var roomToUpdate = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId));
             roomToUpdate = room;
             return roomToUpdate;
+        }
+        public object? UpdateRooms(List<StreamRoom> rooms)
+        {
+            this.StreamRooms = rooms;
+            return StreamRooms;
         }
     }
 }

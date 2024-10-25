@@ -12,6 +12,11 @@ namespace StreamingApp.Hubs
     public class MainHub : Hub
     {
         public static StreamRoomManager streamRoomManager { get; set; }
+
+        public MainHub()
+        {
+            streamRoomManager = new StreamRoomManager();
+        }
         public async Task SendMessage(string user, string message)
             => await Clients.All.SendAsync("SendMessage", user, message);
 
@@ -27,42 +32,55 @@ namespace StreamingApp.Hubs
                 await Clients.Caller.SendAsync("RoomCreated", JsonConvert.SerializeObject(room));
             else await Clients.Caller.SendAsync("Error", "Error occurred when creating a new room.");
         }
-        public async Task JoinRoom(string hostName)
+        public async Task JoinRoom(string username, string hostName)
         {
+            Console.WriteLine("hostName: " + hostName + " username: " + username);
             var room = streamRoomManager.GetRoomByName(hostName);
-            StreamRoom streamRoom = (StreamRoom)room;
+            Console.WriteLine("hostRoom: " + room);
             if (room != null)
             {
-                streamRoomManager.AddJoinerToRoom(
-                new StreamJoiner
+                StreamJoiner streamJoiner = new()
                 {
                     ConnectionId = Context.ConnectionId,
-                    Username = "test" + Context.ConnectionId[..5],
-                    StreamId = streamRoom.StreamId
-                },
-                streamRoom.HostConnectionId);
-                await Clients.Client(streamRoom.HostConnectionId).SendAsync("RoomJoined", JsonConvert.SerializeObject(room), Context.ConnectionId);
-                await Clients.Caller.SendAsync("ClientJoinedRoom", JsonConvert.SerializeObject(room), streamRoom.HostConnectionId); //thông báo về [Client]
+                    Username = !string.IsNullOrEmpty(username) ? username : "test" + Context.ConnectionId[..9],
+                    StreamId = room.StreamId
+                };
+                var add = streamRoomManager.AddJoinerToRoom(streamJoiner, room.HostConnectionId);
+                await Clients.Client(room.HostConnectionId).SendAsync("RoomJoined", JsonConvert.SerializeObject(add), Context.ConnectionId);
+                await Clients.Caller.SendAsync("ClientJoinedRoom", JsonConvert.SerializeObject(room), room.HostConnectionId); //thông báo về [Client]
             }
             else await Clients.Caller.SendAsync("Error", "Room not found or the streamer is offline.");
 
         }
-        public async Task LeaveRoom(string username,string hostConnectionId)
+        public async Task LeaveRoom(string username, string hostConnectionId)
         {
-            var room = streamRoomManager.GetRoomByHostConnectionId(hostConnectionId);
-            streamRoomManager.RemoveJoinerFromRoom(hostConnectionId, Context.ConnectionId);
+
+            var room = streamRoomManager.RemoveJoinerFromRoom(hostConnectionId, Context.ConnectionId);
             await Clients.Client(hostConnectionId).SendAsync("RoomLeft", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
-        public async Task SendOffer(string offer, string ClientConnectionId)
+        public async Task SendOffer(object offer, string ClientConnectionId)
         {
             //send offer tới client
-            await Clients.Client(ClientConnectionId).SendAsync("ReceiveOffer", offer);
+            try
+            {
+                // Log the parameters
+                Console.WriteLine($"SendOffer called with offer: {JsonConvert.SerializeObject(offer)}, ClientConnectionId: {ClientConnectionId}");
+
+                // Send offer to client
+                await Clients.Client(ClientConnectionId).SendAsync("ReceiveOffer", offer);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in SendOffer: {ex.Message}");
+                throw;
+            }
         }
-        public async Task SendAnswer(string answer, string connectionId)
+        public async Task SendAnswer(object answer, string connectionId)
         {
             await Clients.Client(connectionId).SendAsync("ReceiveAnswer", answer, Context.ConnectionId);
         }
-        public async Task SendIceCandidate(string candidate, string connectionId)
+        public async Task SendIceCandidate(object candidate, string connectionId)
         {
             await Clients.Client(connectionId).SendAsync("ReceiveIceCandidate", candidate);
         }

@@ -328,7 +328,7 @@ export default function CustomModal(props) {
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
                         //  WebRTCHandle.start();
-                        SignalRTest.start();
+                        SignalRTest.start("hello");
                         //  WebRTCHandle.startStream();
                         //  WebRTCHandle.CreateRoom('1', '1');
                       }}/>

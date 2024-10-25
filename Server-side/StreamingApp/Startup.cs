@@ -42,6 +42,7 @@ namespace StreamingApp
             // Đăng ký dịch vụ AuthService
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>

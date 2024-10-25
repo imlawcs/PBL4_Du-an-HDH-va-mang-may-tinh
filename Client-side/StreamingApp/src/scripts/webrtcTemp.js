@@ -11,13 +11,13 @@ import * as signalR from '@microsoft/signalr'
 //[HOST] stream
 let localStream;
 //[CLIENT] stream 
-let remoteStream = [];
+// let remoteStream;
 
 //[CLIENT]
 let hostConnectionId;
 //[HOST] peer
-let remoteConnectionId = [];
-let hostPeerConnection = [];
+let remoteConnectionId = {};
+let hostPeerConnection = {};
 //[CLIENT] peer
 //[ALL]
 let isServerOn = false;
@@ -45,7 +45,9 @@ connection.on("ready", async => {
     console.log("SignalR ready");
     isServerOn = true;
 });
-
+connection.on("message", async message => {
+    console.log("Message: " + message);
+});
 //[HOST]room created
 connection.on("roomCreated", async (hostName) => {
     console.log("Room created by: " + hostName);
@@ -62,10 +64,16 @@ connection.on("roomLeft", async (room, clientId) => {
 */
 connection.on("roomJoined", async (room, viewerConnectionId) => {
     console.log("Room joined by: " + room);
-    remoteConnectionId.push(viewerConnectionId);
-    console.log("Viewer Connection Id: " + remoteConnectionId.find(viewerConnectionId));
-    hostPeerConnection[viewerConnectionId] = new RTCPeerConnection(servers);
-    await SignalRTest.makeCall(hostPeerConnection[viewerConnectionId], viewerConnectionId); //send offer to client[viewerConnectionId]
+    try{
+        remoteConnectionId.push(viewerConnectionId);
+        console.log("Viewer Connection Id: " + viewerConnectionId);
+        hostPeerConnection[viewerConnectionId] = new RTCPeerConnection(servers);
+        await SignalRTest.makeCall(hostPeerConnection[viewerConnectionId], viewerConnectionId);
+    }
+    catch(err){
+        console.error("Error: " + err);
+    }
+     //send offer to client[viewerConnectionId]
 });
 //[CLIENT] noti to client that he has joined room
 connection.on("clientJoinedRoom", async (room, host) => {
@@ -129,6 +137,8 @@ peerConnection.onconnectionstatechange = (event) => {
         console.log("Connected");
     }
 }
+
+
 export const SignalRTest = {
         //[BOTH] start signalR
         async serverOn() {
@@ -136,6 +146,7 @@ export const SignalRTest = {
                 await connection.start();
                 console.log("SignalR Connected");
                 connection.invoke("ready");
+                isServerOn = true;
                 //room created announce to make call
             } catch (err) {
                 console.error(err);
@@ -168,17 +179,21 @@ export const SignalRTest = {
         },
         //[HOST]make call (init peer and create offer)
         async makeCall(toViewerPeer, clientConnectionId) {
-            localStream.getTracks().forEach(track => toViewerPeer.addTrack(track, localStream));
-            await PeerHandler.makeOffer(toViewerPeer);
-            const offer = await toViewerPeer.createOffer();
-            await toViewerPeer.setLocalDescription(offer);
-            connection.invoke("sendOffer", offer, clientConnectionId);
+            try {
+                localStream.getTracks().forEach(track => toViewerPeer.addTrack(track, localStream));
+                const offer = await toViewerPeer.createOffer();
+                await toViewerPeer.setLocalDescription(offer);
+                console.log(`Sending offer to client: ${clientConnectionId}`);
+                await connection.invoke("SendOffer", offer, clientConnectionId);
+            } catch (err) {
+                console.error(`Error in makeCall: ${err.message}`);
+            }
         },
         //[CLIENT]join room
-        async joinRoom(hostName) {
+        async joinRoom(username, hostName) {
             await this.serverOn(); //Turn server on
             if(isServerOn){
-                connection.invoke("joinRoom", hostName); //Join room and send offer
+                connection.invoke("joinRoom", username ,hostName); //Join room and send offer
             }
             else alert("Server is off");
         },
@@ -209,7 +224,12 @@ const PeerHandler = {
     },
     async handleIceCandidate(candidate) {
         try{
-            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            peerConnection.addEventListener('track', async (event) => {
+                const remoteVideo = document.getElementById('remote__stream');
+                const [remoteStream] = event.streams;
+                remoteVideo.srcObject = remoteStream;
+            });
         }
         catch(err){
             console.error("Error adding received ice candidate: ", err);

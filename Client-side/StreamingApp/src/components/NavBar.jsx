@@ -29,9 +29,7 @@ export default function NavBar(props) {
         setTimeout(() => setShowToast(false), 300); // Wait for slide out animation
       }, 3000);
     }
-    if(token) {
-      setIsLoggedIn(true);
-    }
+    console.log(token);
     return () => clearTimeout(timer);
   }, [showToast, token]);
 
