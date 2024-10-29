@@ -32,7 +32,7 @@ namespace StreamingApp.Migrations
                     RoleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    RoleDesc = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    RoleDesc = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -63,12 +63,12 @@ namespace StreamingApp.Migrations
                     Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Bio = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    ProfilePic = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ProfilePic = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    UserStatus = table.Column<bool>(type: "bit", nullable: false),
-                    IsEmailNoti = table.Column<bool>(type: "bit", nullable: false)
+                    UserStatus = table.Column<bool>(type: "bit", nullable: true),
+                    IsEmailNoti = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
