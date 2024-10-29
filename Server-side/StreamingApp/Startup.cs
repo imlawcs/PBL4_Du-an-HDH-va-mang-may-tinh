@@ -1,8 +1,6 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using StreamingApp.Hubs;
 using StreamingApp.Managers;
 using StreamingApp.Middlewares;
 using StreamingApp.Services;
@@ -57,10 +55,8 @@ namespace StreamingApp
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    // ValidateIssuer = true,
-                    ValidateIssuer = false,
-                    // ValidateAudience = true,
-                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
@@ -120,8 +116,6 @@ namespace StreamingApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<MainHub>("/webrtc")
-                .RequireCors("ClientPermission");
             });
         }
     }

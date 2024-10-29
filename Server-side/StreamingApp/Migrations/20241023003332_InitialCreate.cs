@@ -32,7 +32,7 @@ namespace StreamingApp.Migrations
                     RoleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    RoleDesc = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
+                    RoleDesc = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -297,6 +297,12 @@ namespace StreamingApp.Migrations
                 name: "IX_Users_RoleId",
                 table: "Users",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserName",
+                table: "Users",
+                column: "UserName",
+                unique: true);
         }
 
         /// <inheritdoc />
