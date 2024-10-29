@@ -4,6 +4,7 @@ using StreamingApp.Managers;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Data.SqlClient;
 
 namespace StreamingApp.Services
 {
@@ -43,17 +44,61 @@ namespace StreamingApp.Services
 
             user.UserName = model.UserName;
             user.DisplayName = model.DisplayName;
+            if(model.Bio != null)
             user.Bio = model.Bio;
+            if(model.ProfilePic != null)
             user.ProfilePic = model.ProfilePic;
             user.Email = model.Email;
+            if(model.PhoneNumber != null)
             user.PhoneNumber = model.PhoneNumber;
+            if(model.IsEmailNoti != null)
             user.IsEmailNoti = model.IsEmailNoti;
-            
 
-            if (!string.IsNullOrEmpty(model.Password))
+            try
             {
-                user.Password = HashPassword(model.Password);
+                await UserManager.UpdateUser(model.UserId, user);
+                return (true, Array.Empty<string>());
             }
+            //catch trùng username
+
+            catch (DbUpdateException ex)
+            {
+                var sqlException = ex.InnerException as SqlException;
+                if (sqlException != null)
+                {
+                    // Log the error number and message
+                    Console.WriteLine($"SQL Error Number: {sqlException.Number}, Message: {sqlException.Message}");
+
+                    // Check for unique constraint violation
+                    if (sqlException.Number == 2627 || sqlException.Number == 2601)
+                    {
+                        return (false, new[] { "Username is already taken" });
+                    }
+                }
+                return (false, new[] { "Failed to update user" });
+            }
+            catch (Exception ex)
+            {
+                // Log the general exception
+                Console.WriteLine($"Exception: {ex.Message}");
+                return (false, new[] { "Failed to update user" });
+            } 
+        }
+        public async Task<(bool Succeeded, string[] Errors)> UpdatePasswordAsync(UserUpdatePasswordDto model)
+        {
+            var user = await UserManager.GetUserById(model.UserId);
+
+            if (user == null)
+            {
+                return (false, new[] { "User not found" });
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(model.OldPassword, user.Password))
+            {
+                return (false, new[] { "Old password is incorrect" });
+            }
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
 
             try
             {
@@ -62,16 +107,7 @@ namespace StreamingApp.Services
             }
             catch (DbUpdateException)
             {
-                return (false, new[] { "Failed to update user" });
-            }
-        }
-
-        private string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+                return (false, new[] { "Failed to update password" });
             }
         }
     }

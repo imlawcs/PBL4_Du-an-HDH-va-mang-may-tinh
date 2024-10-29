@@ -43,13 +43,13 @@ namespace StreamingApp.Controllers
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto userUpdateDto)
         {
             if (id != userUpdateDto.UserId)
-                return BadRequest();
+                return BadRequest("Id is not match");
 
             var result = await _userService.UpdateUserAsync(userUpdateDto);
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            return NoContent();
+            return Ok("Update user successfully");
         }
 
         [HttpDelete("{id}")]
@@ -57,9 +57,22 @@ namespace StreamingApp.Controllers
         {
             var result = await _userService.DeleteUserAsync(id);
             if (!result)
-                return NotFound();
+                return NotFound("User not found");
 
-            return NoContent();
+            return Ok("Delete user successfully");
+        }
+
+        [HttpPut("{id}/update-password")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] UserUpdatePasswordDto userUpdatePasswordDto)
+        {
+            if (id != userUpdatePasswordDto.UserId)
+                return BadRequest("Id is not match");
+
+            var result = await _userService.UpdatePasswordAsync(userUpdatePasswordDto);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok("Update password successfully");
         }
 
     }

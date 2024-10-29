@@ -12,7 +12,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={<Home />}/>
+        <Route index element={<Home />} />
         <Route path="category" element={<Category />} />
         <Route path="streamManager" element={<StreamManager />} />
         <Route path="/user/:username" element={<UserNamePage />} />

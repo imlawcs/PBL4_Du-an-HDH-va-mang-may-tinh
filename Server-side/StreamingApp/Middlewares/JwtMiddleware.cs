@@ -81,7 +81,7 @@ public class JwtMiddleware
         catch (Exception ex)
         {
             // Nếu token không hợp lệ, trả về mã lỗi 401 và thông báo
-            context.Response.StatusCode = 401;
+            context.Response.StatusCode = 401; 
             await context.Response.WriteAsync($"Invalid token: {ex.Message}");
             return; // Ngăn không cho tiếp tục xử lý request
         }

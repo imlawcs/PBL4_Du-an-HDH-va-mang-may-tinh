@@ -57,10 +57,8 @@ namespace StreamingApp
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    // ValidateIssuer = true,
-                    ValidateIssuer = false,
-                    // ValidateAudience = true,
-                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
@@ -120,8 +118,6 @@ namespace StreamingApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<MainHub>("/webrtc")
-                .RequireCors("ClientPermission");
             });
         }
     }

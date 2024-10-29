@@ -6,5 +6,5 @@ public interface IUserService
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<(bool Succeeded, string[] Errors)> UpdateUserAsync(UserUpdateDto model);
         Task<bool> DeleteUserAsync(int id);
-    
+        Task<(bool Succeeded, string[] Errors)> UpdatePasswordAsync(UserUpdatePasswordDto userUpdatePasswordDto);
 }

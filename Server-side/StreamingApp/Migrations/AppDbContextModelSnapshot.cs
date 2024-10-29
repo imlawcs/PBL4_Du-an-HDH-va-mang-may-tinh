@@ -292,6 +292,9 @@ namespace StreamingApp.Migrations
 
                     b.HasIndex("RoleId");
 
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("Users");
                 });
 
