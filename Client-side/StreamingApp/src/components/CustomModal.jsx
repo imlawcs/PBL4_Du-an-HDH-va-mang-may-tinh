@@ -49,7 +49,7 @@ export default function CustomModal(props) {
       return Object.keys(newErrors).length === 0;
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
       if (validateForm()) {
         try {
           const response = await fetch("https://localhost:3001/api/auth/login", {
