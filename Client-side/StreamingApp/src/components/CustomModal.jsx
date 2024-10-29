@@ -5,6 +5,7 @@ import "../assets/css/NavBar.css";
 import BtnIcon from "./BtnIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import logo from "../assets/img/Logo__sieufix.png";
+import { SignalRTest } from "../scripts/webrtcTemp";
 import {
   faPenToSquare,
   faArrowDown,
@@ -20,29 +21,32 @@ import {
   faInstagram,
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
+import { useAuth } from "../hooks/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 
 export default function CustomModal(props) {
-
-  
+  const Auth = useAuth();
+  const navigate = useNavigate();
   if (props.type == "login") {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [Username, setUsername] = useState("");
+    const [Password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
       let newErrors = {};
 
-      if (!username.trim()) {
-        newErrors.username = "Username is required";
-      } else if (username.length < 3) {
-        newErrors.username = "Username must be at least 3 characters";
+      if (!Username.trim()) {
+        newErrors.Username = "Username is required";
+      } else if (Username.length < 3) {
+        newErrors.Username = "Username must be at least 3 characters";
       }
 
-      if (!password) {
-        newErrors.password = "Password is required";
-      } else if (password.length < 6) {
-        newErrors.password = "Password must be at least 6 characters";
+      if (!Password) {
+        newErrors.Password = "Password is required";
+      } else if (Password.length < 6) {
+        newErrors.Password = "Password must be at least 6 characters";
       }
 
       setErrors(newErrors);
@@ -51,29 +55,30 @@ export default function CustomModal(props) {
 
     const handleLogin = async () => {
       if (validateForm()) {
-        try {
-          const response = await fetch("https://localhost:3001/api/auth/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ Username, Password }),
-          });
+        // try {
+        //   const response = await fetch("https://localhost:3001/api/auth/login", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({ Username, Password }),
+        //   });
 
-          if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem("token", data.token); // Store the JWT token
-            props.login(Username, Password); // Call the login function passed via props
-          } else {
-            const errorData = await response.json();
-            setErrors({ form: errorData.message });
-          }
-        } catch (error) {
-          setErrors({ form: "An error occurred. Please try again." });
-        } finally {
-          setLoading(false);
-        }
+        //   if (response.ok) {
+        //     const data = await response.json();
+        //     localStorage.setItem("token", data.token); // Store the JWT token
+        //     props.login(Username, Password); // Call the login function passed via props
+        //   } else {
+        //     const errorData = await response.json();
+        //     setErrors({ form: errorData.message });
+        //   }
+        // } catch (error) {
+        //   setErrors({ form: "An error occurred. Please try again." });
+        // } finally {
+        //   setLoading(false);
+        // }
         // props.login(Username, Password);
+        await Auth.logIn({Username, Password});
       }
     };
     return (
@@ -92,24 +97,24 @@ export default function CustomModal(props) {
                   className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                   type="text"
                   placeholder="Username"
-                  value={username}
+                  value={Username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
-                {errors.username && (
+                {errors.Username && (
                   <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
-                    {errors.username}
+                    {errors.Username}
                   </span>
                 )}
                 <input
                   className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                  type="password"
+                  type="Password"
                   placeholder="Password"
-                  value={password}
+                  value={Password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                {errors.password && (
+                {errors.Password && (
                   <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
-                    {errors.password}
+                    {errors.Password}
                   </span>
                 )}
               </div>
@@ -132,7 +137,7 @@ export default function CustomModal(props) {
                   </span>
                 </span>
                 <span className="fs__normal-1 league-spartan-light citizenship ta__center">
-                  Forgot your password?{" "}
+                  Forgot your Password?{" "}
                   <span className="fs__normal-1 league-spartan-semibold citizenship cur__pointer no__user-select">
                     Reset
                   </span>
@@ -151,17 +156,17 @@ export default function CustomModal(props) {
   else if (props.type === "signup") {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [agreeTerms, setAgreeTerms] = useState(false);
-    const [username, setUsername] = useState("");
+    const [Username, setUsername] = useState("");
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [Password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
     const validateSignup = () => {
       let newErrors = {};
 
-      if (!username.trim()) {
-        newErrors.username = "Username is required";
-      } else if (username.length < 3) {
-        newErrors.username = "Username must be at least 3 characters long";
+      if (!Username.trim()) {
+        newErrors.Username = "Username is required";
+      } else if (Username.length < 3) {
+        newErrors.Username = "Username must be at least 3 characters long";
       }
 
       if (!email.trim()) {
@@ -170,13 +175,13 @@ export default function CustomModal(props) {
         newErrors.email = "Email is invalid";
       }
 
-      if (!password) {
-        newErrors.password = "Password is required";
-      } else if (password.length < 8) {
-        newErrors.password = "Password must be at least 8 characters long";
+      if (!Password) {
+        newErrors.Password = "Password is required";
+      } else if (Password.length < 8) {
+        newErrors.Password = "Password must be at least 8 characters long";
       }
 
-      if (password !== confirmPassword) {
+      if (Password !== confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
       }
 
@@ -192,7 +197,8 @@ export default function CustomModal(props) {
     const handleSignup = () => {
       if (validateSignup()) {
         // Proceed with signup
-        props.signup();
+        
+        // props.signup();
       }
     };
     return (
@@ -210,12 +216,12 @@ export default function CustomModal(props) {
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                 type="text"
                 placeholder="Username"
-                value={username}
+                value={Username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              {errors.username && (
+              {errors.Username && (
                 <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
-                  {errors.username}
+                  {errors.Username}
                 </span>
               )}
               <input
@@ -232,19 +238,19 @@ export default function CustomModal(props) {
               )}
               <input
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                type="password"
+                type="Password"
                 placeholder="Password"
-                value={password}
+                value={Password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {errors.password && (
+              {errors.Password && (
                 <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
-                  {errors.password}
+                  {errors.Password}
                 </span>
               )}
               <input
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                type="password"
+                type="Password"
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
