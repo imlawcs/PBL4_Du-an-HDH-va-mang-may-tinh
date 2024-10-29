@@ -51,12 +51,31 @@ export default function CustomModal(props) {
 
     const handleLogin = () => {
       if (validateForm()) {
-        props.login(username, password);
+        try {
+          const response = await fetch("https://localhost:3001/api/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Username, Password }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem("token", data.token); // Store the JWT token
+            props.login(Username, Password); // Call the login function passed via props
+          } else {
+            const errorData = await response.json();
+            setErrors({ form: errorData.message });
+          }
+        } catch (error) {
+          setErrors({ form: "An error occurred. Please try again." });
+        } finally {
+          setLoading(false);
+        }
+        // props.login(Username, Password);
       }
     };
-
-    
-
     return (
       <>
         <div className="modal__holder">
@@ -297,7 +316,21 @@ export default function CustomModal(props) {
                       odit, commodi voluptatem ea quos nostrum alias expedita
                       velit doloremque perferendis soluta vitae!
                     </pre>
-                    <Button type="default" text={"Start"} />
+                    <div className="fill__container rr__flex-row rrf__col-small">
+                      <Button type="default" text={"Preview Stream"} onClick={() => {
+                        //  WebRTCHandle.start();
+                        SignalRTest.preview();
+                        document.getElementById('offline_label').style.display = 'none';
+                        //  WebRTCHandle.startStream();
+                        //  WebRTCHandle.CreateRoom('1', '1');
+                      }}/>
+                      <Button type="default" text={"Start"} onClick={() => {
+                        //  WebRTCHandle.start();
+                        SignalRTest.start("hello");
+                        //  WebRTCHandle.startStream();
+                        //  WebRTCHandle.CreateRoom('1', '1');
+                      }}/>
+                    </div>
                   </>
                 ) : (
                   <>

@@ -18,7 +18,7 @@ export default function NavBar(props) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastPosition, setToastPosition] = useState("-100%");
-
+  const [token, setToken] = useState(localStorage.getItem("token"));
   useEffect(() => {
     let timer;
     if (showToast) {
@@ -29,6 +29,7 @@ export default function NavBar(props) {
         setTimeout(() => setShowToast(false), 300); // Wait for slide out animation
       }, 3000);
     }
+    console.log(token);
     return () => clearTimeout(timer);
   }, [showToast]);
 
