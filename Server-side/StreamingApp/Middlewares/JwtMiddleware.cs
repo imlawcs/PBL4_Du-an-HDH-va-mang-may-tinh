@@ -28,11 +28,7 @@ public class JwtMiddleware
             await _next(context); // Bỏ qua middleware cho yêu cầu đến login và register
             return;
         }
-        if (context.Request.Path.StartsWithSegments("/webrtc"))
-        {
-            await _next(context);
-            return;
-        }
+
         if (token != null)
         {
             await AttachUserToContext(context, token);
@@ -86,7 +82,7 @@ public class JwtMiddleware
         catch (Exception ex)
         {
             // Nếu token không hợp lệ, trả về mã lỗi 401 và thông báo
-            context.Response.StatusCode = 401;
+            context.Response.StatusCode = 401; 
             await context.Response.WriteAsync($"Invalid token: {ex.Message}");
             return; // Ngăn không cho tiếp tục xử lý request
         }

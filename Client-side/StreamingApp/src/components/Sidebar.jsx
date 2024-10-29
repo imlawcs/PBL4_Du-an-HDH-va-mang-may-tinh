@@ -83,7 +83,7 @@ export default function Sidebar(props) {
                 <div className="sh__content-holder rr__flex-row">
                   <div className="rr__flex-col rrf__row-normal">
                     <div className="vd__holder bg__color-2 rr__flex-col">
-                      <video id="localVideo"></video>
+                      {/* output of the stream here */}
                       <span className="fs__title-3 league-spartan-semibold citizenship">
                         Offline
                       </span>
@@ -1041,6 +1041,69 @@ export default function Sidebar(props) {
                       userName: "nauts",
                       category: "League Of Legends",
                     },
+                    {
+                      title: "ROAD TO CHALLENGER",
+                      thumbnail: "https://i.imgur.com/pQrIBFY.jpg",
+                      profilePic: "https://i.imgur.com/A3jLXXN.jpg",
+                      userName: "pro_gamer123",
+                      category: "League Of Legends",
+                    },
+                    {
+                      title: "CHILL STREAM",
+                      thumbnail: "https://i.imgur.com/ZGfCkYC.jpg",
+                      profilePic: "https://i.imgur.com/M7uPcKN.jpg",
+                      userName: "relaxed_streamer",
+                      category: "Just Chatting",
+                    },
+                    {
+                      title: "RANKED GRIND",
+                      thumbnail: "https://i.imgur.com/8TZvZJO.jpg",
+                      profilePic: "https://i.imgur.com/K2HdEji.jpg",
+                      userName: "competitive_player",
+                      category: "Valorant",
+                    },
+                    {
+                      title: "SPEEDRUN ATTEMPT",
+                      thumbnail: "https://i.imgur.com/nXYWoZS.jpg",
+                      profilePic: "https://i.imgur.com/L8zGJU2.jpg",
+                      userName: "speed_demon",
+                      category: "Minecraft",
+                    },
+                    {
+                      title: "ESPORTS TOURNAMENT",
+                      thumbnail: "https://i.imgur.com/qR3VbVY.jpg",
+                      profilePic: "https://i.imgur.com/F2XU58M.jpg",
+                      userName: "esports_pro",
+                      category: "Counter-Strike: Global Offensive",
+                    },
+                    {
+                      title: "STRATEGY GUIDE",
+                      thumbnail: "https://i.imgur.com/T8KYYmU.jpg",
+                      profilePic: "https://i.imgur.com/W9XUx7E.jpg",
+                      userName: "strategy_master",
+                      category: "Starcraft II",
+                    },
+                    {
+                      title: "CASUAL GAMEPLAY",
+                      thumbnail: "https://i.imgur.com/3XZhJLU.jpg",
+                      profilePic: "https://i.imgur.com/Q9ZXuZY.jpg",
+                      userName: "casual_gamer",
+                      category: "The Sims 4",
+                    },
+                    {
+                      title: "HORROR NIGHT",
+                      thumbnail: "https://i.imgur.com/7ZjU9L2.jpg",
+                      profilePic: "https://i.imgur.com/X6Y3VNm.jpg",
+                      userName: "scared_streamer",
+                      category: "Resident Evil Village",
+                    },
+                    {
+                      title: "RETRO GAMING",
+                      thumbnail: "https://i.imgur.com/1KZqPjq.jpg",
+                      profilePic: "https://i.imgur.com/P9ZkL7H.jpg",
+                      userName: "retro_lover",
+                      category: "Super Mario World",
+                    },
                   ].map((content, index) => (
                     <VideoContent
                       key={index}
@@ -1320,12 +1383,33 @@ export default function Sidebar(props) {
                 {/* <span className="fs__title-5 league-spartan-regular citizenship ta__center fill__container">
                   Stream is offline
                 </span> */}
-                
-                  <video style={{
-                    width: "500px",
-                    height: "500px",
-                  }} id="remote__stream" control autoplay muted></video>
-                
+                <Suspense
+                  fallback={
+                    <div className="fs__title-5 league-spartan-regular citizenship ta__center fill__container">
+                      Loading...
+                    </div>
+                  }
+                >
+                  <LazyJWPlayer
+                    library="https://cdn.jwplayer.com/libraries/VXc5h4Tf.js"
+                    file={sidetracked}
+                    aspectRatio="16:9"
+                    width="100%"
+                    customCss={`
+                      .jw-slider-time .jw-slider-container .jw-rail,
+                      .jw-slider-time .jw-slider-container .jw-buffer,
+                      .jw-slider-time .jw-slider-container .jw-progress {
+                        background-color: var(--secondary-color);
+                      }
+                      .jw-icon-inline,
+                      .jw-icon-tooltip,
+                      .jw-slider-horizontal .jw-slider-container .jw-knob,
+                      .jw-icon-display {
+                        color: var(--secondary-color);
+                      }
+                    `}
+                  />
+                </Suspense>
               </div>
 
               <StreamUserInfo

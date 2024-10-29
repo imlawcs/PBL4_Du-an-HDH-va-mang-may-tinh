@@ -10,7 +10,6 @@ import Button from "./Button";
 import "../assets/css/StreamChat.css";
 import BtnIcon from "./BtnIcon";
 import { useState } from "react";
-import { WebRTCHandle } from "../scripts/webrtcHandle";
 export default function StreamChat(props) {
   const context =
     "Consequat ex amet quis aliqua duis. Aute sunt cupidatat irure ex anim cillum Lorem culpa. Aute elit commodo occaecat sunt elit culpa qui mollit. Commodo id officia adipisicing pariatur consectetur tempor occaecat.";
@@ -32,7 +31,55 @@ export default function StreamChat(props) {
             </div>
           </div>
           <div className="sc__body">
-            <div id="chat__contents" className="sc__body-holder">
+            <div className="sc__body-holder">
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
+              <ChatComp
+                badge={null}
+                timeStamp="15:00"
+                userName="resolved"
+                chatContext={context}
+              />
               <ChatComp
                 badge={null}
                 timeStamp="15:00"
@@ -54,10 +101,7 @@ export default function StreamChat(props) {
               <BtnIcon icons={faIcons} />
             </div>
             <div className="sc__btn-holder rr__flex-row">
-              <Button type="default" text="Chat" onClick={() => {
-                WebRTCHandle.SendMessage(1, 1 ,document.getElementById('chat__box').value);
-                document.getElementById('chat__box').value = "";
-              }}/>
+              <Button type="default" text="Chat" />
             </div>
           </div>
         </div>
