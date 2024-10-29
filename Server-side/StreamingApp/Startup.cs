@@ -19,8 +19,11 @@ namespace StreamingApp
         public void ConfigureServices(IServiceCollection services)
         {
             // Đăng ký DbContext với chuỗi kết nối từ appsettings.json
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            
+             services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+               .EnableSensitiveDataLogging() // Enable detailed error logging
+               .LogTo(Console.WriteLine, LogLevel.Error)); // Log errors to console
 
             // Đăng ký các dịch vụ
             services.AddControllers();

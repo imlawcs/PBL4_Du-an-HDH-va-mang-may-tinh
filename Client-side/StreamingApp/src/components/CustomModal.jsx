@@ -20,7 +20,11 @@ import {
   faInstagram,
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
+
+
 export default function CustomModal(props) {
+
+  
   if (props.type == "login") {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -50,6 +54,9 @@ export default function CustomModal(props) {
         props.login(username, password);
       }
     };
+
+    
+
     return (
       <>
         <div className="modal__holder">
@@ -121,7 +128,8 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type === "signup") {
+  } 
+  else if (props.type === "signup") {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [agreeTerms, setAgreeTerms] = useState(false);
     const [username, setUsername] = useState("");
@@ -160,6 +168,7 @@ export default function CustomModal(props) {
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
     };
+
 
     const handleSignup = () => {
       if (validateSignup()) {
@@ -438,4 +447,5 @@ export default function CustomModal(props) {
       </>
     );
   }
+
 }

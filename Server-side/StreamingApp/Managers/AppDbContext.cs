@@ -4,7 +4,10 @@ using StreamingApp.Models.Entities;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { 
+        Roles.Add(new Role { RoleName = "Admin", RoleDesc = "Admin" });
+        Roles.Add(new Role { RoleName = "User", RoleDesc = "User" });
+    }
 
     public DbSet<Blocked> Blockeds { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -21,7 +24,7 @@ public class AppDbContext : DbContext
      protected override void OnModelCreating(ModelBuilder modelBuilder)
 
         {
-base.OnModelCreating(modelBuilder);
+    base.OnModelCreating(modelBuilder);
 
     modelBuilder.Entity<Blocked>(entity =>
     {
@@ -83,6 +86,10 @@ base.OnModelCreating(modelBuilder);
                 .HasKey(sc => new { sc.CategoryId, sc.StreamId });
             modelBuilder.Entity<StreamTag>()
                 .HasKey(st => new { st.TagId, st.StreamId });
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.UserName)
+                .IsUnique();
 
             base.OnModelCreating(modelBuilder);
 

@@ -257,7 +257,7 @@ namespace StreamingApp.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsEmailNoti")
+                    b.Property<bool?>("IsEmailNoti")
                         .HasColumnType("bit");
 
                     b.Property<string>("Password")
@@ -271,7 +271,6 @@ namespace StreamingApp.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ProfilePic")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -286,12 +285,15 @@ namespace StreamingApp.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("UserStatus")
+                    b.Property<bool?>("UserStatus")
                         .HasColumnType("bit");
 
                     b.HasKey("UserId");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
