@@ -15,15 +15,13 @@ public class AuthService : IAuthService
 
     public User LoginUser(LoginModel login)
     {
-        // Truy vấn cơ sở dữ liệu để tìm người dùng
         var user = _context.Users.FirstOrDefault(u => u.UserName == login.Username);
 
-        // Kiểm tra người dùng có tồn tại không
         if (user == null)
         {
             throw new CustomException
             {
-                ErrorCode = 401, // Unauthorized
+                ErrorCode = 401, 
                 Message = "Invalid username or password"
             };
         }
@@ -33,25 +31,22 @@ public class AuthService : IAuthService
         {
             throw new CustomException
             {
-                ErrorCode = 401, // Unauthorized
+                ErrorCode = 401, 
                 Message = "Invalid username or password"
             };
         }
 
-        // Kiểm tra các thuộc tính có thể null
         return new User
         {
-            UserName = user.UserName,
-            Email = user.Email ?? string.Empty, // Tránh lỗi null
-            PhoneNumber = user.PhoneNumber ?? string.Empty // Tránh lỗi null
-            // Không trả về Password vì lý do bảo mật
+            UserId = user.UserId,
+            Email = user.Email ?? string.Empty,
+            RoleId = user.RoleId
         };
     }
 
 
     public User RegisterUser(RegisterModel registerModel)
     {
-        // Kiểm tra xem username có tồn tại hay không
         if (_context.Users.Any(u => u.UserName == registerModel.Username))
         {
             throw new CustomException
@@ -61,11 +56,10 @@ public class AuthService : IAuthService
             };
         }
 
-        // Tạo một người dùng mới
         var user = new User
         {
             UserName = registerModel.Username,
-            Password = BCrypt.Net.BCrypt.HashPassword(registerModel.Password), // Hash mật khẩu
+            Password = BCrypt.Net.BCrypt.HashPassword(registerModel.Password), 
             Email = registerModel.Email,
             PhoneNumber = registerModel.PhoneNumber,
             DisplayName = registerModel.DisplayName,
@@ -75,20 +69,18 @@ public class AuthService : IAuthService
 
         try
         {
-            // Thêm người dùng vào context và lưu thay đổi
             _context.Users.Add(user);
             _context.SaveChanges();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error saving user: {ex.Message}");
-            throw; // Hoặc xử lý lỗi theo cách khác nếu cần
+            throw; 
         }
 
         return new User
         {
             UserName = user.UserName,
-            Password = user.Password, // Mật khẩu không nên được trả về
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
             DisplayName = user.DisplayName,

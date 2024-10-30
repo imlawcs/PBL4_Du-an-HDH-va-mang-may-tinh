@@ -36,11 +36,11 @@ namespace StreamingApp.Controllers
                     return Ok(new { token });
                 }
 
-                return Unauthorized();
+                return Unauthorized(new { error = "Invalid username or password." });
             }
             catch (CustomException ex)
             {
-                return BadRequest(new { error = ex.Message }); // Trả về thông điệp lỗi cụ thể
+                return BadRequest(new { error = ex.Message }); 
             }
             catch (Exception ex)
             {
@@ -60,7 +60,6 @@ namespace StreamingApp.Controllers
 
             try
             {
-                // Tạo người dùng mới
                 var newUser = _authService.RegisterUser(registerModel);
                 if (newUser != null)
                 {
@@ -71,32 +70,29 @@ namespace StreamingApp.Controllers
             }
             catch (CustomException ex)
             {
-                // Trả về lỗi cụ thể từ CustomException
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                // Trả về lỗi chung nếu có lỗi khác
                 return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
         }
-
 
         public string GenerateToken(User user)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // Thêm claim NameIdentifier
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), 
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.RoleId.ToString()) // Thêm các claim khác nếu cần
+                new Claim(ClaimTypes.Role, user.RoleId.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: null, // Bạn có thể đặt issuer nếu cần
-                audience: null, // Bạn có thể đặt audience nếu cần
+                issuer: _config["Jwt:Issuer"],  
+                audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
@@ -113,7 +109,6 @@ namespace StreamingApp.Controllers
                 return Unauthorized(new { message = "Unauthorized" });
             }
 
-            // Trả về thông tin người dùng (ví dụ userId hoặc profile)
             return Ok(new { userId });
         }
     }

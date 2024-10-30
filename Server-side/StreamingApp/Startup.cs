@@ -20,13 +20,9 @@ namespace StreamingApp
 
         public void ConfigureServices(IServiceCollection services)
         {
-
-
-            // Đăng ký DbContext với chuỗi kết nối từ appsettings.json
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             
-            //tránh lỗi vòng tròn
             services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -40,10 +36,7 @@ namespace StreamingApp
                 options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
             });
 
-
-
             // Đăng ký CORS
-
             services.AddCors(options =>
             {
                 options.AddPolicy("ClientPermission", policy =>
@@ -54,6 +47,7 @@ namespace StreamingApp
                         .AllowCredentials();
                 });
             });
+
             // Đăng ký các dịch vụ
             services.AddControllers();
             services.AddSignalR();
@@ -66,6 +60,7 @@ namespace StreamingApp
 
             services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
+            
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>
             {
@@ -74,39 +69,32 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
-                options.Authority = "https://localhost:5173";
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
+                // options.Authority = "http://localhost:3000";
+                // options.RequireHttpsMetadata = false;
+                // options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+
                     ValidateAudience = true,
+                    ValidAudience = Configuration["Jwt:Audience"],
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    // ValidAudience = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Audience"],
-                    // IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Key"]))
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                 };
-                // options.Events = new JwtBearerEvents
-                // {
-                //     OnMessageReceived = context =>
-                //     {
-                //         var accessToken = context.Request.Query["access_token"];
-
-                //         // If the request is for our hub...
-                //         var path = context.HttpContext.Request.Path;
-                //         if (!string.IsNullOrEmpty(accessToken) &&
-                //             (path.StartsWithSegments("/webrtc")))
-                //         {
-                //             // Read the token out of the query string
-                //             context.Token = accessToken;
-                //         }
-                //         return Task.CompletedTask;
-                //     }
-                // };
             });
+
+            // Cấu hình Authorization
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => 
+                    policy.RequireRole("Admin")); 
+
+                options.AddPolicy("RequireUserRole", policy => 
+                    policy.RequireRole("2"));
+            });
+
 
             // Đăng ký Swagger cho API Documentation
             services.AddEndpointsApiExplorer();
@@ -122,19 +110,16 @@ namespace StreamingApp
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseCors("ClientPermission");
 
-            // Sử dụng Authentication trước khi Authorization
             app.UseAuthentication();
 
-            // Thêm middleware tùy chỉnh của bạn (nếu cần thiết)
             app.UseMiddleware<JwtMiddleware>();
             app.UseMiddleware<ValidateMiddleware>();
+            app.UseMiddleware<AuthorizationMiddleware>();
 
-            // Sử dụng Authorization sau Authentication
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
