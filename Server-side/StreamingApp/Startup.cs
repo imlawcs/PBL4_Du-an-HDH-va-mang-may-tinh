@@ -20,9 +20,28 @@ namespace StreamingApp
 
         public void ConfigureServices(IServiceCollection services)
         {
+
+
             // Đăng ký DbContext với chuỗi kết nối từ appsettings.json
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            
+            //tránh lỗi vòng tròn
+            services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.WriteIndented = true;
+            });
+
+            //k hiện id, value
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+            });
+
+
+
             // Đăng ký CORS
 
             services.AddCors(options =>
@@ -42,6 +61,9 @@ namespace StreamingApp
             // Đăng ký dịch vụ AuthService
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ModManager>();
+            services.AddScoped<IModService, ModService>();
+
             services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
             // Đăng ký JWT Authentication

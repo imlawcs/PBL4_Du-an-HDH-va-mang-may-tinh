@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace StreamingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241023003332_InitialCreate")]
+    [Migration("20241029154847_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

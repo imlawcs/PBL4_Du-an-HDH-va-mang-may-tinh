@@ -5,10 +5,7 @@ using StreamingApp.Models.Entities;
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { 
-        Roles.Add(new Role { RoleName = "Admin", RoleDesc = "Admin" });
-        Roles.Add(new Role { RoleName = "User", RoleDesc = "User" });
     }
-
     public DbSet<Blocked> Blockeds { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Following> Followings { get; set; }
@@ -90,6 +87,17 @@ public class AppDbContext : DbContext
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserName)
                 .IsUnique();
+
+            modelBuilder.Entity<Role>().HasData(
+            new Role { RoleId = 1, RoleName = "Admin", RoleDesc = "Admin" },
+            new Role { RoleId = 2, RoleName = "User", RoleDesc = "User" }
+            );
+
+            modelBuilder.Entity<User>().HasData(
+                new User { UserId = 1, UserName = "admin1", Password = BCrypt.Net.BCrypt.HashPassword("11111111"), Email = "daolehanhnguyen@gmail.com", PhoneNumber = "0333414094", DisplayName = "Dao Le Hanh Nguyen", RoleId = 1 },
+                new User { UserId = 2, UserName = "admin2", Password = BCrypt.Net.BCrypt.HashPassword("22222222"), Email = "minhnguyetdn2004@gmail.com", PhoneNumber = "0775500744", DisplayName = "Huynh Thuy Minh Nguyet", RoleId = 1 },
+                new User { UserId = 3, UserName = "admin3", Password = BCrypt.Net.BCrypt.HashPassword("33333333"), Email = "huukhoa04@gmail.com", PhoneNumber = "0333414094", DisplayName = "Nguyen Huu Khoa", RoleId = 1 }
+            );
 
             base.OnModelCreating(modelBuilder);
 
