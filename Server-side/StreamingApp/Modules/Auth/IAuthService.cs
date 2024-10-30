@@ -1,8 +1,11 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using StreamingApp.Models.Entities;
 
 public interface IAuthService
 {
-    User LoginUser(LoginModel loginModel);
-    // User GetUserByUsername(string username);  // Thêm hàm lấy người dùng theo username
-    User RegisterUser(RegisterModel registerModel);  // Thêm hàm đăng ký người dùng mới
+    User LoginUser(LoginModel login);
+    User RegisterUser(RegisterModel registerModel);
+    Task<User> ProcessExternalLogin(ClaimsPrincipal principal, string provider);
+    AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl);
 }
