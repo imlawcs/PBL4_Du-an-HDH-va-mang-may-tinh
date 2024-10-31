@@ -40,7 +40,7 @@ export default function StreamChat(props) {
             {/* signalr here */}
           </div>
           <div className="sc__footer rr__flex-col">
-            {auth.user ? 
+            {auth.token ? 
             <>
             <div className="cb__holder rr__flex-row">
               <input
@@ -61,10 +61,11 @@ export default function StreamChat(props) {
             </> 
             :
             <>
-              <span className="fs__normal-2 league-spartan-semibold citizenship">
+              <span className="fs__normal-2 fill__container league-spartan-semibold citizenship ta__center">
                 Please login to chat
               </span>
-            </>}
+            </>
+            }
             
           </div>
         </div>

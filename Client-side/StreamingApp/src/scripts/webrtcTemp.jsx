@@ -214,11 +214,13 @@ export const SignalRTest = {
             }
         },
         async start(hostName) {
-            if(localStream != null){
-                await this.serverOn(); //Turn server on
-                connection.invoke("createRoom", hostName); //Create room and wait for offer from client
+            if(isServerOn){
+                if(localStream != null){
+                    connection.invoke("createRoom", hostName); //Create room and wait for offer from client
+                }
+                else alert("Please start preview first");
             }
-            else alert("Please start preview first");
+            else alert("Server is off");
         },
         //[HOST]preview stream
         async preview() {
@@ -248,6 +250,7 @@ export const SignalRTest = {
                     }
                 };
                 const offer = await hostPeerConnection[clientConnectionId].createOffer();
+                console.log("Offer created: " + offer);
                 await hostPeerConnection[clientConnectionId].setLocalDescription(offer);
                 console.log(`Sending offer to client: ${clientConnectionId}`);
                 await connection.invoke("SendOffer", offer, clientConnectionId);
@@ -276,13 +279,9 @@ export const SignalRTest = {
 
         stop() {
             connection.invoke("removeRoom");
-            connection.stop().then(() => {
-                console.log("SignalR Disconnected");
-                document.getElementById('localVideo').style.display = 'none';
-                isServerOn = false;
-            }).catch(err => {
-                console.error("Error: " + err);
-            });
+            document.getElementById('localVideo').style.display = 'none';
+            isServerOn = false;
+            
         }
 
 }

@@ -30,15 +30,17 @@ namespace StreamingApp.Hubs
             //global disconection check
             Console.WriteLine("Client disconnected: " + Context.ConnectionId);
             var remove = streamRoomManager.RemoveConnection(Context.ConnectionId);
-            if (typeof(StreamRoom) == remove.GetType())
+            if (remove is StreamRoom room)
             {
-                var room = (StreamRoom)remove;
                 Clients.Client(room.HostConnectionId).SendAsync("RoomRemove", Context.ConnectionId);
             }
-            else if (typeof(string) == remove.GetType())
+            else if (remove is string host)
             {
-                var host = (string)remove;
                 Clients.Client(host).SendAsync("RoomLeft", Context.ConnectionId);
+            }
+            else if (remove is null)
+            {
+                Console.WriteLine("Room not found cuz room is null");
             }
             return base.OnDisconnectedAsync(exception);
         }
@@ -93,6 +95,7 @@ namespace StreamingApp.Hubs
         public async Task RemoveRoom()
         {
             var room = streamRoomManager.RemoveConnection(Context.ConnectionId);
+            Console.WriteLine("Room removed: " + JsonConvert.SerializeObject(room));
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, Context.ConnectionId);
             await Clients.Caller.SendAsync("RoomRemoved", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
