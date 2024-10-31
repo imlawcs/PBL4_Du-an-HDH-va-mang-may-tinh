@@ -36,6 +36,7 @@ export default function NavBar(props) {
     }
     else setIsLoggedIn(false);
     console.log(token);
+    console.log(auth.user);
     return () => clearTimeout(timer);
   }, [showToast]);
   const handleLogout = () => {

@@ -29,7 +29,7 @@ namespace StreamingApp
             {
                 options.AddPolicy("ClientPermission", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173")
+                    policy.WithOrigins(Configuration["ClientSide:Url"])
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -52,7 +52,6 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
-                options.Authority = "https://localhost:5173";
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters

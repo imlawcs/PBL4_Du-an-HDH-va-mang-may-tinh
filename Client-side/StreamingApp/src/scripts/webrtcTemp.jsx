@@ -1,4 +1,5 @@
 import * as signalR from '@microsoft/signalr'
+import { sendMessage } from '@microsoft/signalr/dist/esm/Utils';
 
 /*
     This file handles all the WebRTC related functionalities.
@@ -44,27 +45,43 @@ const connection = new signalR.HubConnectionBuilder()
 //webSocket events
 connection.on("ready", async => {
     console.log("SignalR ready");
-    isServerOn = true;
 });
-connection.on("message", async message => {
-    console.log("Message: " + message);
+connection.on("sendMessage", async (username, message) => {
+    console.log(`${username}: ` + message);
+    const chatContents = document.getElementById('chat__holder');
+    const chatComponent = (
+        <ChatComp
+            badge={null}
+            timeStamp={new Date().toLocaleTimeString()}
+            userName={username}
+            chatContext={message}
+        />
+    );
+    ReactDOM.render(chatComponent, chatContents.appendChild(document.createElement('div')));
 });
 //[HOST]room created
 connection.on("roomCreated", async (hostName) => {
     console.log("Room created by: " + hostName);
     console.log("Waiting for client to join...");
 });
-connection.on("roomLeft", async (room, clientId) => {
+//[HOST]roomLeft
+connection.on("roomLeft", async (clientId) => {
     console.log("Client left: " + clientId);
     hostPeerConnection[clientId].close();
     hostPeerConnection[clientId] = null;
 })
+//[HOST] room remove
+connection.on("roomRemoved", async (hostName) => {
+    localStream.getTracks().forEach(track => track.stop());
+    localStream = null;
+    console.log("Room removed by: " + hostName);
+});
 //[HOST]roomJoined by client
 /*
     Khi client join room, host sẽ bắt đầu gửi offer cho client
 */
 connection.on("roomJoined", async (room, viewerConnectionId) => {
-    console.log("Room joined by: " + room);
+    console.log("Room updated: " + room);
     try{
         console.log("Viewer Connection Id: " + viewerConnectionId);
         hostPeerConnection[viewerConnectionId] = new RTCPeerConnection(servers);
@@ -178,8 +195,13 @@ peerConnection.addEventListener('track', async (event) => {
     remoteVideo.srcObject = remoteStream;
 });
 
+
+
 export const SignalRTest = {
-        //[BOTH] start signalR
+        getServerStatus(){
+            return isServerOn;
+        },
+    //[BOTH] start signalR
         async serverOn() {
             try {
                 await connection.start();
@@ -247,6 +269,20 @@ export const SignalRTest = {
             remoteStream.getTracks().forEach(track => track.stop());
             remoteStream = null;
             connection.invoke("leaveRoom", hostConnectionId);
+        },
+        async sendMessage(message, user) {
+            connection.invoke("sendMessage", user, message, hostConnectionId);
+        },
+
+        stop() {
+            connection.invoke("removeRoom");
+            connection.stop().then(() => {
+                console.log("SignalR Disconnected");
+                document.getElementById('localVideo').style.display = 'none';
+                isServerOn = false;
+            }).catch(err => {
+                console.error("Error: " + err);
+            });
         }
 
 }

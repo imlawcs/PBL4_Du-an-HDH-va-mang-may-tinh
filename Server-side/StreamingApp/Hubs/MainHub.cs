@@ -16,6 +16,33 @@ namespace StreamingApp.Hubs
         {
             streamRoomManager = new StreamRoomManager();
         }
+
+        public override Task OnConnectedAsync()
+        {
+            //global connection check
+            Console.WriteLine("Client connected: " + Context.ConnectionId);
+
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            //global disconection check
+            Console.WriteLine("Client disconnected: " + Context.ConnectionId);
+            var remove = streamRoomManager.RemoveConnection(Context.ConnectionId);
+            if (typeof(StreamRoom) == remove.GetType())
+            {
+                var room = (StreamRoom)remove;
+                Clients.Client(room.HostConnectionId).SendAsync("RoomRemove", Context.ConnectionId);
+            }
+            else if (typeof(string) == remove.GetType())
+            {
+                var host = (string)remove;
+                Clients.Client(host).SendAsync("RoomLeft", Context.ConnectionId);
+            }
+            return base.OnDisconnectedAsync(exception);
+        }
+
         public async Task SendMessage(string user, string message, string hostConnectionId)
             => await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
 
@@ -62,6 +89,12 @@ namespace StreamingApp.Hubs
             var room = streamRoomManager.RemoveJoinerFromRoom(hostConnectionId, Context.ConnectionId);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostConnectionId);
             await Clients.Client(hostConnectionId).SendAsync("RoomLeft", JsonConvert.SerializeObject(room), Context.ConnectionId);
+        }
+        public async Task RemoveRoom()
+        {
+            var room = streamRoomManager.RemoveConnection(Context.ConnectionId);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, Context.ConnectionId);
+            await Clients.Caller.SendAsync("RoomRemoved", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
         public async Task SendOffer(object offer, string ClientConnectionId)
         {

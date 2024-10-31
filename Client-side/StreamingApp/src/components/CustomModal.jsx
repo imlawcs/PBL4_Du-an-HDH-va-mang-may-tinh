@@ -284,6 +284,7 @@ export default function CustomModal(props) {
   } else if (props.type == "SM") {
     const [option, setOption] = useState(0);
     const [isClose, setIsClose] = useState(false);
+    const [serverStatus, setServerStatus] = useState(false);
     return (
       <>
         <div className="modal__layout bg__color-2">
@@ -323,18 +324,30 @@ export default function CustomModal(props) {
                       velit doloremque perferendis soluta vitae!
                     </pre>
                     <div className="fill__container rr__flex-row rrf__col-small">
+                      {serverStatus ? 
+                      <>
+                        <Button type="default" text={"Stop"} onClick={() => {
+                          SignalRTest.stop();
+                          setServerStatus(false);
+                          document.getElementById('offline_label').style.display = 'block';
+                        }}/>
+                      </> : 
+                      <>
+
+                      </>}
                       <Button type="default" text={"Preview Stream"} onClick={() => {
-                        //  WebRTCHandle.start();
+                        
                         SignalRTest.preview();
                         document.getElementById('offline_label').style.display = 'none';
-                        //  WebRTCHandle.startStream();
-                        //  WebRTCHandle.CreateRoom('1', '1');
+                        
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
-                        //  WebRTCHandle.start();
+                        
                         SignalRTest.start("hello");
-                        //  WebRTCHandle.startStream();
-                        //  WebRTCHandle.CreateRoom('1', '1');
+                        setServerStatus(true);
+                        console.log("Status: " + serverStatus);
+                        //truyền context.username vào đây
+                        
                       }}/>
                     </div>
                   </>
