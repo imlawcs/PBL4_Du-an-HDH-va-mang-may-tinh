@@ -16,9 +16,9 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost("assign-mod")]
-        public async Task<IActionResult> AssignChannelModAsync([FromBody] ModDto ModDto)
+        public async Task<IActionResult> AssignChannelModAsync([FromBody] ModDTO ModDTO)
         {
-            var result = await _roleService.AssignChannelModAsync(ModDto.channelId, ModDto.userId);
+            var result = await _roleService.AssignChannelModAsync(ModDTO.ChannelId, ModDTO.UserId);
             if (result.Succeeded)
             {
                 return Ok(result.Errors);
@@ -27,9 +27,9 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost("assign-role")]
-        public async Task<IActionResult> AssignRole([FromBody] RoleDto RoleDto)
+        public async Task<IActionResult> AssignRole([FromBody] RoleDTO RoleDto)
         {
-            var result = await _roleService.AssignRole(RoleDto.channelId, RoleDto.userId, RoleDto.roleId);
+            var result = await _roleService.AssignRole(RoleDto.ChannelId, RoleDto.UserId, RoleDto.RoleId);
             if (result.Succeeded)
             {
                 return Ok(result.Errors);
@@ -38,9 +38,9 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost("remove-role")]
-        public async Task<IActionResult> RemoveRole([FromBody] RoleDto RoleDto)
+        public async Task<IActionResult> RemoveRole([FromBody] RoleDTO RoleDto)
         {
-            var result = await _roleService.RemoveRole(RoleDto.channelId, RoleDto.userId, RoleDto.roleId);
+            var result = await _roleService.RemoveRole(RoleDto.ChannelId, RoleDto.UserId, RoleDto.RoleId);
             if (result.Succeeded)
             {
                 return Ok(result.Errors);
@@ -49,9 +49,9 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost("remove-mod")]
-        public async Task<IActionResult> RemoveChannelModAsync([FromBody] ModDto ModDto)
+        public async Task<IActionResult> RemoveChannelModAsync([FromBody] ModDTO ModDTO)
         {
-            var result = await _roleService.RemoveChannelModAsync(ModDto.channelId, ModDto.userId);
+            var result = await _roleService.RemoveChannelModAsync(ModDTO.ChannelId, ModDTO.UserId);
             if (result.Succeeded)
             {
                 return Ok(result.Errors);
@@ -70,9 +70,9 @@ namespace StreamingApp.Controllers
         }
 
         [HttpGet("is")]
-        public async Task<IActionResult> IsChannelModAsync([FromBody] ModDto ModDto)
+        public async Task<IActionResult> IsChannelModAsync([FromBody] ModDTO ModDTO)
         {
-            var result = await _roleService.IsChannelModAsync(ModDto.channelId, ModDto.userId);
+            var result = await _roleService.IsChannelModAsync(ModDTO.ChannelId, ModDTO.UserId);
             return Ok(result.Errors);
         }
     }
