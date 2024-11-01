@@ -48,7 +48,7 @@ public class AppDbContext : DbContext
 
         entity.HasOne(ur => ur.ChannelOwner) // Quan hệ với User qua ChannelOwnerId
         .WithMany()
-        .HasForeignKey(ur => ur.channelOwnerID)
+        .HasForeignKey(ur => ur.ChannelOwnerId)
         .OnDelete(DeleteBehavior.NoAction);
 
         entity.HasOne(ur => ur.Role) // Quan hệ với Role

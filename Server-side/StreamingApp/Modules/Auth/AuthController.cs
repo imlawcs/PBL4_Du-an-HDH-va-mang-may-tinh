@@ -31,7 +31,7 @@ namespace StreamingApp.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), 
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                // new Claim(ClaimTypes.Role, user.RoleId.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

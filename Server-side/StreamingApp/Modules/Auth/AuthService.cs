@@ -35,7 +35,7 @@ public class AuthService : IAuthService
         {
             UserId = user.UserId,
             Email = user.Email ?? string.Empty,
-            RoleId = user.RoleId
+            // RoleId = user.RoleId
         };
     }
 
@@ -59,7 +59,6 @@ public class AuthService : IAuthService
             DisplayName = registerModel.DisplayName,
             RegisterDate = DateTime.Now,
             // RoleId = 2
-
         };
 
         try
@@ -104,7 +103,7 @@ public class AuthService : IAuthService
                 Email = email,
                 UserName = email, // Bạn có thể chọn tạo username dựa trên email
                 Password = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Mật khẩu ngẫu nhiên
-                RoleId = 2 // Phân quyền mặc định cho người dùng mới
+                // RoleId = 2 // Phân quyền mặc định cho người dùng mới
             };
 
             _context.Users.Add(user);

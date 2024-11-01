@@ -56,7 +56,8 @@ namespace StreamingApp
 
 
             services.AddScoped<ModManager>();
-            services.AddScoped<IModService, ModService>();
+            services.AddScoped<IRoleService, RoleService>();
+
 
             services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
