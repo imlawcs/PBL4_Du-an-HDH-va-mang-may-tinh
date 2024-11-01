@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace StreamingApp.Migrations
 {
     /// <inheritdoc />
@@ -251,6 +253,25 @@ namespace StreamingApp.Migrations
                         principalTable: "Tag",
                         principalColumn: "TagId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Role",
+                columns: new[] { "RoleId", "RoleDesc", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Admin", "Admin" },
+                    { 2, "User", "User" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserId", "Bio", "DisplayName", "Email", "IsEmailNoti", "Password", "PhoneNumber", "ProfilePic", "RegisterDate", "RoleId", "UserName", "UserStatus" },
+                values: new object[,]
+                {
+                    { 1, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$u7lNu9If/cfnKJi9lra8d.828bY8ZCY73yo0JNbyMAhqZfs7cD9tC", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "admin1", null },
+                    { 2, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$ZXKmogTz5SOB3.d.Czqu6O31eTq2m7.9vhZX4pjgbK1poRxZRzahC", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "admin2", null },
+                    { 3, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$bswUunEdityfWBhZmrw5JOAtKTAhKQ/7oKK6pWv2Ka3Gi5BDKuleC", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "admin3", null }
                 });
 
             migrationBuilder.CreateIndex(

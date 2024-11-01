@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace StreamingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241030011623_InitialCreate")]
+    [Migration("20241101074610_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -320,7 +320,7 @@ namespace StreamingApp.Migrations
                             UserId = 1,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$XShyewmfFEESztzG2KkVKuzG2un/upHfnlEGg/C8CJ0P5mn1Am3Im",
+                            Password = "$2a$11$u7lNu9If/cfnKJi9lra8d.828bY8ZCY73yo0JNbyMAhqZfs7cD9tC",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RoleId = 1,
@@ -331,7 +331,7 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$53oyfUorBHUbaBsr7X/SLOD3/E0SiWSkSmkiPi5ZXlZyDKVjt0ZIW",
+                            Password = "$2a$11$ZXKmogTz5SOB3.d.Czqu6O31eTq2m7.9vhZX4pjgbK1poRxZRzahC",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RoleId = 1,
@@ -342,7 +342,7 @@ namespace StreamingApp.Migrations
                             UserId = 3,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$f/AgKe6FckKLRU/rwpvWiu1I2Qyek6ORxPEYRLMD4lv.CJpkTv0Gy",
+                            Password = "$2a$11$bswUunEdityfWBhZmrw5JOAtKTAhKQ/7oKK6pWv2Ka3Gi5BDKuleC",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RoleId = 1,
