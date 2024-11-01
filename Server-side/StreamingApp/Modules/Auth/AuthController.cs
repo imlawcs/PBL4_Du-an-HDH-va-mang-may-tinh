@@ -18,11 +18,11 @@ namespace StreamingApp.Controllers
         private readonly IConfiguration _config;
         private readonly IAuthService _authService;
 
-        public AuthController(IConfiguration config, IAuthService authService)
-        {
-            _config = config;
-            _authService = authService;
-        }
+        // public AuthController(IConfiguration config, IAuthService authService)
+        // {
+        //     _config = config;
+        //     _authService = authService;
+        // }
 
         // Tạo JWT token cho người dùng sau khi xác thực thành công
         public string GenerateToken(User user)
@@ -56,11 +56,11 @@ namespace StreamingApp.Controllers
             {
                 var user = _authService.LoginUser(loginModel);
 
-                if (user != null)
-                {
-                    var token = GenerateToken(user);
-                    return Ok(new { token });
-                }
+        //         if (user != null)
+        //         {
+        //             var token = GenerateToken(user);
+        //             return Ok(new { token });
+        //         }
 
                 return Unauthorized(new { error = "Invalid username or password." });
             }

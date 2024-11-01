@@ -50,8 +50,15 @@ namespace StreamingApp
             services.AddSignalR();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<CategoryManager>();
+            services.AddScoped<ICategoryService, CategoryService>();
+
+
             services.AddScoped<ModManager>();
             services.AddScoped<IModService, ModService>();
+
+
             services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
 

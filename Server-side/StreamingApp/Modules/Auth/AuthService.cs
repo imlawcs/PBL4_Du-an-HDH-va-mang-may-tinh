@@ -58,7 +58,7 @@ public class AuthService : IAuthService
             PhoneNumber = registerModel.PhoneNumber,
             DisplayName = registerModel.DisplayName,
             RegisterDate = DateTime.Now,
-            RoleId = 2 
+            // RoleId = 2
         };
 
         try
@@ -83,8 +83,44 @@ public class AuthService : IAuthService
             PhoneNumber = user.PhoneNumber,
             DisplayName = user.DisplayName,
             RegisterDate = user.RegisterDate,
-            RoleId = user.RoleId
+            // RoleId = user.RoleId
         };
+    }
+
+    // Xử lý đăng nhập bên ngoài (như Google, Facebook)
+    public async Task<User> ProcessExternalLogin(ClaimsPrincipal principal, string provider)
+    {
+        // Lấy email từ claims của người dùng
+        var email = principal.FindFirstValue(ClaimTypes.Email);
+        // Tìm người dùng dựa trên email
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null)
+        {
+            // Tạo người dùng mới nếu không tồn tại
+            user = new User
+            {
+                Email = email,
+                UserName = email, // Bạn có thể chọn tạo username dựa trên email
+                Password = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Mật khẩu ngẫu nhiên
+                RoleId = 2 // Phân quyền mặc định cho người dùng mới
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync(); // Lưu người dùng mới vào cơ sở dữ liệu
+        }
+
+        // Trả về người dùng đã đăng nhập
+        return user;
+    }
+
+    // Cấu hình các thuộc tính cho xác thực bên ngoài (OAuth)
+    public AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl)
+    {
+        // Tạo các thuộc tính xác thực với redirect URL
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        // Có thể thêm thông tin khác vào properties nếu cần
+        return properties;
     }
 
     // Xử lý đăng nhập bên ngoài (như Google, Facebook)

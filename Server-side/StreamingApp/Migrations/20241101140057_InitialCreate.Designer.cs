@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace StreamingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241030011623_InitialCreate")]
+    [Migration("20241101140057_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -82,23 +82,6 @@ namespace StreamingApp.Migrations
                     b.ToTable("Followings");
                 });
 
-            modelBuilder.Entity("StreamingApp.Models.Entities.Moderator", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    b.Property<int>("UserIdModerator")
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    b.HasKey("UserId", "UserIdModerator");
-
-                    b.HasIndex("UserIdModerator");
-
-                    b.ToTable("Moderators");
-                });
-
             modelBuilder.Entity("StreamingApp.Models.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -167,6 +150,12 @@ namespace StreamingApp.Migrations
                             RoleId = 2,
                             RoleDesc = "User",
                             RoleName = "User"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            RoleDesc = "Moderator",
+                            RoleName = "Moderator"
                         });
                 });
 
@@ -294,9 +283,6 @@ namespace StreamingApp.Migrations
                     b.Property<DateTime>("RegisterDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -306,8 +292,6 @@ namespace StreamingApp.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("UserId");
-
-                    b.HasIndex("RoleId");
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -320,10 +304,9 @@ namespace StreamingApp.Migrations
                             UserId = 1,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$XShyewmfFEESztzG2KkVKuzG2un/upHfnlEGg/C8CJ0P5mn1Am3Im",
+                            Password = "$2a$11$RJG5QbAKISia/q0bXX4wyOIILEM.njqAHInH3NhPlLlEaGWMbeY9m",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleId = 1,
                             UserName = "admin1"
                         },
                         new
@@ -331,10 +314,9 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$53oyfUorBHUbaBsr7X/SLOD3/E0SiWSkSmkiPi5ZXlZyDKVjt0ZIW",
+                            Password = "$2a$11$gGwmctSdoesgl.ko6s5nne9WfGtXoijaxp7R9wXiDXH4mYioiq1Bm",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleId = 1,
                             UserName = "admin2"
                         },
                         new
@@ -342,11 +324,49 @@ namespace StreamingApp.Migrations
                             UserId = 3,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$f/AgKe6FckKLRU/rwpvWiu1I2Qyek6ORxPEYRLMD4lv.CJpkTv0Gy",
+                            Password = "$2a$11$aWIbo3yXS0Qfze4IiFiIAup4ejL3Jgceo3D3B9WeyMJbh31J1tZaO",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleId = 1,
                             UserName = "admin3"
+                        });
+                });
+
+            modelBuilder.Entity("StreamingApp.Models.Entities.User_Role", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<int?>("channelOwnerID")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("channelOwnerID");
+
+                    b.ToTable("User_Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            UserId = 3,
+                            RoleId = 1
                         });
                 });
 
@@ -386,25 +406,6 @@ namespace StreamingApp.Migrations
                     b.Navigation("Followee");
 
                     b.Navigation("Follower");
-                });
-
-            modelBuilder.Entity("StreamingApp.Models.Entities.Moderator", b =>
-                {
-                    b.HasOne("StreamingApp.Models.Entities.User", "User")
-                        .WithMany("ModeratorOf")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("StreamingApp.Models.Entities.User", "ModeratorUser")
-                        .WithMany("Moderators")
-                        .HasForeignKey("UserIdModerator")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ModeratorUser");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("StreamingApp.Models.Entities.Notification", b =>
@@ -473,15 +474,35 @@ namespace StreamingApp.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("StreamingApp.Models.Entities.User", b =>
+            modelBuilder.Entity("StreamingApp.Models.Entities.User_Role", b =>
                 {
                     b.HasOne("StreamingApp.Models.Entities.Role", "Role")
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("StreamingApp.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("StreamingApp.Models.Entities.User", "ChannelOwner")
+                        .WithMany()
+                        .HasForeignKey("channelOwnerID")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("ChannelOwner");
+
                     b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("StreamingApp.Models.Entities.Role", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("StreamingApp.Models.Entities.User", b =>
@@ -493,10 +514,6 @@ namespace StreamingApp.Migrations
                     b.Navigation("Followers");
 
                     b.Navigation("Followings");
-
-                    b.Navigation("ModeratorOf");
-
-                    b.Navigation("Moderators");
 
                     b.Navigation("Notifications");
                 });
