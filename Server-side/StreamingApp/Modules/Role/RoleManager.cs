@@ -35,7 +35,7 @@ namespace StreamingApp.Managers
                 ChannelOwnerId = channelId
             };
 
-            _context.User_Role.Add(userRole);
+            _context.User_Roles.Add(userRole);
             await _context.SaveChangesAsync();
             if(userRole == null) return (false, new string[] { "Role not assigned" });
             return (true, new string[] {"Role assigned"});
@@ -44,16 +44,16 @@ namespace StreamingApp.Managers
 
         public async Task<(bool Succeeded, string[] Errors)> RemoveRole(int channelId, int userId, int roleId)
         {
-            var userRole = await _context.User_Role.FindAsync(channelId, userId, roleId);
+            var userRole = await _context.User_Roles.FindAsync(channelId, userId, roleId);
             if (userRole == null) return (false, new string[] { "Role not found" });
 
-            _context.User_Role.Remove(userRole);
+            _context.User_Roles.Remove(userRole);
             await _context.SaveChangesAsync();
             return (true, new string[] {"Role removed"});
         }
         public async Task<(bool Succeeded, string[] Errors)> IsRoleAssigned(int channelId, int userId, int roleId)
         {
-            var userRole = await _context.User_Role.FindAsync(channelId, userId, roleId);
+            var userRole = await _context.User_Roles.FindAsync(channelId, userId, roleId);
             return (userRole != null, new string[] { userRole == null ? "Role not assigned" : "Role assigned" });
         }
         public async Task<(bool Succeeded, string[] Errors)> AssignChannelModAsync( int channelId, int userId)
@@ -75,7 +75,7 @@ namespace StreamingApp.Managers
                 ChannelOwnerId = channelId
             };
 
-            _context.User_Role.Add(mod);
+            _context.User_Roles.Add(mod);
             await _context.SaveChangesAsync();
             if(mod == null) return (false, new string[] { "Moderator not assigned" });
             return (true, new string[] {"Moderator assigned"});
@@ -83,19 +83,19 @@ namespace StreamingApp.Managers
 
         public async Task<(bool Succeeded, string[] Errors)> RemoveChannelModAsync(int channelId, int userId)
         {
-            var mod = await _context.User_Role.FindAsync(channelId, userId);
+            var mod = await _context.User_Roles.FindAsync(channelId, userId);
             if (mod == null) return (false, new string[] { "Moderator not found" });
 
-            _context.Moderators.Remove(mod);
+            _context.User_Roles.Remove(mod);
             await _context.SaveChangesAsync();
             return (true, new string[] {"Moderator removed"});
         }
 
         public async Task<IEnumerable<User>> GetChannelModAsync(int channelId)
         {
-            var users = await _context.User_Role
+            var users = await _context.User_Roles
             .Where(m => m.ChannelOwnerId == channelId)
-            .Select(m => m.ModeratorUser)
+            .Select(m => m.User)
             .Where(u => u != null)
             .ToListAsync();
 
@@ -104,7 +104,7 @@ namespace StreamingApp.Managers
 
         public async Task<(bool Succeeded, string[] Errors)> IsChannelModAsync(int channelId, int userId)
         {
-            var mod = await _context.User_Role.FindAsync(channelId, userId);
+            var mod = await _context.User_Roles.FindAsync(channelId, userId);
             return (mod != null, new string[] { mod == null ? "User is not a moderator" : "User is a moderator" });
         }
     }
