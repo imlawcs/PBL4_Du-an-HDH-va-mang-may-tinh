@@ -137,8 +137,8 @@ namespace StreamingApp
             app.UseAuthentication();
 
             // Thêm middleware tùy chỉnh của bạn (nếu cần thiết)
-            app.UseMiddleware<JwtMiddleware>();
-            app.UseMiddleware<ValidateMiddleware>();
+            // app.UseMiddleware<JwtMiddleware>();
+            // app.UseMiddleware<ValidateMiddleware>();
 
             // Sử dụng Authorization sau Authentication
             app.UseAuthorization();

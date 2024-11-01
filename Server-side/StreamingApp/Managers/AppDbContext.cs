@@ -41,21 +41,20 @@ public class AppDbContext : DbContext
     {
         entity.HasKey(ur => new { ur.UserId, ur.RoleId });
 
-        entity.HasOne(ur => ur.User) // Quan hệ với User qua UserId
-        .WithMany()
-        .HasForeignKey(ur => ur.UserId)
-        .OnDelete(DeleteBehavior.NoAction);
+        entity.HasOne(ur => ur.User)
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        entity.HasOne(ur => ur.ChannelOwner) // Quan hệ với User qua ChannelOwnerId
-        .WithMany()
-        .HasForeignKey(ur => ur.channelOwnerID)
-        .OnDelete(DeleteBehavior.NoAction);
+        entity.HasOne(ur => ur.Role)
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(ur => ur.RoleId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        entity.HasOne(ur => ur.Role) // Quan hệ với Role
-        .WithMany(r => r.UserRoles)
-        .HasForeignKey(ur => ur.RoleId)
-        .OnDelete(DeleteBehavior.NoAction);
-
+        entity.HasOne(ur => ur.ChannelOwner)
+            .WithMany()
+            .HasForeignKey(ur => ur.ChannelOwnerId)
+            .OnDelete(DeleteBehavior.NoAction);
     });
 
             modelBuilder.Entity<Following>(entity =>
@@ -93,6 +92,8 @@ public class AppDbContext : DbContext
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserName)
                 .IsUnique();
+
+            
 
             modelBuilder.Entity<Role>().HasData(
             new Role { RoleId = 1, RoleName = "Admin", RoleDesc = "Admin" },

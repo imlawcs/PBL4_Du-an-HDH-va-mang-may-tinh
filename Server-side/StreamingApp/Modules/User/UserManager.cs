@@ -19,12 +19,20 @@ namespace StreamingApp.Managers
 
         //read list
         public async Task<IEnumerable<User>> GetUsers() {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users
+                .Include(u => u.UserRoles) // Nạp UserRoles
+                .ThenInclude(ur => ur.Role) // Nạp Role từ UserRoles
+                .ToListAsync();
+            if (users == null) return null;
+            return users;
         }
 
         //read by id
         public async Task<User?> GetUserById(int id) {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.UserId == id);
             if (user == null) return null;
             return user;
         }

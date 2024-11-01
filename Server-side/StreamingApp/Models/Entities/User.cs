@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 namespace StreamingApp.Models.Entities
 {
@@ -27,12 +28,15 @@ public class User
         public bool? UserStatus { get; set; }
         public bool? IsEmailNoti { get; set; }
 
-        public ICollection<Blocked> BlockedUsers { get; set; }
-        public ICollection<Blocked> BlockedByUsers { get; set; }
+        public virtual ICollection<Blocked> BlockedUsers { get; set; }
+        public virtual ICollection<Blocked> BlockedByUsers { get; set; }
 
-        public ICollection<Following> Followings { get; set; }
-        public ICollection<Following> Followers { get; set; }
+        public virtual ICollection<Following> Followings { get; set; }
+        public virtual ICollection<Following> Followers { get; set; }
 
+        
+        public virtual ICollection<Notification> Notifications { get; set; }
 
-        public ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<User_Role> UserRoles { get; set; }
+        
 }}
