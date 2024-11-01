@@ -14,5 +14,7 @@ namespace StreamingApp.Models.Entities
 
         [MaxLength(100)]
         public string RoleDesc { get; set; }
+
+        public ICollection<User_Role> UserRoles { get; set; }
     }
 }

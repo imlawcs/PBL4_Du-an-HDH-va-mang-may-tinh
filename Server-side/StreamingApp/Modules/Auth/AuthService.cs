@@ -70,7 +70,7 @@ public class AuthService : IAuthService
             PhoneNumber = registerModel.PhoneNumber,
             DisplayName = registerModel.DisplayName,
             RegisterDate = DateTime.Now,
-            RoleId = 2
+            // RoleId = 2
         };
 
         try
@@ -93,7 +93,7 @@ public class AuthService : IAuthService
             PhoneNumber = user.PhoneNumber,
             DisplayName = user.DisplayName,
             RegisterDate = user.RegisterDate,
-            RoleId = user.RoleId
+            // RoleId = user.RoleId
         };
     }
 }
