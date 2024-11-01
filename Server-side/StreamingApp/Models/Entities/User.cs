@@ -7,7 +7,6 @@ public class User
 {       [Key]
         [Required]
         public int UserId { get; set; }
-        public int RoleId { get; set; }
 
         [MaxLength(100)]
         public string UserName { get; set; }
@@ -28,17 +27,12 @@ public class User
         public bool? UserStatus { get; set; }
         public bool? IsEmailNoti { get; set; }
 
-        [ForeignKey("RoleId")]
-        public virtual Role Role { get; set; }
-
         public ICollection<Blocked> BlockedUsers { get; set; }
         public ICollection<Blocked> BlockedByUsers { get; set; }
 
         public ICollection<Following> Followings { get; set; }
         public ICollection<Following> Followers { get; set; }
 
-        public ICollection<Moderator> Moderators { get; set; }
-        public ICollection<Moderator> ModeratorOf { get; set; }
 
         public ICollection<Notification> Notifications { get; set; }
 }}

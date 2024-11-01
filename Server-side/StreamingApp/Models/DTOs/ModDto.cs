@@ -2,13 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StreamingApp.Models.DTOs
 {
-    public class ModDto
+    public class ModDTO
     {
         [Required]
-        public int channelId { get; set; }
+        public int ChannelId { get; set; }
 
         [Required]
-        public int userId { get; set; }
+        public int UserId { get; set; }
         
     }
 }
