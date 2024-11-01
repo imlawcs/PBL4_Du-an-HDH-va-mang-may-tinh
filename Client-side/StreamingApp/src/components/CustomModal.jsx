@@ -285,9 +285,7 @@ export default function CustomModal(props) {
     const [option, setOption] = useState(0);
     const [isClose, setIsClose] = useState(false);
     const [serverStatus, setServerStatus] = useState(false);
-    useEffect(() => {
-      SignalRTest.serverOn();
-    }, []);
+    
     return (
       <>
         <div className="modal__layout bg__color-2">

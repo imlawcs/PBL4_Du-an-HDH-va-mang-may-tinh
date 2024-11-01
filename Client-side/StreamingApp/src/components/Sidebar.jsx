@@ -1399,7 +1399,7 @@ export default function Sidebar(props) {
                       width: "100%",
                       height: "100%",
                     }
-                  } id="remote__stream" autoPlay playsInline controls={false}></video>
+                  } id="remote__stream" autoPlay controls={false}></video>
                 
               </div>
 

@@ -1,5 +1,6 @@
 import * as signalR from '@microsoft/signalr'
 import { sendMessage } from '@microsoft/signalr/dist/esm/Utils';
+import { ApiConstants } from '../API/ApiConstants';
 
 /*
     This file handles all the WebRTC related functionalities.
@@ -34,7 +35,7 @@ let isServerOn = false;
 
 //initialize signalR
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:3001/webrtc",{
+    .withUrl(ApiConstants.BASE_URL + "/webrtc",{
     //  accessTokenFactory: () => getToken(),
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
@@ -97,6 +98,15 @@ connection.on("clientJoinedRoom", async (room, host) => {
     console.log("joined: " + room);
     hostConnectionId = host;
     console.log("Host Connection Id: " + hostConnectionId);
+});
+connection.on("disposeClient", async (host) => {
+    console.log("left room:  " + host);
+    hostConnectionId = null;
+    peerConnection.close();
+    peerConnection = null;
+    remoteStream.getTracks().forEach(track => track.stop());
+    remoteStream = null;
+    
 });
 /*
     Client nhận offer từ host và gửi lại answer cho host
@@ -213,8 +223,20 @@ export const SignalRTest = {
                 console.error(err);
             }
         },
+        async serverOff(){
+            try {
+                if(connection.connectionStarted){
+                    await connection.stop();
+                    console.log("SignalR Disconnected");
+                    isServerOn = false;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        },
         async start(hostName) {
             if(isServerOn){
+                 //Turn server on
                 if(localStream != null){
                     connection.invoke("createRoom", hostName); //Create room and wait for offer from client
                 }
@@ -280,7 +302,6 @@ export const SignalRTest = {
         stop() {
             connection.invoke("removeRoom");
             document.getElementById('localVideo').style.display = 'none';
-            isServerOn = false;
             
         }
 

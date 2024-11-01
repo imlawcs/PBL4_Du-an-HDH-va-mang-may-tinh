@@ -37,6 +37,7 @@ namespace StreamingApp.Hubs
             else if (remove is string host)
             {
                 Clients.Client(host).SendAsync("RoomLeft", Context.ConnectionId);
+                Clients.Client(Context.ConnectionId).SendAsync("DisposeClient", host);
             }
             else if (remove is null)
             {
@@ -99,6 +100,7 @@ namespace StreamingApp.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, Context.ConnectionId);
             await Clients.Caller.SendAsync("RoomRemoved", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
+        //current issue
         public async Task SendOffer(object offer, string ClientConnectionId)
         {
             //send offer tới client
