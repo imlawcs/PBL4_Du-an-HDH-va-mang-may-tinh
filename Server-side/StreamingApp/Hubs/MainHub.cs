@@ -36,8 +36,10 @@ namespace StreamingApp.Hubs
             }
             else if (remove is string host)
             {
+                Groups.RemoveFromGroupAsync(Context.ConnectionId, host);
                 Clients.Client(host).SendAsync("RoomLeft", Context.ConnectionId);
                 Clients.Client(Context.ConnectionId).SendAsync("DisposeClient", host);
+
             }
             else if (remove is null)
             {
@@ -86,6 +88,7 @@ namespace StreamingApp.Hubs
             else await Clients.Caller.SendAsync("Error", "Room not found or the streamer is offline.");
 
         }
+        [ObsoleteAttribute("this function doesn\'t work anymore", false)]
         public async Task LeaveRoom(string hostConnectionId)
         {
 

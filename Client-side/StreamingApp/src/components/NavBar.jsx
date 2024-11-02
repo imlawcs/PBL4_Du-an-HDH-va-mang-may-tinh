@@ -31,14 +31,16 @@ export default function NavBar(props) {
         setTimeout(() => setShowToast(false), 300); // Wait for slide out animation
       }, 3000);
     }
+    
+    else setIsLoggedIn(false);
+    return () => clearTimeout(timer);
+  }, [showToast]);
+
+  useEffect(() => {
     if (token) {
       setIsLoggedIn(true);
     }
-    else setIsLoggedIn(false);
-    console.log(token);
-    console.log(auth.user);
-    return () => clearTimeout(timer);
-  }, [showToast]);
+  }, []);
   const handleLogout = () => {
     setIsLoggedIn(false);
     auth.logOut();

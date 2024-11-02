@@ -23,6 +23,7 @@ const AuthProvider = ({ children }) => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
               },
               body: JSON.stringify(data),
             });
@@ -36,7 +37,7 @@ const AuthProvider = ({ children }) => {
                // Call the login function passed via props
             } else {
               const errorData = await response.json();
-              console.error({ form: errorData.error });
+              alert({ form: errorData.error });
               return;
             }
           } catch (error) {
@@ -60,13 +61,12 @@ const AuthProvider = ({ children }) => {
             });
   
             if (response.ok) {
-              alert("Signed up successfully, please login"); // Store the JWT token
-              navigate('/');// Redirect to the home page
+              alert("Signed up successfully, please login"); // Store the JWT token// Redirect to the home page
               return true;
                // Call the login function passed via props
             } else {
               const errorData = await response.json();
-              console.error({ form: errorData.error });
+              alert({ form: errorData.error });
               return { form: errorData.error };
             }
           } catch (error) {

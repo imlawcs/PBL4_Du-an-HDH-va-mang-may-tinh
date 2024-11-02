@@ -16,6 +16,10 @@ export default function StreamChat(props) {
   const context =
     "Consequat ex amet quis aliqua duis. Aute sunt cupidatat irure ex anim cillum Lorem culpa. Aute elit commodo occaecat sunt elit culpa qui mollit. Commodo id officia adipisicing pariatur consectetur tempor occaecat.";
   const [isVisible, setVisible] = useState(true);
+  const [chatContents, setChatContents] = useState("");
+  const [messages, setMessages] = useState(SignalRTest.getChatStream());
+
+    
   const auth = useAuth();
   if (isVisible)
     return (
@@ -35,7 +39,15 @@ export default function StreamChat(props) {
           </div>
           <div className="sc__body">
             <div id="chat__holder" className="sc__body-holder">
-              
+              {messages.map((msg, index) => (
+                <ChatComp
+                  key={index}
+                  badge={msg.badge}
+                  timeStamp={msg.timeStamp}
+                  userName={msg.userName}
+                  chatContext={msg.chatContext}
+                />
+              ))}
             </div>
             {/* signalr here */}
           </div>
@@ -49,19 +61,22 @@ export default function StreamChat(props) {
                 type="text"
                 name="chat__context"
                 id="chat__box"
+                value={chatContents}
+                onChange={(e) => setChatContents(e.target.value)}
               />
               <BtnIcon icons={faIcons} />
             </div>
             <div className="sc__btn-holder rr__flex-row">
               <Button type="default" text="Chat" onClick={() => {
-                const chatContents = document.getElementById('chat__box').value;
-                SignalRTest.sendMessage(chatContents, "random");
+                SignalRTest.sendMessage(chatContents, "random")
+                setMessages(SignalRTest.getChatStream());
+                setChatContents("");
               }}/>
             </div>
             </> 
             :
             <>
-              <span className="fs__normal-2 fill__container league-spartan-semibold citizenship ta__center">
+              <span className="fs__normal-2 fill__container fill__y rrf__ai-center league-spartan-semibold citizenship ta__center">
                 Please login to chat
               </span>
             </>

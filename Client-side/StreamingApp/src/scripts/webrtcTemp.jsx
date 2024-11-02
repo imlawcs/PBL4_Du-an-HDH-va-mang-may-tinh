@@ -1,6 +1,9 @@
 import * as signalR from '@microsoft/signalr'
 import { sendMessage } from '@microsoft/signalr/dist/esm/Utils';
 import { ApiConstants } from '../API/ApiConstants';
+import ChatComp from '../components/ChatComp';
+import { createRoot } from 'react-dom/client';
+import StreamChat from '../components/StreamChat';
 
 /*
     This file handles all the WebRTC related functionalities.
@@ -14,7 +17,7 @@ import { ApiConstants } from '../API/ApiConstants';
 let localStream;
 //[CLIENT] stream 
 // let remoteStream;
-
+let chatStream = new Array();
 //[CLIENT]
 let hostConnectionId;
 //[HOST] peer
@@ -22,6 +25,11 @@ let hostConnectionId;
 let hostPeerConnection = {};
 //[CLIENT] peer
 //[ALL]
+const servers = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" }
+    ]
+};
 let isServerOn = false;
 //get token from local storage
 
@@ -32,6 +40,62 @@ let isServerOn = false;
 //     }
 //     return token;
 // };
+
+/*
+    CHAT HANDLING
+*/
+// let root;
+// let chatContents;
+// const ChatContainer = () => {
+//     const [messages, setMessages] = useState([]);
+
+//     const addMessage = (username, message) => {
+//         const newMessage = {
+//             badge: null,
+//             timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
+//             userName: username,
+//             chatContext: message,
+//         };
+//         setMessages([...messages, newMessage]);
+//     };
+
+//     return (
+//         <div>
+//             {messages.map((msg, index) => (
+//                 <ChatComp
+//                     key={index}
+//                     badge={msg.badge}
+//                     timeStamp={msg.timeStamp}
+//                     userName={msg.userName}
+//                     chatContext={msg.chatContext}
+//                 />
+//             ))}
+//         </div>
+//     );
+// };
+// function initializeChatComponent() {
+//     chatContents = document.getElementById('chat__holder');
+//     if (chatContents) {
+//         root = hydrateRoot(chatContents, <ChatContainer />);
+//         chatContents.addEventListener('addMessage', (event) => {
+//             console.log('addMessage event received');
+//             const { username, message } = event.detail;
+//             const chatContainer = root._internalRoot.current.child.stateNode;
+//             chatContainer.addMessage(username, message);
+//             root.render(<ChatContainer />);
+//         });
+//     } else {
+//         console.error('chat__holder element not found');
+//     }
+// }
+// // Ensure the DOM is fully loaded before initializing the chat component
+// document.addEventListener('DOMContentLoaded', (event) => {
+//     initializeChatComponent();
+// });
+//-----------------------
+
+
+
 
 //initialize signalR
 const connection = new signalR.HubConnectionBuilder()
@@ -49,16 +113,13 @@ connection.on("ready", async => {
 });
 connection.on("sendMessage", async (username, message) => {
     console.log(`${username}: ` + message);
-    const chatContents = document.getElementById('chat__holder');
-    const chatComponent = (
-        <ChatComp
-            badge={null}
-            timeStamp={new Date().toLocaleTimeString()}
-            userName={username}
-            chatContext={message}
-        />
-    );
-    ReactDOM.render(chatComponent, chatContents.appendChild(document.createElement('div')));
+    chatStream.push({
+        userName: username,
+        chatContext: message,
+        timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
+        badge: null,
+    });
+    console.log("successfully pushed message");
 });
 //[HOST]room created
 connection.on("roomCreated", async (hostName) => {
@@ -127,9 +188,7 @@ connection.on("receiveAnswer", async (answer, client) => {
 connection.on("doneAnswer", async () => {
     console.log("DONE SETTING UP!");
 });
-connection.on("sendMessage", async (message, sender) => {
-    console.log("Message from " + sender + ": " + message);
-});
+
 /*
     Sau khi tạo kêt nối, test connection bằng iceCandidate để đổi connectionState
 */
@@ -191,25 +250,30 @@ connection.on("error", async (message) => {
 });
 
 //ice Server
-const servers = {
-    iceServers: [
-        { urls: "stun:stun.l.google.com:19302" }
-    ]
-};
+
 
 
 let peerConnection = new RTCPeerConnection(servers);
-peerConnection.addEventListener('track', async (event) => {
+// peerConnection.addEventListener('track', async (event) => {
+//     const remoteVideo = document.getElementById('remote__stream');
+//     const [remoteStream] = event.streams;
+//     remoteVideo.srcObject = remoteStream[0];
+//     alert("Track received");
+// });
+peerConnection.ontrack = (event) => {
     const remoteVideo = document.getElementById('remote__stream');
-    const [remoteStream] = event.streams;
-    remoteVideo.srcObject = remoteStream;
-});
-
+    remoteVideo.srcObject = event.streams[0];
+    alert("Track received");
+}
 
 
 export const SignalRTest = {
         getServerStatus(){
             return isServerOn;
+        },
+        getChatStream(){
+            console.log(JSON.stringify(chatStream));
+            return chatStream;
         },
     //[BOTH] start signalR
         async serverOn() {
@@ -272,7 +336,7 @@ export const SignalRTest = {
                     }
                 };
                 const offer = await hostPeerConnection[clientConnectionId].createOffer();
-                console.log("Offer created: " + offer);
+                console.log("Offer created: " + JSON.stringify(offer));
                 await hostPeerConnection[clientConnectionId].setLocalDescription(offer);
                 console.log(`Sending offer to client: ${clientConnectionId}`);
                 await connection.invoke("SendOffer", offer, clientConnectionId);
@@ -286,7 +350,7 @@ export const SignalRTest = {
             if(isServerOn){
                 connection.invoke("joinRoom", username ,hostName); //Join room and send offer
             }
-            else alert("Server is off");
+            else console.log("Server is off");
         },
         async leaveRoom() {
             peerConnection.close();
@@ -296,14 +360,20 @@ export const SignalRTest = {
             connection.invoke("leaveRoom", hostConnectionId);
         },
         async sendMessage(message, user) {
-            connection.invoke("sendMessage", user, message, hostConnectionId);
+            if(hostConnectionId !== null){
+                connection.invoke("sendMessage", user, message, hostConnectionId);
+            }
         },
 
         stop() {
             connection.invoke("removeRoom");
             document.getElementById('localVideo').style.display = 'none';
             
-        }
+        },
+        modifySDP(sdp){
+            sdp = sdp.replace(/a=fmtp:.*\r\n/g, '');
+            return sdp;
+        },
 
 }
 

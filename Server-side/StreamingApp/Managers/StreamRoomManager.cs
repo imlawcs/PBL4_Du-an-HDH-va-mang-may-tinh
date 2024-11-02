@@ -76,6 +76,7 @@ namespace StreamingApp.Managers
             {
                 if (room.HostConnectionId.Equals(connectionId, StringComparison.Ordinal))
                 {
+                    //xoa phong
                     DeleteRoomByHostConnectionId(connectionId);
                     return room;
                 }
@@ -83,6 +84,7 @@ namespace StreamingApp.Managers
                 {
                     if (joiner.ConnectionId.Equals(connectionId, StringComparison.Ordinal))
                     {
+                        //remove joiner
                         RemoveJoinerFromRoom(room.HostConnectionId, connectionId);
                         return room.HostConnectionId;
                     }
@@ -94,6 +96,10 @@ namespace StreamingApp.Managers
         public object? AddJoinerToRoom(StreamJoiner joiner, string HostConnectionId)
         {
             var room = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId, StringComparison.Ordinal));
+            if(room.StreamJoiners.FirstOrDefault(joiner => joiner.ConnectionId.Equals(joiner.ConnectionId, StringComparison.Ordinal)) != null)
+            {
+                this.RemoveJoinerFromRoom(HostConnectionId, joiner.ConnectionId);
+            }
             room.StreamJoiners.Add(joiner);
             room.Viewers += 1;
             var update = UpdateRoomByHostConnectionId(HostConnectionId, room);

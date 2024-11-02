@@ -154,10 +154,11 @@ export default function CustomModal(props) {
     );
   } 
   else if (props.type === "signup") {
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [agreeTerms, setAgreeTerms] = useState(false);
     const [Username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
+    const [Email, setEmail] = useState("");
+    const [DisplayName, setDisplayName] = useState("");
+    const [PhoneNumber, setPhoneNumber] = useState("");
+    const [ConfirmPassword, setConfirmPassword] = useState("");
     const [Password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
     const validateSignup = () => {
@@ -165,13 +166,13 @@ export default function CustomModal(props) {
 
       if (!Username.trim()) {
         newErrors.Username = "Username is required";
-      } else if (Username.length < 3) {
-        newErrors.Username = "Username must be at least 3 characters long";
+      } else if (Username.length < 5) {
+        newErrors.Username = "Username must be at least 5 characters long";
       }
 
-      if (!email.trim()) {
+      if (!Email.trim()) {
         newErrors.email = "Email is required";
-      } else if (!/\S+@\S+\.\S+/.test(email)) {
+      } else if (!/\S+@\S+\.\S+/.test(Email)) {
         newErrors.email = "Email is invalid";
       }
 
@@ -181,14 +182,11 @@ export default function CustomModal(props) {
         newErrors.Password = "Password must be at least 8 characters long";
       }
 
-      if (Password !== confirmPassword) {
+      if (Password !== ConfirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
       }
 
-      if (!agreeTerms) {
-        newErrors.agreeTerms = "You must agree to the terms and conditions";
-      }
-
+      
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
     };
@@ -197,7 +195,8 @@ export default function CustomModal(props) {
     const handleSignup = () => {
       if (validateSignup()) {
         // Proceed with signup
-        
+        const data = { Username, Password, ConfirmPassword, Email, PhoneNumber, DisplayName };
+        Auth.signUp(data);
         // props.signup();
       }
     };
@@ -228,7 +227,7 @@ export default function CustomModal(props) {
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                 type="email"
                 placeholder="Email"
-                value={email}
+                value={Email}
                 onChange={(e) => setEmail(e.target.value)}
               />
               {errors.email && (
@@ -236,6 +235,21 @@ export default function CustomModal(props) {
                   {errors.email}
                 </span>
               )}
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                type="text"
+                placeholder="Display name"
+                value={DisplayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+              />
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                type="text"
+                placeholder="Phone number"
+                value={PhoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+              {/* for error */}
               <input
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                 type="Password"
@@ -252,7 +266,7 @@ export default function CustomModal(props) {
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                 type="Password"
                 placeholder="Confirm Password"
-                value={confirmPassword}
+                value={ConfirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               {errors.confirmPassword && (
