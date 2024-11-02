@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StreamingApp.Models.DTOs;
+using StreamingApp.Services;
 
 namespace StreamingApp.Controllers
 {
@@ -35,7 +36,7 @@ namespace StreamingApp.Controllers
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
-                return NotFound();
+                return NotFound("User not found");
             return Ok(user);
         }
 

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace StreamingApp.Migrations
 {
     /// <inheritdoc />
@@ -58,7 +60,6 @@ namespace StreamingApp.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -73,12 +74,6 @@ namespace StreamingApp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
-                    table.ForeignKey(
-                        name: "FK_Users_Role_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Role",
-                        principalColumn: "RoleId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -125,30 +120,6 @@ namespace StreamingApp.Migrations
                     table.ForeignKey(
                         name: "FK_Followings_Users_FollowerId",
                         column: x => x.FollowerId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Moderators",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    UserIdModerator = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Moderators", x => new { x.UserId, x.UserIdModerator });
-                    table.ForeignKey(
-                        name: "FK_Moderators_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Moderators_Users_UserIdModerator",
-                        column: x => x.UserIdModerator,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -206,6 +177,34 @@ namespace StreamingApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "User_Roles",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    channelOwnerID = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User_Roles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_User_Roles_Role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Role",
+                        principalColumn: "RoleId");
+                    table.ForeignKey(
+                        name: "FK_User_Roles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
+                    table.ForeignKey(
+                        name: "FK_User_Roles_Users_channelOwnerID",
+                        column: x => x.channelOwnerID,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StreamCategories",
                 columns: table => new
                 {
@@ -253,6 +252,36 @@ namespace StreamingApp.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Role",
+                columns: new[] { "RoleId", "RoleDesc", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Admin", "Admin" },
+                    { 2, "User", "User" },
+                    { 3, "Moderator", "Moderator" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserId", "Bio", "DisplayName", "Email", "IsEmailNoti", "Password", "PhoneNumber", "ProfilePic", "RegisterDate", "UserName", "UserStatus" },
+                values: new object[,]
+                {
+                    { 1, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$RJG5QbAKISia/q0bXX4wyOIILEM.njqAHInH3NhPlLlEaGWMbeY9m", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
+                    { 2, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$gGwmctSdoesgl.ko6s5nne9WfGtXoijaxp7R9wXiDXH4mYioiq1Bm", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
+                    { 3, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$aWIbo3yXS0Qfze4IiFiIAup4ejL3Jgceo3D3B9WeyMJbh31J1tZaO", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "User_Roles",
+                columns: new[] { "RoleId", "UserId", "channelOwnerID" },
+                values: new object[,]
+                {
+                    { 1, 1, null },
+                    { 1, 2, null },
+                    { 1, 3, null }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Blockeds_BlockedId",
                 table: "Blockeds",
@@ -262,11 +291,6 @@ namespace StreamingApp.Migrations
                 name: "IX_Followings_FolloweeId",
                 table: "Followings",
                 column: "FolloweeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Moderators_UserIdModerator",
-                table: "Moderators",
-                column: "UserIdModerator");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_StreamerUserId",
@@ -294,8 +318,13 @@ namespace StreamingApp.Migrations
                 column: "StreamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_RoleId",
-                table: "Users",
+                name: "IX_User_Roles_channelOwnerID",
+                table: "User_Roles",
+                column: "channelOwnerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Roles_RoleId",
+                table: "User_Roles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
@@ -315,9 +344,6 @@ namespace StreamingApp.Migrations
                 name: "Followings");
 
             migrationBuilder.DropTable(
-                name: "Moderators");
-
-            migrationBuilder.DropTable(
                 name: "Notifications");
 
             migrationBuilder.DropTable(
@@ -325,6 +351,9 @@ namespace StreamingApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "StreamTags");
+
+            migrationBuilder.DropTable(
+                name: "User_Roles");
 
             migrationBuilder.DropTable(
                 name: "Categories");
@@ -336,10 +365,10 @@ namespace StreamingApp.Migrations
                 name: "Tag");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Role");
 
             migrationBuilder.DropTable(
-                name: "Role");
+                name: "Users");
         }
     }
 }
