@@ -16,6 +16,39 @@ namespace StreamingApp.Hubs
         {
             streamRoomManager = new StreamRoomManager();
         }
+
+        public override Task OnConnectedAsync()
+        {
+            //global connection check
+            Console.WriteLine("Client connected: " + Context.ConnectionId);
+
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            //global disconection check
+            Console.WriteLine("Client disconnected: " + Context.ConnectionId);
+            var remove = streamRoomManager.RemoveConnection(Context.ConnectionId);
+            if (remove is StreamRoom room)
+            {
+                Clients.Client(room.HostConnectionId).SendAsync("RoomRemove", Context.ConnectionId);
+            }
+            else if (remove is string host)
+            {
+                Console.WriteLine("Host disconnected: " + host);
+                Groups.RemoveFromGroupAsync(Context.ConnectionId, host);
+                Clients.Client(host).SendAsync("RoomLeft", Context.ConnectionId);
+                Clients.Client(Context.ConnectionId).SendAsync("DisposeClient", host);
+
+            }
+            else if (remove is null)
+            {
+                Console.WriteLine("Room not found cuz room is null");
+            }
+            return base.OnDisconnectedAsync(exception);
+        }
+
         public async Task SendMessage(string user, string message, string hostConnectionId)
             => await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
 
@@ -56,6 +89,7 @@ namespace StreamingApp.Hubs
             else await Clients.Caller.SendAsync("Error", "Room not found or the streamer is offline.");
 
         }
+        [ObsoleteAttribute("this function doesn\'t work anymore", false)]
         public async Task LeaveRoom(string hostConnectionId)
         {
 
@@ -63,6 +97,20 @@ namespace StreamingApp.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostConnectionId);
             await Clients.Client(hostConnectionId).SendAsync("RoomLeft", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
+        public async Task RemoveRoom()
+        {
+
+            var room = streamRoomManager.RemoveConnection(Context.ConnectionId);
+            foreach (var joiner in ((StreamRoom)room).StreamJoiners)
+            {
+                Console.WriteLine("Remove joiner: " + joiner.ConnectionId);
+                await Groups.RemoveFromGroupAsync(joiner.ConnectionId, Context.ConnectionId);
+                await Clients.Client(joiner.ConnectionId).SendAsync("DisposeClient", Context.ConnectionId);
+            }
+            Console.WriteLine("Room removed: " + JsonConvert.SerializeObject(room));
+            await Clients.Caller.SendAsync("RoomRemoved", JsonConvert.SerializeObject(room), Context.ConnectionId);
+        }
+        //current issue
         public async Task SendOffer(object offer, string ClientConnectionId)
         {
             //send offer tới client

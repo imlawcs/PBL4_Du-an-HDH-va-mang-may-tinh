@@ -1255,10 +1255,7 @@ export default function Sidebar(props) {
     );
   } else {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
-    useEffect(() => async () => {
-      console.log("Start loading stream...");
-      await SignalRTest.joinRoom("randomUser", props.userRoute);
-    }, []);
+    
     return (
       <>
         <div className="main__position">
@@ -1399,8 +1396,8 @@ export default function Sidebar(props) {
                       width: "100%",
                       height: "100%",
                     }
-                  } id="remote__stream" autoPlay playsInline controls={false}></video>
-                
+                  } id="remote__stream" autoPlay={true} controls={true} preload="metadata"></video>
+
               </div>
 
               <StreamUserInfo
