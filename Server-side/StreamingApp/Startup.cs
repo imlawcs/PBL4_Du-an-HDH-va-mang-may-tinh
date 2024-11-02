@@ -66,8 +66,13 @@ namespace StreamingApp
             services.AddScoped<ICategoryService, CategoryService>();
 
 
-            services.AddScoped<ModManager>();
-            services.AddScoped<IModService, ModService>();
+            // services.AddScoped<ModManager>();
+            // services.AddScoped<IModService, ModService>();
+
+            services.AddScoped<TagManager>();
+            services.AddScoped<ITagService, TagService>();
+
+
 
 
             services.AddSingleton<MainHub>();
