@@ -32,7 +32,7 @@ const servers = {
 };
 let isServerOn = false;
 //get token from local storage
-
+let viewers;
 // const getToken = () => {
 //     const token = localStorage.getItem('token');
 //     if (!token) {
@@ -274,6 +274,10 @@ export const SignalRTest = {
         getChatStream(){
             console.log(JSON.stringify(chatStream));
             return chatStream;
+        },
+        getHostConnectionId(){
+            console.log("Host Connection Id: " + hostConnectionId);
+            return hostConnectionId;
         },
     //[BOTH] start signalR
         async serverOn() {

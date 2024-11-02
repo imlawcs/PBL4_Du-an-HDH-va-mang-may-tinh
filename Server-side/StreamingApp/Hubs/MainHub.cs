@@ -36,6 +36,7 @@ namespace StreamingApp.Hubs
             }
             else if (remove is string host)
             {
+                Console.WriteLine("Host disconnected: " + host);
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, host);
                 Clients.Client(host).SendAsync("RoomLeft", Context.ConnectionId);
                 Clients.Client(Context.ConnectionId).SendAsync("DisposeClient", host);
@@ -98,9 +99,15 @@ namespace StreamingApp.Hubs
         }
         public async Task RemoveRoom()
         {
+
             var room = streamRoomManager.RemoveConnection(Context.ConnectionId);
+            foreach (var joiner in ((StreamRoom)room).StreamJoiners)
+            {
+                Console.WriteLine("Remove joiner: " + joiner.ConnectionId);
+                await Groups.RemoveFromGroupAsync(joiner.ConnectionId, Context.ConnectionId);
+                await Clients.Client(joiner.ConnectionId).SendAsync("DisposeClient", Context.ConnectionId);
+            }
             Console.WriteLine("Room removed: " + JsonConvert.SerializeObject(room));
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, Context.ConnectionId);
             await Clients.Caller.SendAsync("RoomRemoved", JsonConvert.SerializeObject(room), Context.ConnectionId);
         }
         //current issue

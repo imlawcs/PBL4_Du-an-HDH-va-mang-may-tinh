@@ -11,6 +11,34 @@ openssl req -x509 -newkey rsa:2048 -keyout certs/key.pem -out certs/cert.pem -da
 
 - Replace `youripaddress` with your ip (`localhost` is also accepted)
 
+- Or with config file:
+
+```console
+
+openssl req -x509 -newkey rsa:2048 -keyout certs/key.pem -out certs/cert.pem -days 365 -nodes -config server_cert.cfg
+
+```
+
+- Example of server_cert.cfg:
+
+```cfg
+[ req ]
+default_bits       = 2048
+prompt             = no
+default_md         = sha256
+distinguished_name = dn
+req_extensions     = req_ext
+
+[ dn ]
+CN = yourip
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+IP.1 = yourip
+```
+
 **2. Config your `vite.config.js`**
 
 ```js
@@ -31,7 +59,20 @@ export default defineConfig({
 });
 ```
 
-**3. Run the project:**
+**3. Config your `dev` in `package.json` as below**
+
+```json
+
+"scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+
+```
+
+**4. Run the project:**
 
 ```console
 

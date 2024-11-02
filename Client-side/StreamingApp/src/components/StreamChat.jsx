@@ -9,17 +9,22 @@ import {
 import Button from "./Button";
 import "../assets/css/StreamChat.css";
 import BtnIcon from "./BtnIcon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/AuthProvider";
 import { SignalRTest } from "../scripts/webrtcTemp";
 export default function StreamChat(props) {
   const context =
     "Consequat ex amet quis aliqua duis. Aute sunt cupidatat irure ex anim cillum Lorem culpa. Aute elit commodo occaecat sunt elit culpa qui mollit. Commodo id officia adipisicing pariatur consectetur tempor occaecat.";
   const [isVisible, setVisible] = useState(true);
-  const [chatContents, setChatContents] = useState("");
   const [messages, setMessages] = useState(SignalRTest.getChatStream());
+  const [chatContents, setChatContents] = useState("");
+  const [isOnline, setIsOnline] = useState(SignalRTest.getHostConnectionId());
+  
+  useEffect(() => {
+    setIsOnline(SignalRTest.getHostConnectionId());
+  }, [isOnline]);
 
-    
+
   const auth = useAuth();
   if (isVisible)
     return (
@@ -53,27 +58,34 @@ export default function StreamChat(props) {
           </div>
           <div className="sc__footer rr__flex-col">
             {auth.token ? 
+            isOnline !== null ?
             <>
-            <div className="cb__holder rr__flex-row">
-              <input
-                placeholder="Chat something..."
-                className="chat__box-c fs__normal-2 league-spartan-light fill__container"
-                type="text"
-                name="chat__context"
-                id="chat__box"
-                value={chatContents}
-                onChange={(e) => setChatContents(e.target.value)}
-              />
-              <BtnIcon icons={faIcons} />
-            </div>
-            <div className="sc__btn-holder rr__flex-row">
-              <Button type="default" text="Chat" onClick={() => {
-                SignalRTest.sendMessage(chatContents, "random")
-                setMessages(SignalRTest.getChatStream());
-                setChatContents("");
-              }}/>
-            </div>
+              <div className="cb__holder rr__flex-row">
+                <input
+                  placeholder="Chat something..."
+                  className="chat__box-c fs__normal-2 league-spartan-light fill__container"
+                  type="text"
+                  name="chat__context"
+                  id="chat__box"
+                  value={chatContents}
+                  onChange={(e) => setChatContents(e.target.value)}
+                />
+                <BtnIcon icons={faIcons} />
+              </div>
+              <div className="sc__btn-holder rr__flex-row">
+                <Button type="default" text="Chat" onClick={() => {
+                  SignalRTest.sendMessage(chatContents, "random")
+                  setMessages(SignalRTest.getChatStream());
+                  setChatContents("");
+                }}/>
+              </div>
             </> 
+            :
+            <>
+              <span className="fs__normal-2 fill__container fill__y rrf__ai-center league-spartan-semibold citizenship ta__center">
+                Streamer is offline
+              </span>
+            </>
             :
             <>
               <span className="fs__normal-2 fill__container fill__y rrf__ai-center league-spartan-semibold citizenship ta__center">
