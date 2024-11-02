@@ -1,11 +1,15 @@
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies; // Đảm bảo đã thêm namespace này
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using StreamingApp.Hubs;
 using StreamingApp.Managers;
 using StreamingApp.Middlewares;
 using StreamingApp.Services;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace StreamingApp
 {
@@ -20,11 +24,17 @@ namespace StreamingApp
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Đăng ký DbContext với chuỗi kết nối từ appsettings.json
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            // Đăng ký CORS
 
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; // Sử dụng IgnoreCycles
+                    options.JsonSerializerOptions.WriteIndented = true;
+                });
+
+            // Đăng ký CORS
             services.AddCors(options =>
             {
                 options.AddPolicy("ClientPermission", policy =>
@@ -35,15 +45,23 @@ namespace StreamingApp
                         .AllowCredentials();
                 });
             });
-            // Đăng ký các dịch vụ
-            services.AddControllers();
-            services.AddSignalR();
 
-            // Đăng ký dịch vụ AuthService
+            // Đăng ký các dịch vụ
+            services.AddSignalR();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<CategoryManager>();
+            services.AddScoped<ICategoryService, CategoryService>();
+
+
+            services.AddScoped<ModManager>();
+            services.AddScoped<IRoleService, RoleService>();
+
+
             services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
+
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>
             {
@@ -52,37 +70,56 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
+              
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidAudience = Configuration["Jwt:Audience"],
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    // ValidAudience = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Audience"],
-                    // IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Key"]))
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                 };
-                // options.Events = new JwtBearerEvents
-                // {
-                //     OnMessageReceived = context =>
-                //     {
-                //         var accessToken = context.Request.Query["access_token"];
+            })
 
-                //         // If the request is for our hub...
-                //         var path = context.HttpContext.Request.Path;
-                //         if (!string.IsNullOrEmpty(accessToken) &&
-                //             (path.StartsWithSegments("/webrtc")))
-                //         {
-                //             // Read the token out of the query string
-                //             context.Token = accessToken;
-                //         }
-                //         return Task.CompletedTask;
-                //     }
-                // };
+            // Đăng ký Cookie Authentication và OAuth
+            // services.AddAuthentication(options =>
+            // {
+            //     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            // })
+
+            .AddCookie()
+            .AddGoogle(options =>
+            {
+                options.ClientId = Configuration["Google:ClientId"];
+                options.ClientSecret = Configuration["Google:ClientSecret"];
+                options.CallbackPath = "/signin-google"; // URI callback
+            })
+            .AddFacebook(options =>
+            {
+                options.AppId = Configuration["Facebook:AppId"];
+                options.AppSecret = Configuration["Facebook:AppSecret"];
+                options.CallbackPath = "/signin-facebook"; // URI callback
+            })
+            .AddTwitter(options =>
+            {
+                options.ConsumerKey = Configuration["Twitter:ApiKey"];
+                options.ConsumerSecret = Configuration["Twitter:ApiSecretKey"];
+                options.CallbackPath = "/signin-twitter"; // URI callback
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => 
+                    policy.RequireRole("Admin")); 
+
+                options.AddPolicy("RequireUserRole", policy => 
+                    policy.RequireRole("User"));
             });
 
             // Đăng ký Swagger cho API Documentation
@@ -99,25 +136,21 @@ namespace StreamingApp
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
             app.UseRouting();
-
             app.UseCors("ClientPermission");
-
-            // Sử dụng Authentication trước khi Authorization
             app.UseAuthentication();
 
-            // Thêm middleware tùy chỉnh của bạn (nếu cần thiết)
             app.UseMiddleware<JwtMiddleware>();
             app.UseMiddleware<ValidateMiddleware>();
+            app.UseMiddleware<AuthorizationMiddleware>();
 
-            // Sử dụng Authorization sau Authentication
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<MainHub>("/webrtc");
+
             });
         }
     }
