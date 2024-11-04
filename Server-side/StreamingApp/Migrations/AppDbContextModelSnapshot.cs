@@ -299,29 +299,39 @@ namespace StreamingApp.Migrations
                         new
                         {
                             UserId = 1,
+                            DisplayName = "admin",
+                            Email = "admin@gmail.com",
+                            Password = "$2a$11$Nv2wnP//LvYKrM15k7L5aeeLWbd22FNETz4S1CVmCfSkYBZiCmb1e",
+                            PhoneNumber = "1111111111",
+                            RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserName = "Admin Placeholder"
+                        },
+                        new
+                        {
+                            UserId = 2,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$VlMWGGxUmfATNLVD/hWX9eF7Rf7X8INI/vOhRptD5F0WNIYoVHSPe",
+                            Password = "$2a$11$vgdwYNRlcq1vBtDBBMF7PeuRrrHpkmA9.H.E0Xv3YRE/j33jMCw42",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin1"
                         },
                         new
                         {
-                            UserId = 2,
+                            UserId = 3,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$9jDOx7.bNCYTj2AKDo.Ae.0.u4B5pZXaIjm13glBwMSvmPwrvED86",
+                            Password = "$2a$11$AWbblPXxlniN/BArZPcWOO0HfUS8MN6ai8XZW5Szmf5dQm6QJql7q",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin2"
                         },
                         new
                         {
-                            UserId = 3,
+                            UserId = 4,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$2e/wsZBKwqTJURb14ejYue16ZTlPNU.Dl/RVq4ZyItd/UaKjOQ3mG",
+                            Password = "$2a$11$Ax0wmrxAdKoPZuqGWe.p6O1b7cbnBpahc2.l4xYsS8KdWYR4hBKfq",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin3"
@@ -338,10 +348,11 @@ namespace StreamingApp.Migrations
                         .HasColumnType("int")
                         .HasColumnOrder(1);
 
-                    b.Property<int?>("ChannelOwnerId")
-                        .HasColumnType("int");
+                    b.Property<int>("ChannelOwnerId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
 
-                    b.HasKey("UserId", "RoleId");
+                    b.HasKey("UserId", "RoleId", "ChannelOwnerId");
 
                     b.HasIndex("ChannelOwnerId");
 
@@ -352,18 +363,21 @@ namespace StreamingApp.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = 1,
-                            RoleId = 1
-                        },
-                        new
-                        {
                             UserId = 2,
-                            RoleId = 1
+                            RoleId = 1,
+                            ChannelOwnerId = 1
                         },
                         new
                         {
                             UserId = 3,
-                            RoleId = 1
+                            RoleId = 1,
+                            ChannelOwnerId = 1
+                        },
+                        new
+                        {
+                            UserId = 4,
+                            RoleId = 1,
+                            ChannelOwnerId = 1
                         });
                 });
 
@@ -476,7 +490,8 @@ namespace StreamingApp.Migrations
                     b.HasOne("StreamingApp.Models.Entities.User", "ChannelOwner")
                         .WithMany()
                         .HasForeignKey("ChannelOwnerId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("StreamingApp.Models.Entities.Role", "Role")
                         .WithMany("UserRoles")

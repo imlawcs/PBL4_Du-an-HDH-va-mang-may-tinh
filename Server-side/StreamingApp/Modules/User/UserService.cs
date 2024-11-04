@@ -110,5 +110,10 @@ namespace StreamingApp.Services
                 return (false, new[] { "Failed to update password" });
             }
         }
+
+        public Task<User> GetUserByNameAsync(string name)
+        {
+            return UserManager.GetUserByName(name);
+        }
     }
 }

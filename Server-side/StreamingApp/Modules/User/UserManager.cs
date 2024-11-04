@@ -63,5 +63,11 @@ namespace StreamingApp.Managers
             return true;
         }
 
+        internal async Task<User?> GetUserByName(string name)
+        {
+            var user = await _context.Users.Where<User>(u => u.UserName == name).FirstOrDefaultAsync();
+            if (user == null) return null;
+            return user;
+        }
     }
 }

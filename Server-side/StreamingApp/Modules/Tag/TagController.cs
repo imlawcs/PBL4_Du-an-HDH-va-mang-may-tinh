@@ -65,7 +65,7 @@ namespace StreamingApp.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategoryAsync(int id)
+        public async Task<IActionResult> DeleteTagAsync(int id)
         {
             var result = await _tagService.DeleteTagAsync(id);
             if (!result)

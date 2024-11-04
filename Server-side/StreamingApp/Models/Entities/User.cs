@@ -12,6 +12,7 @@ public class User
         [MaxLength(100)]
         public string UserName { get; set; }
         [MaxLength(100)]
+        [JsonIgnore]
         public string Password { get; set; }
         [MaxLength(100)]
         public string DisplayName { get; set; }

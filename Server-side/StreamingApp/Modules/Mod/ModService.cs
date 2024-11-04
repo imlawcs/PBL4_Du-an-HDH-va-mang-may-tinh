@@ -3,32 +3,36 @@ using StreamingApp.Models.Entities;
 using StreamingApp.Managers;
 using StreamingApp.Services;
 
-public class ModService : IModService
+
+public class RoleService : IRoleService
 {
-    private readonly ModManager ModManager;
-
-    public ModService(ModManager modManager)
+    AppDbContext _context;
+    public RoleService(AppDbContext context)
     {
-        ModManager = modManager ?? throw new ArgumentNullException(nameof(modManager));
+        _context = context;
+    }
+    public Task<Role> CreateRole(Role role)
+    {
+        throw new NotImplementedException();
     }
 
-    public Task<(bool Succeeded, string[] Errors)> AssignChannelModAsync(int channelId, int userId)
+    public Task<bool> DeleteRole(int id)
     {
-        return ModManager.AssignChannelModAsync(channelId, userId);
+        throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<User>> GetChannelModAsync(int channelId)
+    public Task<IEnumerable<Role>> GetAllRolesAsync()
     {
-        return ModManager.GetChannelModAsync(channelId);
+        throw new NotImplementedException();
     }
 
-    public Task<(bool Succeeded, string[] Errors)> IsChannelModAsync(int channelId, int userId)
+    public Task<Role?> GetRoleByIdAsync(int id)
     {
-        return ModManager.IsChannelModAsync(channelId, userId);
+        return _context.Roles.FindAsync(id).AsTask();    
     }
 
-    public Task<(bool Succeeded, string[] Errors)> RemoveChannelModAsync(int channelId, int userId)
+    public Task<(bool Succeeded, string[] Errors)> UpdateRole(int id, Role model)
     {
-        return ModManager.RemoveChannelModAsync(channelId, userId);
+        throw new NotImplementedException();
     }
 }
