@@ -80,7 +80,7 @@ const AuthProvider = ({ children }) => {
                // Call the login function passed via props
             } else {
               const errorData = await response.json();
-              alert({ form: errorData.error });
+              alert(JSON.stringify({ form: errorData.error }));
               return { form: errorData.error };
             }
           } catch (error) {
@@ -99,5 +99,5 @@ const AuthProvider = ({ children }) => {
 
 export default AuthProvider;
 export const useAuth = () => {
-    return useContext(AuthContext);
+  return useContext(AuthContext);
 };

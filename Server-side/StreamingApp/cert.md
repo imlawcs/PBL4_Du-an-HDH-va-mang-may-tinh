@@ -46,7 +46,7 @@ namespace StreamingApp
                               {
                                   httpsOptions.ServerCertificate = new X509Certificate2("./DevCert/certificate.pfx", "yourpassword");
                               });
-                          }); ;
+                          }); 
                 });
     }
 }

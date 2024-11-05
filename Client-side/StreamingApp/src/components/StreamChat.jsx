@@ -74,7 +74,7 @@ export default function StreamChat(props) {
               </div>
               <div className="sc__btn-holder rr__flex-row">
                 <Button type="default" text="Chat" onClick={() => {
-                  SignalRTest.sendMessage(chatContents, "random")
+                  SignalRTest.sendMessage(chatContents, "random");
                   setMessages(SignalRTest.getChatStream());
                   setChatContents("");
                 }}/>
