@@ -1,6 +1,7 @@
 import React, { useContext, createContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ApiConstants } from "../API/ApiConstants";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 interface AuthContextType {
     token: string;
@@ -13,10 +14,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<string | null>("");
     const [token, setToken] = useState(localStorage.getItem("site") || "");
     const navigate = useNavigate();
-    const location = useLocation();
+
+    const decodeToken = (token: string) => {
+      try {
+          const decoded = jwtDecode<JwtPayload>(token, { header: false });
+          console.log("Decoded token: ", decoded);
+          return decoded;
+      } catch (error) {
+          console.error("Error decoding token: ", error);
+          return null;
+      }
+  };
     const logIn = async (data: any) => {
         try {
             const response = await fetch(ApiConstants.BASE_URL + ApiConstants.LOGIN, {
@@ -30,8 +41,10 @@ const AuthProvider = ({ children }) => {
   
             if (response.ok) {
               const data = await response.json();
-              setUser(data.User);
               localStorage.setItem("site", data.token); // Store the JWT token
+              const userData = decodeToken(data.token);
+              localStorage.setItem("user", JSON.stringify(userData));
+              setUser(JSON.stringify(userData));
               navigate(0); // Redirect to the home page
               return;
                // Call the login function passed via props
@@ -45,9 +58,10 @@ const AuthProvider = ({ children }) => {
           }
     }
     const logOut = function () {
-        setUser(null);
+        setUser("");
         setToken("");
         localStorage.removeItem("site");
+        localStorage.removeItem("user");
         navigate("/");
     };
     const signUp = async (data: any) => {
@@ -66,7 +80,7 @@ const AuthProvider = ({ children }) => {
                // Call the login function passed via props
             } else {
               const errorData = await response.json();
-              alert({ form: errorData.error });
+              alert(JSON.stringify({ form: errorData.error }));
               return { form: errorData.error };
             }
           } catch (error) {
@@ -85,5 +99,5 @@ const AuthProvider = ({ children }) => {
 
 export default AuthProvider;
 export const useAuth = () => {
-    return useContext(AuthContext);
+  return useContext(AuthContext);
 };

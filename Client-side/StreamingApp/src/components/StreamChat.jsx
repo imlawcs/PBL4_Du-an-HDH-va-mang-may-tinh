@@ -16,15 +16,34 @@ export default function StreamChat(props) {
   const context =
     "Consequat ex amet quis aliqua duis. Aute sunt cupidatat irure ex anim cillum Lorem culpa. Aute elit commodo occaecat sunt elit culpa qui mollit. Commodo id officia adipisicing pariatur consectetur tempor occaecat.";
   const [isVisible, setVisible] = useState(true);
-  const [messages, setMessages] = useState(SignalRTest.getChatStream());
+  const [messages, setMessages] = useState([]);
   const [chatContents, setChatContents] = useState("");
   const [isOnline, setIsOnline] = useState(SignalRTest.getHostConnectionId());
-  
+  const connection = SignalRTest.getConnection();
+
   useEffect(() => {
-    setIsOnline(SignalRTest.getHostConnectionId());
-  }, [isOnline]);
+    connection.on("sendMessage", (username, message) => { 
+      console.log(`${username}: ` + message);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          userName: username,
+          chatContext: message,
+          timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
+          badge: null,
+        }
+      ]);
+    });
 
+    return () => {
+      connection.off("sendMessage");
+    };
+  }, [connection]);
 
+  const handleSendMessage = () => {
+    SignalRTest.sendMessage(chatContents, "random");
+    setChatContents("");
+  }
   const auth = useAuth();
   if (isVisible)
     return (
@@ -44,7 +63,7 @@ export default function StreamChat(props) {
           </div>
           <div className="sc__body">
             <div id="chat__holder" className="sc__body-holder">
-              {messages.map((msg, index) => (
+            {messages.map((msg, index) => (
                 <ChatComp
                   key={index}
                   badge={msg.badge}
@@ -73,11 +92,7 @@ export default function StreamChat(props) {
                 <BtnIcon icons={faIcons} />
               </div>
               <div className="sc__btn-holder rr__flex-row">
-                <Button type="default" text="Chat" onClick={() => {
-                  SignalRTest.sendMessage(chatContents, "random")
-                  setMessages(SignalRTest.getChatStream());
-                  setChatContents("");
-                }}/>
+                <Button type="default" text="Chat" onClick={handleSendMessage}/>
               </div>
             </> 
             :

@@ -40,6 +40,7 @@ namespace StreamingApp
                 options.AddPolicy("ClientPermission", policy =>
                 {
                     policy.WithOrigins(Configuration["ClientSide:Url"])
+                        .SetIsOriginAllowedToAllowWildcardSubdomains()
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -57,7 +58,7 @@ namespace StreamingApp
 
             services.AddScoped<ModManager>();
             services.AddScoped<IRoleService, RoleService>();
-
+            services.AddScoped<RoleManager>();
 
             services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();
@@ -70,7 +71,7 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
-              
+
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -115,10 +116,10 @@ namespace StreamingApp
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("RequireAdminRole", policy => 
-                    policy.RequireRole("Admin")); 
+                options.AddPolicy("RequireAdminRole", policy =>
+                    policy.RequireRole("Admin"));
 
-                options.AddPolicy("RequireUserRole", policy => 
+                options.AddPolicy("RequireUserRole", policy =>
                     policy.RequireRole("User"));
             });
 

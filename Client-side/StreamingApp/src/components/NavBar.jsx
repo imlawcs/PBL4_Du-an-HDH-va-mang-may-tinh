@@ -10,11 +10,12 @@ import { useState, useEffect } from "react";
 import CustomModal from "./CustomModal";
 import Toast from "./Toast";
 import { useAuth } from "../hooks/AuthProvider";
-
+import { ApiConstants } from "../API/ApiConstants";
 export default function NavBar(props) {
   const route = props.routing;
   const auth = useAuth();
   const navigate = useNavigate();
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(0);
   const [showToast, setShowToast] = useState(false);
@@ -31,7 +32,6 @@ export default function NavBar(props) {
         setTimeout(() => setShowToast(false), 300); // Wait for slide out animation
       }, 3000);
     }
-    
     else setIsLoggedIn(false);
     return () => clearTimeout(timer);
   }, [showToast]);
@@ -39,6 +39,9 @@ export default function NavBar(props) {
   useEffect(() => {
     if (token) {
       setIsLoggedIn(true);
+    }
+    if(user){
+      console.log(JSON.stringify(user[ApiConstants.CLAIMS.EMAIL]));
     }
   }, []);
   const handleLogout = () => {
