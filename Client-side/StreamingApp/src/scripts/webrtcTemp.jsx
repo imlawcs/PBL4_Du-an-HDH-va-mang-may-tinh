@@ -111,16 +111,17 @@ const connection = new signalR.HubConnectionBuilder()
 connection.on("ready", async => {
     console.log("SignalR ready");
 });
-connection.on("sendMessage", async (username, message) => {
-    console.log(`${username}: ` + message);
-    chatStream.push({
-        userName: username,
-        chatContext: message,
-        timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
-        badge: null,
-    });
-    console.log("successfully pushed message");
-});
+//temp disable
+// connection.on("sendMessage", async (username, message) => {
+//     console.log(`${username}: ` + message);
+//     chatStream.push({
+//         userName: username,
+//         chatContext: message,
+//         timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
+//         badge: null,
+//     });
+//     console.log("successfully pushed message");
+// });
 //[HOST]room created
 connection.on("roomCreated", async (hostName) => {
     console.log("Room created by: " + hostName);
@@ -147,6 +148,10 @@ connection.on("roomJoined", async (room, viewerConnectionId) => {
     try{
         console.log("Viewer Connection Id: " + viewerConnectionId);
         hostPeerConnection[viewerConnectionId] = new RTCPeerConnection(servers);
+        hostPeerConnection[viewerConnectionId].addTransceiver('video', { direction: 'sendrecv' });
+        // const dataChannel = hostPeerConnection[viewerConnectionId].createDataChannel("media");
+        // setupDataChannel(dataChannel);
+        
         await SignalRTest.makeCall(viewerConnectionId);
     }
     catch(err){
@@ -193,31 +198,6 @@ connection.on("doneAnswer", async () => {
     Sau khi tạo kêt nối, test connection bằng iceCandidate để đổi connectionState
 */
 
-//[ALL]start ice candidates
-// connection.on("startIceCandidate", async (connectionId, destination) => {
-//     console.log("Start Ice Candidates");
-//     try {
-//         if(destination === "toHost"){
-//             //client -> host
-//             peerConnection.onicecandidate = event => {
-//                 if (event.candidate) {
-//                     connection.invoke("sendIceCandidate", event.candidate, connectionId, "fromClient");
-//                 }
-//             };
-//         }
-//         else {
-//             //host -> client
-//             hostPeerConnection[connectionId].onicecandidate = event => {
-//                 if (event.candidate) {
-//                     connection.invoke("sendIceCandidate", event.candidate, connectionId, "fromHost");
-//                 }
-//             };
-//         }
-//     } catch (error) {
-//         console.error("Error: " + error);
-//     }
-    
-// });
 //[ALL]received ice candidates
 connection.on("receiveIceCandidate", async (candidate, sender, type) => {
     console.log("Received Ice Candidate");
@@ -254,12 +234,8 @@ connection.on("error", async (message) => {
 
 
 let peerConnection = new RTCPeerConnection(servers);
-// peerConnection.addEventListener('track', async (event) => {
-//     const remoteVideo = document.getElementById('remote__stream');
-//     const [remoteStream] = event.streams;
-//     remoteVideo.srcObject = remoteStream[0];
-//     alert("Track received");
-// });
+peerConnection.addTransceiver('video', { direction: 'sendrecv' });
+
 peerConnection.ontrack = (event) => {
     const remoteVideo = document.getElementById('remote__stream');
     remoteVideo.srcObject = event.streams[0];
@@ -268,6 +244,9 @@ peerConnection.ontrack = (event) => {
 
 
 export const SignalRTest = {
+        getConnection(){
+            return connection;
+        },
         getServerStatus(){
             return isServerOn;
         },
@@ -276,7 +255,6 @@ export const SignalRTest = {
             return chatStream;
         },
         getHostConnectionId(){
-            console.log("Host Connection Id: " + hostConnectionId);
             return hostConnectionId;
         },
     //[BOTH] start signalR
