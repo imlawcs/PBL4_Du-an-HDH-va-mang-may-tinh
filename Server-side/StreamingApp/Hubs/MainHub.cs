@@ -50,7 +50,11 @@ namespace StreamingApp.Hubs
         }
 
         public async Task SendMessage(string user, string message, string hostConnectionId)
-            => await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
+        {
+            await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
+            await Clients.Client(hostConnectionId).SendAsync("SendMessageAdmin", user, message);
+
+        }
 
         public async Task Ready()
         => await Clients.Caller.SendAsync("Ready");
@@ -85,6 +89,7 @@ namespace StreamingApp.Hubs
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.HostConnectionId);
                 await Clients.Client(room.HostConnectionId).SendAsync("RoomJoined", JsonConvert.SerializeObject(add), Context.ConnectionId);
                 await Clients.Caller.SendAsync("ClientJoinedRoom", JsonConvert.SerializeObject(room), room.HostConnectionId); //thông báo về [Client]
+                await Clients.Group(room.HostConnectionId).SendAsync("roomUpdate", JsonConvert.SerializeObject(room.StreamJoiners)); //update danh sách viewers, update viewcount
             }
             else await Clients.Caller.SendAsync("Error", "Room not found or the streamer is offline.");
 

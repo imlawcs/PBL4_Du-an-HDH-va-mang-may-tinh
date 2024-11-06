@@ -112,16 +112,18 @@ connection.on("ready", async => {
     console.log("SignalR ready");
 });
 //temp disable
-// connection.on("sendMessage", async (username, message) => {
-//     console.log(`${username}: ` + message);
-//     chatStream.push({
-//         userName: username,
-//         chatContext: message,
-//         timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
-//         badge: null,
-//     });
-//     console.log("successfully pushed message");
-// });
+connection.on("sendMessageAdmin", async (username, message) => {
+    time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false })
+    console.log(`${time} ${username}: ` + message);
+    // chatStream.push({
+    //     userName: username,
+    //     chatContext: message,
+    //     timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
+    //     badge: null,
+    // });
+
+});
+
 //[HOST]room created
 connection.on("roomCreated", async (hostName) => {
     console.log("Room created by: " + hostName);
@@ -349,7 +351,9 @@ export const SignalRTest = {
 
         stop() {
             connection.invoke("removeRoom");
+            localStream.getTracks().forEach(track => track.stop());
             document.getElementById('localVideo').style.display = 'none';
+
             
         },
         modifySDP(sdp){

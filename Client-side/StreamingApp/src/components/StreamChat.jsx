@@ -16,34 +16,18 @@ export default function StreamChat(props) {
   const context =
     "Consequat ex amet quis aliqua duis. Aute sunt cupidatat irure ex anim cillum Lorem culpa. Aute elit commodo occaecat sunt elit culpa qui mollit. Commodo id officia adipisicing pariatur consectetur tempor occaecat.";
   const [isVisible, setVisible] = useState(true);
-  const [messages, setMessages] = useState([]);
   const [chatContents, setChatContents] = useState("");
   const [isOnline, setIsOnline] = useState(SignalRTest.getHostConnectionId());
-  const connection = SignalRTest.getConnection();
-
-  useEffect(() => {
-    connection.on("sendMessage", (username, message) => { 
-      console.log(`${username}: ` + message);
-      setMessages(prevMessages => [
-        ...prevMessages,
-        {
-          userName: username,
-          chatContext: message,
-          timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
-          badge: null,
-        }
-      ]);
-    });
-
-    return () => {
-      connection.off("sendMessage");
-    };
-  }, [connection]);
+  const [toggleUserList, setToggleUserList] = useState(false);
+  
 
   const handleSendMessage = () => {
     SignalRTest.sendMessage(chatContents, "random");
     setChatContents("");
   }
+  const handleToggleUserList = () => {
+    setToggleUserList(!toggleUserList);
+  };
   const auth = useAuth();
   if (isVisible)
     return (
@@ -58,12 +42,15 @@ export default function StreamChat(props) {
               <span className="fs__normal-2 league-spartan-semibold citizenship mx-auto">
                 STREAM CHAT
               </span>
-              <BtnIcon icons={faEye} />
+              <BtnIcon icons={faEye} onClick={handleToggleUserList}/>
             </div>
           </div>
           <div className="sc__body">
             <div id="chat__holder" className="sc__body-holder">
-            {messages.map((msg, index) => (
+
+            {
+            (toggleUserList === false) ? 
+              props.messages.map((msg, index) => (
                 <ChatComp
                   key={index}
                   badge={msg.badge}
@@ -71,7 +58,18 @@ export default function StreamChat(props) {
                   userName={msg.userName}
                   chatContext={msg.chatContext}
                 />
-              ))}
+              ))
+              :
+              props.userList.map((user, index) => (
+                <ChatComp
+                  key={index}
+                  badge={null}
+                  timeStamp={null}
+                  userName={user.Username}
+                  chatContext={user.ConnectionId}
+                />
+              ))
+              }
             </div>
             {/* signalr here */}
           </div>
@@ -88,6 +86,7 @@ export default function StreamChat(props) {
                   id="chat__box"
                   value={chatContents}
                   onChange={(e) => setChatContents(e.target.value)}
+                  onSubmit={handleSendMessage}
                 />
                 <BtnIcon icons={faIcons} />
               </div>
