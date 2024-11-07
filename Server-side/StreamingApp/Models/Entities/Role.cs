@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace StreamingApp.Models.Entities
 {
@@ -7,6 +8,7 @@ namespace StreamingApp.Models.Entities
     public class Role
     {
         [Key] [Required]
+        [JsonIgnore]
         public int RoleId { get; set; }
 
         [MaxLength(100)]
@@ -15,6 +17,7 @@ namespace StreamingApp.Models.Entities
         [MaxLength(100)]
         public string RoleDesc { get; set; }
 
-        public ICollection<User_Role> UserRoles { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<User_Role> UserRoles { get; set; }
     }
 }
