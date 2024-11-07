@@ -12,8 +12,8 @@ namespace StreamingApp.Models.Entities
         [Key, Column(Order = 1)]
         [Required]
         public int BlockedId { get; set; }
-        public User Blocker { get; set; }
-        public User BlockedUser { get; set; }
+        public virtual User Blocker { get; set; }
+        public virtual User BlockedUser { get; set; }
 
     }
 }
