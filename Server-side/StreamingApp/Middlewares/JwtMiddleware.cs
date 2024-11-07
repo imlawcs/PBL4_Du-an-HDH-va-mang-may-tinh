@@ -22,10 +22,9 @@ public class JwtMiddleware
     {
         var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
-        // Bỏ qua middleware cho các yêu cầu đến login, register và webrtc
         if (context.Request.Path.StartsWithSegments("/api/auth/login") || context.Request.Path.StartsWithSegments("/api/auth/register") || context.Request.Path.StartsWithSegments("/webrtc"))
         {
-            await _next(context); // Bỏ qua middleware cho yêu cầu đến login và register
+            await _next(context);
             return;
         }
         if (token != null)
@@ -38,9 +37,9 @@ public class JwtMiddleware
         }
         else
         {
-            context.Response.StatusCode = 401; // Unauthorized
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Invalid token");
-            return; // Ngăn không cho tiếp tục xử lý request
+            return;
         }
 
         await _next(context);
@@ -68,9 +67,9 @@ public class JwtMiddleware
             var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
-                context.Response.StatusCode = 401; // Unauthorized
+                context.Response.StatusCode = 401;
                 await context.Response.WriteAsync("Invalid token: Missing NameIdentifier claim");
-                return; // Ngăn không cho tiếp tục xử lý request
+                return;
             }
 
             var userId = userIdClaim.Value;
@@ -80,8 +79,7 @@ public class JwtMiddleware
         }
         catch (Exception ex)
         {
-            // Nếu token không hợp lệ, trả về mã lỗi 401 và thông báo
-            context.Response.StatusCode = 401; 
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync($"Invalid token: {ex.Message}");
             return; // Ngăn không cho tiếp tục xử lý request
         }
