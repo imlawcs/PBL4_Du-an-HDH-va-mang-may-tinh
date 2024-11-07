@@ -56,6 +56,7 @@ namespace StreamingApp
 
 
             services.AddScoped<ModManager>();
+            services.AddScoped<RoleManager>();
             services.AddScoped<IRoleService, RoleService>();
 
 
