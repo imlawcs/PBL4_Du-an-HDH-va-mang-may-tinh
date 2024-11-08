@@ -182,24 +182,24 @@ namespace StreamingApp.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    channelOwnerID = table.Column<int>(type: "int", nullable: true)
+                    ChannelOwnerId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User_Roles", x => new { x.UserId, x.RoleId });
+                    table.PrimaryKey("PK_User_Roles", x => new { x.UserId, x.RoleId, x.ChannelOwnerId });
                     table.ForeignKey(
                         name: "FK_User_Roles_Role_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Role",
                         principalColumn: "RoleId");
                     table.ForeignKey(
-                        name: "FK_User_Roles_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_User_Roles_Users_ChannelOwnerId",
+                        column: x => x.ChannelOwnerId,
                         principalTable: "Users",
                         principalColumn: "UserId");
                     table.ForeignKey(
-                        name: "FK_User_Roles_Users_channelOwnerID",
-                        column: x => x.channelOwnerID,
+                        name: "FK_User_Roles_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId");
                 });
@@ -267,19 +267,20 @@ namespace StreamingApp.Migrations
                 columns: new[] { "UserId", "Bio", "DisplayName", "Email", "IsEmailNoti", "Password", "PhoneNumber", "ProfilePic", "RegisterDate", "UserName", "UserStatus" },
                 values: new object[,]
                 {
-                    { 1, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$RJG5QbAKISia/q0bXX4wyOIILEM.njqAHInH3NhPlLlEaGWMbeY9m", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
-                    { 2, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$gGwmctSdoesgl.ko6s5nne9WfGtXoijaxp7R9wXiDXH4mYioiq1Bm", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
-                    { 3, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$aWIbo3yXS0Qfze4IiFiIAup4ejL3Jgceo3D3B9WeyMJbh31J1tZaO", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
+                    { 1, null, "admin", "admin@gmail.com", null, "$2a$11$Nv2wnP//LvYKrM15k7L5aeeLWbd22FNETz4S1CVmCfSkYBZiCmb1e", "1111111111", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin Placeholder", null },
+                    { 2, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$vgdwYNRlcq1vBtDBBMF7PeuRrrHpkmA9.H.E0Xv3YRE/j33jMCw42", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
+                    { 3, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$AWbblPXxlniN/BArZPcWOO0HfUS8MN6ai8XZW5Szmf5dQm6QJql7q", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
+                    { 4, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$Ax0wmrxAdKoPZuqGWe.p6O1b7cbnBpahc2.l4xYsS8KdWYR4hBKfq", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "User_Roles",
-                columns: new[] { "RoleId", "UserId", "channelOwnerID" },
+                columns: new[] { "ChannelOwnerId", "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { 1, 1, null },
-                    { 1, 2, null },
-                    { 1, 3, null }
+                    { 1, 1, 2 },
+                    { 1, 1, 3 },
+                    { 1, 1, 4 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -318,9 +319,9 @@ namespace StreamingApp.Migrations
                 column: "StreamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_Roles_channelOwnerID",
+                name: "IX_User_Roles_ChannelOwnerId",
                 table: "User_Roles",
-                column: "channelOwnerID");
+                column: "ChannelOwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Roles_RoleId",

@@ -1255,10 +1255,35 @@ export default function Sidebar(props) {
     );
   } else {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
-    useEffect(() => async () => {
-      console.log("Start loading stream...");
-      await SignalRTest.joinRoom("randomUser", props.userRoute);
-    }, []);
+    const [messages, setMessages] = useState([]);
+    const [userList, setUserList] = useState([]);
+    const connection = SignalRTest.getConnection();
+
+    useEffect(() => {
+      if(connection == null) return;
+      connection.on("sendMessage", (username, message) => {
+        console.log(`${username}: ` + message);
+        setMessages(prevMessages => [
+          ...prevMessages,
+          {
+            userName: username,
+            chatContext: message,
+            timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
+            badge: null,
+          }
+        ]);
+      });
+      connection.on("roomUpdate", (users) => {
+        console.log((users));
+        setUserList(JSON.parse(users));
+      });
+      return () => {
+        connection.off("sendMessage");
+        connection.off("roomUpdate");
+      }
+    }, [connection]);
+    
+
     return (
       <>
         <div className="main__position">
@@ -1399,8 +1424,8 @@ export default function Sidebar(props) {
                       width: "100%",
                       height: "100%",
                     }
-                  } id="remote__stream" autoPlay playsInline controls={false}></video>
-                
+                  } id="remote__stream" autoPlay={true} controls={true} preload="metadata"></video>
+
               </div>
 
               <StreamUserInfo
@@ -1408,11 +1433,11 @@ export default function Sidebar(props) {
                 title="Hello guys"
                 category="osu!"
                 profilePic="https://i.imgur.com/neHVP5j.jpg"
-                viewCount={123492}
+                viewCount={userList.length}
                 flCount={12342}
               />
             </div>
-            <StreamChat />
+            <StreamChat messages={messages} userList={userList}/>
           </div>
         </div>
       </>

@@ -39,7 +39,8 @@ namespace StreamingApp
             {
                 options.AddPolicy("ClientPermission", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173")
+                    policy.WithOrigins(Configuration["ClientSide:Url"])
+                        .SetIsOriginAllowedToAllowWildcardSubdomains()
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -54,9 +55,19 @@ namespace StreamingApp
             services.AddScoped<CategoryManager>();
             services.AddScoped<ICategoryService, CategoryService>();
 
-
-            services.AddScoped<ModManager>();
+            services.AddScoped<RoleManager>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<User_RoleManager>();
+            services.AddScoped<IUser_RoleService, User_RoleService>();  
+
+
+            // services.AddScoped<ModManager>();
+            // services.AddScoped<IModService, ModService>();
+
+            services.AddScoped<TagManager>();
+            services.AddScoped<ITagService, TagService>();
+
+
 
 
             services.AddSingleton<MainHub>();
@@ -70,15 +81,14 @@ namespace StreamingApp
             })
             .AddJwtBearer(options =>
             {
-                // options.Authority = "http://localhost:3000";
-                // options.RequireHttpsMetadata = false;
-                // options.SaveToken = true;
+
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-
                     ValidateAudience = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
                     ValidAudience = Configuration["Jwt:Audience"],
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
@@ -116,10 +126,10 @@ namespace StreamingApp
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("RequireAdminRole", policy => 
-                    policy.RequireRole("Admin")); 
+                options.AddPolicy("RequireAdminRole", policy =>
+                    policy.RequireRole("Admin"));
 
-                options.AddPolicy("RequireUserRole", policy => 
+                options.AddPolicy("RequireUserRole", policy =>
                     policy.RequireRole("User"));
             });
 
@@ -150,7 +160,8 @@ namespace StreamingApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<MainHub>("/hubs/main");
+                endpoints.MapHub<MainHub>("/webrtc");
+
             });
         }
     }

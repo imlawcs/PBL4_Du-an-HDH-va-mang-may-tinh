@@ -10,5 +10,6 @@ namespace StreamingApp.Services{
         Task<(bool Succeeded, string[] Errors)> RemoveChannelModAsync(int channelId, int userId);
         Task<IEnumerable<User>> GetChannelModAsync(int channelId);
         Task<(bool Succeeded, string[] Errors)> IsChannelModAsync(int channelId, int userId);
+        Task<(bool Succeeded, string[] Errors)> GetRoleByIdAsync(int roleId);
     }
 }

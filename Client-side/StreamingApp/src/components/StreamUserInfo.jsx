@@ -4,6 +4,10 @@ import BtnIcon from "./BtnIcon";
 import { faEllipsis, faEye, faHeart, faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "./Button";
+import { useEffect, useState } from "react";
+import { SignalRTest } from "../scripts/webrtcTemp";
+import { Colors } from "../constants/Colors";
+import Toast from "./Toast";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
@@ -23,6 +27,16 @@ export default function StreamUserInfo(props) {
           return number;
         }
       }
+    const [isFollowed, setIsFollowed] = useState(false); 
+      //show toast
+    const [showToast, setShowToast] = useState(false);
+
+    const handleFollow = () => {
+
+        setIsFollowed(!isFollowed);
+        setShowToast(true);
+    }
+
     return(
         <>
         <div className="sui__layout fill__container">
@@ -56,7 +70,7 @@ export default function StreamUserInfo(props) {
                     <div className="uih__right-holder rr__flex-col">
                         <div className="uihr__btn-holder rr__flex-row">
                             <BtnIcon icons={faShareFromSquare}/>
-                            <BtnIcon icons={faHeart}/>
+                            <BtnIcon icons={faHeart} color={isFollowed ? Colors.secondary : "#fff"} onClick={handleFollow}/>
                         </div>
                         <div className="uihr__view-holder rr__flex-row">
                             <span className="uihr__view-count citizenship league-spartan-semibold fs__large-1">
@@ -81,6 +95,12 @@ export default function StreamUserInfo(props) {
                 </div>
             </div>
         </div>
+        {showToast && (
+            <Toast
+                message={isFollowed ? "Followed" : "Unfollowed"}
+                onDispose={() => setShowToast(false)}
+            />
+        )}
         </>
     );
 }

@@ -70,11 +70,38 @@ namespace StreamingApp.Managers
             return StreamRooms.FirstOrDefault(room => room.RoomName.Equals(name, StringComparison.Ordinal));
         }
 
+        public object? RemoveConnection(string connectionId)
+        {
+            foreach (var room in StreamRooms)
+            {
+                if (room.HostConnectionId.Equals(connectionId, StringComparison.Ordinal))
+                {
+                    //xoa phong
+                    DeleteRoomByHostConnectionId(connectionId);
+                    return room;
+                }
+                foreach (var joiner in room.StreamJoiners)
+                {
+                    if (joiner.ConnectionId.Equals(connectionId, StringComparison.Ordinal))
+                    {
+                        //remove joiner
+                        RemoveJoinerFromRoom(room.HostConnectionId, connectionId);
+                        return room.HostConnectionId;
+                    }
+                }
+            }
+            return null;
+        }
+
         public object? AddJoinerToRoom(StreamJoiner joiner, string HostConnectionId)
         {
             var room = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId, StringComparison.Ordinal));
+            if (room.StreamJoiners.FirstOrDefault(joiner => joiner.ConnectionId.Equals(joiner.ConnectionId, StringComparison.Ordinal)) != null)
+            {
+                this.RemoveJoinerFromRoom(HostConnectionId, joiner.ConnectionId);
+            }
             room.StreamJoiners.Add(joiner);
-            room.Viewers += 1;
+            room.Viewers = room.StreamJoiners.Count;
             var update = UpdateRoomByHostConnectionId(HostConnectionId, room);
             return update;
         }
@@ -82,7 +109,7 @@ namespace StreamingApp.Managers
         {
             var room = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId, StringComparison.Ordinal));
             room.StreamJoiners.Remove(room.StreamJoiners.FirstOrDefault(joiner => joiner.ConnectionId.Equals(joinerConnectionId, StringComparison.Ordinal)));
-            room.Viewers -= 1;
+            room.Viewers = room.StreamJoiners.Count;
             var update = UpdateRoomByHostConnectionId(HostConnectionId, room);
             return update;
         }
@@ -93,7 +120,7 @@ namespace StreamingApp.Managers
             this.StreamRooms.Remove(room);
             return room;
         }
-        public object? DeleteRoomByHostConnectionId(int HostConnectionId)
+        public object? DeleteRoomByHostConnectionId(string HostConnectionId)
         {
             var room = StreamRooms.FirstOrDefault(room => room.HostConnectionId.Equals(HostConnectionId));
             StreamRooms.Remove(room);

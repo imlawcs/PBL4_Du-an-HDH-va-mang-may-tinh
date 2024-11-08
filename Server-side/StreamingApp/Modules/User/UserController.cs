@@ -40,6 +40,15 @@ namespace StreamingApp.Controllers
             return Ok(user);
         }
 
+        [HttpGet("name={name}")]
+        public async Task<IActionResult> GetUser(string name)
+        {
+            var user = await _userService.GetUserByNameAsync(name);
+            if (user == null)
+                return NotFound("User not found");
+            return Ok(user);
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto userUpdateDto)
         {
