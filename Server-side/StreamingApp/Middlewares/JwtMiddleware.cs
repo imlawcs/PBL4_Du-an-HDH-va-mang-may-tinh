@@ -24,7 +24,7 @@ public class JwtMiddleware
 
         if (context.Request.Path.StartsWithSegments("/api/auth/login") || context.Request.Path.StartsWithSegments("/api/auth/register") || context.Request.Path.StartsWithSegments("/webrtc"))
         {
-            await _next(context); 
+            await _next(context);
             return;
         }
         if (token != null)
@@ -37,9 +37,9 @@ public class JwtMiddleware
         }
         else
         {
-            context.Response.StatusCode = 401; 
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Invalid token");
-            return; 
+            return;
         }
 
         await _next(context);
@@ -69,7 +69,7 @@ public class JwtMiddleware
             {
                 context.Response.StatusCode = 401;
                 await context.Response.WriteAsync("Invalid token: Missing NameIdentifier claim");
-                return; 
+                return;
             }
 
             var userId = userIdClaim.Value;
@@ -79,7 +79,7 @@ public class JwtMiddleware
         }
         catch (Exception ex)
         {
-            context.Response.StatusCode = 401; 
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync($"Invalid token: {ex.Message}");
             return; // Ngăn không cho tiếp tục xử lý request
         }

@@ -9,16 +9,19 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import CustomModal from "./CustomModal";
 import Toast from "./Toast";
-
+import { useAuth } from "../hooks/AuthProvider";
+import { ApiConstants } from "../API/ApiConstants";
 export default function NavBar(props) {
   const route = props.routing;
+  const auth = useAuth();
   const navigate = useNavigate();
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastPosition, setToastPosition] = useState("-100%");
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(localStorage.getItem("site") || "");
   useEffect(() => {
     let timer;
     if (showToast) {
@@ -29,10 +32,22 @@ export default function NavBar(props) {
         setTimeout(() => setShowToast(false), 300); // Wait for slide out animation
       }, 3000);
     }
-    console.log(token);
+    else setIsLoggedIn(false);
     return () => clearTimeout(timer);
   }, [showToast]);
 
+  useEffect(() => {
+    if (token) {
+      setIsLoggedIn(true);
+    }
+    if(user){
+      console.log(JSON.stringify(user[ApiConstants.CLAIMS.EMAIL]));
+    }
+  }, []);
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    auth.logOut();
+  }
   const handleShowToast = (message) => {
     setToastMessage(message);
     setShowToast(true);
@@ -59,10 +74,7 @@ export default function NavBar(props) {
             <ProfileMenu
               userName="Resolved"
               imgLink="https://i.imgur.com/neHVP5j.jpg"
-              logout={() => {
-                setIsLoggedIn(false);
-                navigate("/");
-              }}
+              logout={handleLogout}
             />
           </div>
         </div>
@@ -90,10 +102,7 @@ export default function NavBar(props) {
             <ProfileMenu
               userName="Resolved"
               imgLink="https://i.imgur.com/neHVP5j.jpg"
-              logout={() => {
-                setIsLoggedIn(false);
-                navigate("/");
-              }}
+              logout={handleLogout}
             />
           </div>
         </div>
@@ -151,10 +160,7 @@ export default function NavBar(props) {
             <ProfileMenu
               userName="Resolved"
               imgLink="https://i.imgur.com/neHVP5j.jpg"
-              logout={() => {
-                setIsLoggedIn(false);
-                navigate("/");
-              }}
+              logout={handleLogout}
             />
           ) : (
             <>
@@ -170,7 +176,6 @@ export default function NavBar(props) {
           <CustomModal
             type="login"
             login={() => {
-              setIsLoggedIn(true);
               setIsModalOpen(0);
             }}
             offModal={() => setIsModalOpen(0)}

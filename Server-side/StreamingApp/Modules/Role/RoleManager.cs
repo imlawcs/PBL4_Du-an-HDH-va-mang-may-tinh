@@ -107,5 +107,11 @@ namespace StreamingApp.Managers
             var mod = await _context.User_Roles.FindAsync(channelId, userId);
             return (mod != null, new string[] { mod == null ? "User is not a moderator" : "User is a moderator" });
         }
+
+        public async Task<(bool Succeeded, string[] Errors)> GetRoleByIdAsync(int roleId)
+        {
+            var role = await _context.Roles.FindAsync(roleId);
+            return (role != null, new string[] { role == null ? "Role not found" : "Role found" });
+        }
     }
 }

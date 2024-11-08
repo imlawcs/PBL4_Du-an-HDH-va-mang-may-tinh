@@ -44,7 +44,7 @@ export default function BtnIcon(props) {
     return (
       <>
         <div className="rr__icon-btn citizenship" onClick={props.onClick}>
-          <FontAwesomeIcon icon={props.icons} />
+          <FontAwesomeIcon icon={props.icons} color={props.color}/>
         </div>
       </>
     );
