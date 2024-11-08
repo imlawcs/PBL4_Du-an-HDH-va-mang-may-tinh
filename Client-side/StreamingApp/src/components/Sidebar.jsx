@@ -28,6 +28,7 @@ import IconCard from "./IconCard";
 import { faFacebook, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { SignalRTest } from "../scripts/webrtcTemp";
+import UserChannelList from "./UserChannelList";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -249,12 +250,6 @@ export default function Sidebar(props) {
       </div>
     );
   } else if (props.routing == "index") {
-    const LazyChannelComp = lazy(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve(import("./ChannelComp")), 200)
-        )
-    );
     const LazyVideoContent = lazy(
       () =>
         new Promise((resolve) =>
@@ -264,146 +259,7 @@ export default function Sidebar(props) {
     return (
       <div className="main__position">
         <div className="sidebar bg__color-2 rr__flex-row">
-          <div className="border__r">
-            <div className="cn__holder rr__flex-col hide__scroll-bar">
-              <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                FOLLOWED CHANNELS
-              </div>
-              <div className="cn__holder-comps">
-                {/* map user here */}
-                <Suspense
-                  fallback={
-                    <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                      Loading...
-                    </div>
-                  }
-                >
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                </Suspense>
-                <Button
-                  type={"link-type"}
-                  text={"Show more"}
-                  onClick={() => {}}
-                />
-              </div>
-              <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                RECOMMENDED CHANNELS
-              </div>
-              <div className="cn__holder-comps">
-                {/* map user here */}
-                <Suspense
-                  fallback={
-                    <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                      Loading...
-                    </div>
-                  }
-                >
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                </Suspense>
-                <Button
-                  type={"link-type"}
-                  text={"Show more"}
-                  onClick={() => {}}
-                />
-              </div>
-            </div>
-          </div>
+          <UserChannelList />
         </div>
         <div className="main__content bg__color-00">
           <img
