@@ -3,10 +3,13 @@ using StreamingApp.Models.Entities;
 namespace StreamingApp.Services{
     public interface IRoleService
     {
-        Task<Role> CreateRole(Role role);
-        Task<Role?> GetRoleByIdAsync(int id);
-        Task<IEnumerable<Role>> GetAllRolesAsync();
-        Task<(bool Succeeded, string[] Errors)> UpdateRole(int id, Role model);
-        Task<bool> DeleteRole(int id);
+        Task<(bool Succeeded, string[] Errors)> AssignRole(int channelId, int userId, int roleId);
+        Task<(bool Succeeded, string[] Errors)> RemoveRole(int channelId, int userId, int roleId);
+        Task<(bool Succeeded, string[] Errors)> IsRoleAssigned(int channelId, int userId, int roleId);
+        Task<(bool Succeeded, string[] Errors)> AssignChannelModAsync(int channelId, int userId);
+        Task<(bool Succeeded, string[] Errors)> RemoveChannelModAsync(int channelId, int userId);
+        Task<IEnumerable<User>> GetChannelModAsync(int channelId);
+        Task<(bool Succeeded, string[] Errors)> IsChannelModAsync(int channelId, int userId);
+        Task<(bool Succeeded, string[] Errors)> GetRoleByIdAsync(int roleId);
     }
 }

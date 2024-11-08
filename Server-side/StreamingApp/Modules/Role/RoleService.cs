@@ -3,32 +3,54 @@ using StreamingApp.Models.Entities;
 using StreamingApp.Managers;
 using StreamingApp.Services;
 
-public class ModService : IModService
-{
-    private readonly ModManager ModManager;
-
-    public ModService(ModManager modManager)
+namespace StreamingApp.Services {
+    public class RoleService : IRoleService
     {
-        ModManager = modManager ?? throw new ArgumentNullException(nameof(modManager));
-    }
+        private readonly RoleManager roleManager;
 
-    public Task<(bool Succeeded, string[] Errors)> AssignChannelModAsync(int channelId, int userId)
-    {
-        return ModManager.AssignChannelModAsync(channelId, userId);
-    }
+        public RoleService(RoleManager roleManager)
+        {
+            roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+        }
 
-    public Task<IEnumerable<User>> GetChannelModAsync(int channelId)
-    {
-        return ModManager.GetChannelModAsync(channelId);
-    }
 
-    public Task<(bool Succeeded, string[] Errors)> IsChannelModAsync(int channelId, int userId)
-    {
-        return ModManager.IsChannelModAsync(channelId, userId);
-    }
+        public Task<(bool Succeeded, string[] Errors)> AssignRole(int channelId, int userId, int roleId)
+        {
+            return roleManager.AssignRole(channelId, userId, roleId);
+        }
 
-    public Task<(bool Succeeded, string[] Errors)> RemoveChannelModAsync(int channelId, int userId)
-    {
-        return ModManager.RemoveChannelModAsync(channelId, userId);
+        public Task<(bool Succeeded, string[] Errors)> RemoveRole(int channelId, int userId, int roleId)
+        {
+            return roleManager.RemoveRole(channelId, userId, roleId);
+        }
+
+        public Task<IEnumerable<User>> GetChannelModAsync(int channelId)
+        {
+            return roleManager.GetChannelModAsync(channelId);
+        }
+
+        public Task<(bool Succeeded, string[] Errors)> IsChannelModAsync(int channelId, int userId)
+        {
+            return roleManager.IsChannelModAsync(channelId, userId);
+        }
+        public Task<(bool Succeeded, string[] Errors)> AssignChannelModAsync(int channelId, int userId)
+        {
+            return roleManager.AssignChannelModAsync(channelId, userId);
+        }
+
+        public Task<(bool Succeeded, string[] Errors)> IsRoleAssigned(int channelId, int userId, int roleId)
+        {
+            return roleManager.IsRoleAssigned(channelId, userId, roleId);
+        }
+
+        public Task<(bool Succeeded, string[] Errors)> RemoveChannelModAsync(int channelId, int userId)
+        {
+            return roleManager.RemoveChannelModAsync(channelId, userId);
+        }
+
+        public Task<(bool Succeeded, string[] Errors)> GetRoleByIdAsync(int roleId)
+        {
+            return roleManager.GetRoleByIdAsync(roleId);
+        }
     }
 }

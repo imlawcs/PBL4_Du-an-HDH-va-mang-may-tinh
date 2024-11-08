@@ -55,6 +55,7 @@ namespace StreamingApp
             services.AddScoped<CategoryManager>();
             services.AddScoped<ICategoryService, CategoryService>();
 
+            services.AddScoped<RoleManager>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<User_RoleManager>();
             services.AddScoped<IUser_RoleService, User_RoleService>();  
