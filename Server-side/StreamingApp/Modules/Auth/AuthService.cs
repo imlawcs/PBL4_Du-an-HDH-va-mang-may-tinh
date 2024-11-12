@@ -18,9 +18,9 @@ public class AuthService : IAuthService
         _context = context;
     }
 
-    public User LoginUser(LoginModel login)
+    public async Task<User> LoginUserAsync(LoginModel login)
     {
-        var user = _context.Users.FirstOrDefault(u => u.UserName == login.Username);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == login.Username);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
         {
@@ -64,6 +64,26 @@ public class AuthService : IAuthService
         try
         {
             _context.Users.Add(user);
+            _context.SaveChanges();
+            User newUser = _context.Users.Where(u => u.UserName == user.UserName).FirstOrDefault();
+            if (newUser == null)
+            {
+                throw new CustomException
+                {
+                    ErrorCode = 500,
+                    Message = "Error saving user"
+                };
+            }
+            Console.WriteLine(JsonSerializer.Serialize(newUser));
+            int userId = newUser.UserId;
+            Console.WriteLine(userId);
+            var userRole = new User_Role
+            {
+                UserId = userId,
+                RoleId = 2,
+                ChannelOwnerId = userId
+            };
+            _context.User_Roles.Add(userRole);
             _context.SaveChanges();
         }
         catch (Exception ex)

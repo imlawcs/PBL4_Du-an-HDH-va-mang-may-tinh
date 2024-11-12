@@ -6,8 +6,8 @@ namespace StreamingApp.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    [Authorize(Policy = "RequireUserRole")]
-    // [RequireRole("User")]
+    // [Authorize(Policy = "RequireUserRole")]
+    [RequireRole("User")]
     public class HelloController : ControllerBase
     {
         [HttpGet]
