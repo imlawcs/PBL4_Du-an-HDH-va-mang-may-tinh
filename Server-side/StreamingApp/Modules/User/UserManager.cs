@@ -23,6 +23,7 @@ namespace StreamingApp.Managers
                 .Include(u => u.UserRoles) // Nạp UserRoles
                 .ThenInclude(ur => ur.Role) // Nạp Role từ UserRoles
                 .ToListAsync();
+            
             if (users == null) return null;
             return users;
         }

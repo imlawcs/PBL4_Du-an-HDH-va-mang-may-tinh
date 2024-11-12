@@ -113,5 +113,21 @@ namespace StreamingApp.Managers
             var role = await _context.Roles.FindAsync(roleId);
             return (role != null, new string[] { role == null ? "Role not found" : "Role found" });
         }
+
+        public async Task<int> GetRoleByUserIdAsync(int userId)
+        {
+            if (_context?.User_Roles == null)
+            {
+                throw new InvalidOperationException("Database context or User_Roles is not properly initialized.");
+            }
+
+            var roleId = await _context.User_Roles
+                .Where(r => r.UserId == userId) 
+                .Select(r => (int?)r.RoleId)
+                .FirstOrDefaultAsync();
+
+            return roleId ?? 0; // Trả về 0 nếu roleId là null
+        }
+
     }
 }

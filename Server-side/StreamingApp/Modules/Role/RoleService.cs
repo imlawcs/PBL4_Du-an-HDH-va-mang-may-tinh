@@ -52,5 +52,10 @@ namespace StreamingApp.Services {
         {
             return roleManager.GetRoleByIdAsync(roleId);
         }
+
+        public Task<int> GetRoleByUserIdAsync(int userId)
+        {
+            return roleManager.GetRoleByUserIdAsync(userId);
+        }
     }
 }
