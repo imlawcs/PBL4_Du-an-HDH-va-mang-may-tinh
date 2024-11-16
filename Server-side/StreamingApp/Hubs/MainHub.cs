@@ -48,11 +48,25 @@ namespace StreamingApp.Hubs
             }
             return base.OnDisconnectedAsync(exception);
         }
-
+        //TODO: Handle role detecting
         public async Task SendMessage(string user, string message, string hostConnectionId)
         {
-            await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
-            await Clients.Client(hostConnectionId).SendAsync("SendMessageAdmin", user, message);
+            var room = streamRoomManager.GetRoomByHostConnectionId(hostConnectionId);
+            if (room == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Room not found or the streamer is offline.");
+                return;
+            }
+            else if (room is StreamRoom room1)
+            {
+                if (room1.RoomName.Equals(user))
+                {
+                    await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message, "owner");
+                }
+                else
+                    await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
+                await Clients.Client(hostConnectionId).SendAsync("SendMessageAdmin", user, message);
+            }
 
         }
 

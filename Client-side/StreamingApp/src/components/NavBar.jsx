@@ -144,7 +144,10 @@ export default function NavBar(props) {
             id="search__box"
           />
           <div className="search__btn citizenship">
-            <FontAwesomeIcon icon={faSearch} />
+            <FontAwesomeIcon icon={faSearch} onClick={() => {
+              const searchValue = document.getElementById("search__box").value;
+              navigate(`/searchResult?query=${encodeURIComponent(searchValue)}`);
+            }}/>
           </div>
         </div>
         <div

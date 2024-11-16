@@ -381,6 +381,10 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type == "SMdesc__setting") {
+    
+    const handleStreamDesc = () => {
+
+    }
     return (
       <>
         <div className="smd__size rr__flex-col def-pad-1 bg__color-2 rrf__row-normal citizenship">
@@ -408,8 +412,20 @@ export default function CustomModal(props) {
                 placeholder="Search category..."
               />
             </div>
+            <div className="rr__flex-row">
+              <label className="smd__label fs__normal-2 league-spartan-regular">
+                Tags
+              </label>
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
+                type="text"
+                placeholder="Seperate tags with commas..."
+              />
+            </div>
             <div className="rr__flex-row-reverse">
-              <Button type="default" text="Save" onClick={() => {}} />
+              <Button type="default" text="Save" onClick={() => {
+
+              }} />
             </div>
           </div>
         </div>

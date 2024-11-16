@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function UserChannelList() {
     const [channels, setChannels] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(localStorage.getItem("site"));
     const navigate = useNavigate();
     function adminCheck(channel) {
         if (channel.userName && (channel.userName.includes("admin") || channel.userName.includes("Admin"))) {
@@ -43,24 +44,11 @@ export default function UserChannelList() {
                 </> 
                 : 
                 <>
+                {token && <>
                 <div className="cn__holder-label league-spartan-semibold fs__normal-2">
                   FOLLOWED CHANNELS
                 </div>
                 <div className="cn__holder-comps">
-                {/* TODO: api to check followed channels, stream status, random channels*/}
-                {/* {channels
-                                .filter(user => !user.isFollowed) // Filter recommended users
-                                .slice(0, 5) // Take the first 5 recommended users
-                                .map(user => (
-                                    <ChannelComp
-                                        key={user.userId}
-                                        isOffline={!user.userStatus}
-                                        profilePic={user.profilePic || "https://i.imgur.com/neHVP5j.jpg"}
-                                        userName={user.userName}
-                                        category={user.category || "null"}
-                                        viewCount={user.viewCount || 0}
-                                    />
-                                ))} */}
                   {channels.length > 0 && channels
                   .filter((user) => adminCheck(user) === false)
                   .slice(0, 5)
@@ -85,6 +73,7 @@ export default function UserChannelList() {
                     }}
                   />
                 </div>
+                </>}
                 <div className="cn__holder-label league-spartan-semibold fs__normal-2">
                   RECOMMENDED CHANNELS
                 </div>
