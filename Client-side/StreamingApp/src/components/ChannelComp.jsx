@@ -38,7 +38,7 @@ export default function ChannelComp(props) {
         const status = props.isOffline;
         if(!status)
             return(
-                <div className="cn__comp">
+                <div className="cn__comp" onClick={props.onClick}>
                     <div className="left__side-comp">
                         <img src={props.profilePic} className="cn__avatar" />
                         <div className="txt__content-holder">
@@ -56,7 +56,7 @@ export default function ChannelComp(props) {
             </div>
             )
         else return(
-            <div className="cn__comp">
+            <div className="cn__comp" onClick={props.onClick}>
                 <div className="left__side-comp">
                     <img src={props.profilePic} className="cn__avatar" />
                     <div className="txt__content-holder">

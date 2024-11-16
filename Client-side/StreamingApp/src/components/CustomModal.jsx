@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 export default function CustomModal(props) {
   const Auth = useAuth();
   const navigate = useNavigate();
+  const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
   if (props.type == "login") {
     const [Username, setUsername] = useState("");
     const [Password, setPassword] = useState("");
@@ -356,7 +357,7 @@ export default function CustomModal(props) {
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
                         
-                        SignalRTest.start("hello");
+                        SignalRTest.start(userGlobal.userName);
                         setServerStatus(true);
                         console.log("Status: " + serverStatus);
                         //truyền context.username vào đây
@@ -459,8 +460,8 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type == "account__setting profile-settings") {
-    const [displayName, setDisplayName] = useState(props.displayName);
-    const [bio, setBio] = useState(props.bio);
+    const [displayName, setDisplayName] = useState(userGlobal.displayName);
+    const [bio, setBio] = useState(userGlobal.bio || "");
     return (
       <>
         <div className="modal__layout rr__flex-col def-pad-2em bg__color-2">
@@ -508,7 +509,10 @@ export default function CustomModal(props) {
               </div>
             </div>
             <hr className="fill__container" />
-            <Button type="default" text="Save" onClick={() => {}} />
+            <Button type="default" text="Save" onClick={() => {
+              setUserGlobal({...userGlobal, displayName, bio});
+              localStorage.setItem("user", JSON.stringify({...userGlobal, displayName, bio}));
+            }} />
           </div>
         </div>
       </>

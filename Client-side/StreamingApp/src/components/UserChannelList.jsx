@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { UserRoutes } from "../API/UserRoutes";
 import ChannelComp from "./ChannelComp";
 import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
 export default function UserChannelList() {
     const [channels, setChannels] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
     function adminCheck(channel) {
         if (channel.userName && (channel.userName.includes("admin") || channel.userName.includes("Admin"))) {
             return true;
@@ -17,7 +19,7 @@ export default function UserChannelList() {
         {
             try
             {
-                const res = await UserRoutes.GetUsers();
+                const res = await UserRoutes.getUsers();
                 setChannels(res || []);
                 setLoading(false);
             }
@@ -64,6 +66,9 @@ export default function UserChannelList() {
                   .slice(0, 5)
                   .map((user) => (
                     <ChannelComp
+                      onClick={() => {
+                        navigate(`/user/${user.userName}`);
+                      }}
                       key={user.userId}
                       isOffline={user.userStatus? false : true}
                       profilePic={user.profilePic? user.profilePic : "https://i.imgur.com/neHVP5j.jpg"}
