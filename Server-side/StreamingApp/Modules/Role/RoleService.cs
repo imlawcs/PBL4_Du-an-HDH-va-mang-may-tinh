@@ -10,7 +10,7 @@ namespace StreamingApp.Services {
 
         public RoleService(RoleManager roleManager)
         {
-            roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+            this.roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
 
@@ -48,7 +48,7 @@ namespace StreamingApp.Services {
             return roleManager.RemoveChannelModAsync(channelId, userId);
         }
 
-        public Task<(bool Succeeded, string[] Errors)> GetRoleByIdAsync(int roleId)
+        public Task<Role?> GetRoleByIdAsync(int roleId)
         {
             return roleManager.GetRoleByIdAsync(roleId);
         }

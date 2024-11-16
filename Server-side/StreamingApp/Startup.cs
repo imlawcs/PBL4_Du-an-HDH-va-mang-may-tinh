@@ -149,13 +149,13 @@ namespace StreamingApp
 
             app.UseRouting();
             app.UseCors("ClientPermission");
-            app.UseAuthentication();
+            // app.UseAuthentication();
 
-            app.UseMiddleware<JwtMiddleware>();
-            app.UseMiddleware<ValidateMiddleware>();
-            app.UseMiddleware<AuthorizationMiddleware>();
+            // app.UseMiddleware<JwtMiddleware>();
+            // app.UseMiddleware<ValidateMiddleware>();
+            // app.UseMiddleware<AuthorizationMiddleware>();
 
-            app.UseAuthorization();
+            // app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

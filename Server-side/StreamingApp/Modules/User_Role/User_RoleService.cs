@@ -33,17 +33,17 @@ namespace StreamingApp.Services
             return User_RoleManager.DeleteUser_Role(UserId, RoleId, ChannelOwnerId);
         }
 
-        public Task<IEnumerable<User_Role>> GetAllUser_RolesAsync()
+        public Task<IEnumerable<UserRoleDetailDto>> GetAllUser_RolesAsync()
         {
             return User_RoleManager.GetListUser_Role();
         }
 
-        public Task<IEnumerable<User_Role>> GetListUser_RoleByIdAsync(int UserId)
+        public Task<IEnumerable<UserRoleDetailDto>> GetListUser_RoleByIdAsync(int UserId)
         {
             return User_RoleManager.GetListUser_Role(UserId);
         }
 
-        public Task<User_Role?> GetUser_RoleByIdAsync(int UserId, int RoleId, int ChannelOwnerId)
+        public Task<UserRoleDetailDto?> GetUser_RoleByIdAsync(int UserId, int RoleId, int ChannelOwnerId)
         {
             return User_RoleManager.GetUser_RoleWithId(UserId, RoleId, ChannelOwnerId);
         }
