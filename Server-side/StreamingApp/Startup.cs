@@ -67,6 +67,8 @@ namespace StreamingApp
             services.AddScoped<TagManager>();
             services.AddScoped<ITagService, TagService>();
 
+            services.AddScoped<StreamManager>();
+            services.AddScoped<IStreamService, StreamService>();
 
 
 

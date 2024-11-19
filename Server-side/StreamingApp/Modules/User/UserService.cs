@@ -22,16 +22,21 @@ namespace StreamingApp.Services
             return UserManager.DeleteUser(id);
         }
 
-        public Task<IEnumerable<User>> GetAllUsersAsync()
+        public Task<String> GetAllUsersAsync()
         {
-            return UserManager.GetUsers();
+            return UserManager.GetListUser();
+        }
+
+
+        public Task<String> GetUserByIdAsyncWithRole(int id)
+        {
+            return UserManager.GetUserByIdWithRole(id);
         }
 
         public Task<User> GetUserByIdAsync(int id)
         {
             return UserManager.GetUserById(id);
         }
-
 
         public async Task<(bool Succeeded, string[] Errors)> UpdateUserAsync(UserUpdateDto model)
         {
@@ -111,9 +116,11 @@ namespace StreamingApp.Services
             }
         }
 
-        public Task<User> GetUserByNameAsync(string name)
+        public Task<String> GetUserByNameAsync(string name)
         {
             return UserManager.GetUserByName(name);
         }
+
+       
     }
 }
