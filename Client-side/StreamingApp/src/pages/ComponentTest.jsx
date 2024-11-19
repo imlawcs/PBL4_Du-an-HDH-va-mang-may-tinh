@@ -30,14 +30,6 @@ export default function ComponentTest() {
           chatContext="Hello World!"
           badge="vip"
         />
-        <ChannelComp type="search"
-          profilePic="https://via.placeholder.com/150"
-          userName="User1"
-          followers={1000}
-          onClick={() => {
-            navigate("/user/User1");
-          }}
-        />
         </div>
       </div>
     </>

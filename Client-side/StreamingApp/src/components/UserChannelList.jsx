@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserRoutes } from "../API/UserRoutes";
+import { UserRoutes } from "../API/User.routes";
 import ChannelComp from "./ChannelComp";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";

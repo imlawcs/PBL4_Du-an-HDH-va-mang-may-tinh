@@ -2,7 +2,7 @@ import React, { useContext, createContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ApiConstants } from "../API/ApiConstants";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import { UserRoutes } from "../API/UserRoutes";
+import { UserRoutes } from "../API/User.routes";
 
 interface AuthContextType {
     token: string;
