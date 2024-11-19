@@ -26,8 +26,11 @@ import StatBox from "./StatBox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import IconCard from "./IconCard";
 import { faFacebook, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { SignalRTest } from "../scripts/webrtcTemp";
+import UserChannelList from "./UserChannelList";
+import { UserRoutes } from "../API/User.routes";
+import defaultImage from "../assets/img/Logo__Sieufix.png";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -249,12 +252,6 @@ export default function Sidebar(props) {
       </div>
     );
   } else if (props.routing == "index") {
-    const LazyChannelComp = lazy(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve(import("./ChannelComp")), 200)
-        )
-    );
     const LazyVideoContent = lazy(
       () =>
         new Promise((resolve) =>
@@ -264,146 +261,7 @@ export default function Sidebar(props) {
     return (
       <div className="main__position">
         <div className="sidebar bg__color-2 rr__flex-row">
-          <div className="border__r">
-            <div className="cn__holder rr__flex-col hide__scroll-bar">
-              <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                FOLLOWED CHANNELS
-              </div>
-              <div className="cn__holder-comps">
-                {/* map user here */}
-                <Suspense
-                  fallback={
-                    <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                      Loading...
-                    </div>
-                  }
-                >
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                </Suspense>
-                <Button
-                  type={"link-type"}
-                  text={"Show more"}
-                  onClick={() => {}}
-                />
-              </div>
-              <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                RECOMMENDED CHANNELS
-              </div>
-              <div className="cn__holder-comps">
-                {/* map user here */}
-                <Suspense
-                  fallback={
-                    <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                      Loading...
-                    </div>
-                  }
-                >
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <LazyChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <LazyChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                </Suspense>
-                <Button
-                  type={"link-type"}
-                  text={"Show more"}
-                  onClick={() => {}}
-                />
-              </div>
-            </div>
-          </div>
+          <UserChannelList />
         </div>
         <div className="main__content bg__color-00">
           <img
@@ -540,130 +398,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-            <div className="border__r">
-              <div className="cn__holder rr__flex-col">
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  FOLLOWED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                  <Button
-                    type={"link-type"}
-                    text={"Show more"}
-                    onClick={() => {}}
-                  />
-                </div>
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  RECOMMENDED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                  <Button
-                    type={"link-type"}
-                    text={"Show more"}
-                    onClick={() => {}}
-                  />
-                </div>
-              </div>
-            </div>
+            <UserChannelList />
             <div className="main__content bg__color-00 rr__flex-col">
               {/* main content here */}
               <div className="fl__content-holder rr__flex-col">
@@ -752,130 +487,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-            <div className="border__r">
-              <div className="cn__holder rr__flex-col">
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  FOLLOWED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                  <Button
-                    type={"link-type"}
-                    text={"Show more"}
-                    onClick={() => {}}
-                  />
-                </div>
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  RECOMMENDED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                  <Button
-                    type={"link-type"}
-                    text={"Show more"}
-                    onClick={() => {}}
-                  />
-                </div>
-              </div>
-            </div>
+              <UserChannelList />
             <div className="main__content bg__color-00 rr__flex-col">
               {/* main content here */}
               <div className="fl__content-holder rr__flex-col">
@@ -960,70 +572,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-            <div className="border__r">
-              <div className="cn__holder rr__flex-col">
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  FOLLOWED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="StreamerX"
-                    category="Fortnite"
-                    viewCount={0}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="GamerPro"
-                    category="Valorant"
-                    viewCount={5678}
-                  />
-                </div>
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  RECOMMENDED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="NewStreamer"
-                    category="Just Chatting"
-                    viewCount={789}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="EsportsPlayer"
-                    category="Dota 2"
-                    viewCount={10234}
-                  />
-                </div>
-              </div>
-            </div>
+              <UserChannelList />
             <div className="main__content bg__color-00">
               {/* Main content will be inserted here */}
               <div className="fl__content-holder rr__flex-col">
@@ -1128,94 +677,62 @@ export default function Sidebar(props) {
       </>
     );
   } else if (props.routing == "SearchResult") {
+    const [searchParams] = useSearchParams();
+    const search = searchParams.get("query");
+    const [userList, setUserList] = useState([]);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const renderLoading = () => {
+      return (
+        <>
+          <span className="fs__title-3">Loading</span>
+        </>
+      )
+    }
+    useEffect(() => {
+      UserRoutes.getUsers().then((res) => {
+        setUserList(res);
+      });
+      setLoading(false);
+    }, []);
     return (
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-            <div className="border__r">
-              <div className="cn__holder rr__flex-col">
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  FOLLOWED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                </div>
-              </div>
-            </div>
+          <UserChannelList />
             <div className="main__content bg__color-00">
               {/* Main content will be inserted here */}
               <div className="fl__content-holder rr__flex-col">
                 <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
-                  Search results for "searchTerm"
+                  Search results for "{search}"
                 </span>
-                <div className="def-pad-2"></div>
+                {/* <div className="def-pad-2"></div> */}
                 <span className="fs__large-2 league-spartan-regular citizenship fill__container def-pad-2 no__padding-lr">
-                  Channels tag with "searchTerm"
+                  Channels related with "{search}"
                 </span>
+                
                 <div className="sh__content-holder rr__flex-col">
-                  {[
-                    {
-                      title: "Exploring New Horizons",
-                      thumbnail: "https://i.imgur.com/mUaz2eC.jpg",
-                      profilePic: "https://i.imgur.com/JcLIDUe.jpg",
-                      userName: "explorer123",
-                      category: "Just Chatting",
-                      view: 1500,
-                    },
-                    {
-                      title: "Late Night Coding Session",
-                      thumbnail: "https://i.imgur.com/nWxUwqZ.jpg",
-                      profilePic: "https://i.imgur.com/qN5DFQN.jpg",
-                      userName: "codemaster",
-                      category: "Science & Technology",
-                      view: 800,
-                    },
-                    {
-                      title: "Speedrunning Mario 64",
-                      thumbnail: "https://i.imgur.com/7ZjOD7a.jpg",
-                      profilePic: "https://i.imgur.com/8GC6owZ.jpg",
-                      userName: "speedster",
-                      category: "Retro",
-                      view: 2200,
-                    },
-                    {
-                      title: "Cooking Stream: Italian Cuisine",
-                      thumbnail: "https://i.imgur.com/3fPsZD1.jpg",
-                      profilePic: "https://i.imgur.com/LZ1Xosc.jpg",
-                      userName: "chefmaster",
-                      category: "Food & Drink",
-                      view: 1800,
-                    },
-                    {
-                      title: "Chill Music Stream",
-                      thumbnail: "https://i.imgur.com/2RqvQkS.jpg",
-                      profilePic: "https://i.imgur.com/T9qKjXV.jpg",
-                      userName: "musiclover",
-                      category: "Music",
-                      view: 3000,
-                    },
-                  ].map((content, index) => (
-                    <VideoContent
-                      key={index}
-                      type="search"
-                      title={content.title}
-                      thumbnail={content.thumbnail}
-                      profilePic={content.profilePic}
-                      userName={content.userName}
-                      category={content.category}
-                      view={content.view}
-                    />
+                  {loading? 
+                  renderLoading() 
+                  : 
+                  userList
+                  .filter(user => user.userName.includes(search) || user.displayName.includes(search))
+                  .map((user, index) => (
+                      <>
+                      <ChannelComp type="search"
+                        key={index}
+                        profilePic={user.profilePic? user.profilePic : defaultImage}
+                        userName={user.userName}
+                        followers={user.followers? user.followers : 0}
+                        onClick={() => {
+                          navigate(`/user/${user.userName}`);
+                        }}
+                      />
+                      </>
                   ))}
                 </div>
                 <span className="fs__large-2 league-spartan-regular citizenship fill__container def-pad-2 no__padding-lr">
-                  Live channels
+                  Channels with search term "{search}"
                 </span>
                 <div className="sh__content-holder rr__flex-row">
                   {[
@@ -1245,7 +762,7 @@ export default function Sidebar(props) {
                   ))}
                 </div>
                 <span className="fs__large-2 league-spartan-regular citizenship fill__container def-pad-2 no__padding-lr">
-                  Categories
+                  Categories with search terms "{search}"
                 </span>
               </div>
             </div>
@@ -1261,7 +778,7 @@ export default function Sidebar(props) {
 
     useEffect(() => {
       if(connection == null) return;
-      connection.on("sendMessage", (username, message) => {
+      connection.on("sendMessage", (username, message, badge) => {
         console.log(`${username}: ` + message);
         setMessages(prevMessages => [
           ...prevMessages,
@@ -1269,7 +786,7 @@ export default function Sidebar(props) {
             userName: username,
             chatContext: message,
             timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
-            badge: null,
+            badge: badge,
           }
         ]);
       });
@@ -1288,131 +805,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-            <div className="border__r">
-              <div className="cn__holder rr__flex-col">
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  FOLLOWED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                  <Button
-                    type={"link-type"}
-                    text={"Show more"}
-                    onClick={() => {}}
-                  />
-                </div>
-                <div className="cn__holder-label league-spartan-semibold fs__normal-2">
-                  RECOMMENDED CHANNELS
-                </div>
-                <div className="cn__holder-comps">
-                  {/* map user here */}
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={1326}
-                  />
-                  <ChannelComp
-                    isOffline={false}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={132326}
-                  />
-                  <ChannelComp
-                    isOffline={true}
-                    profilePic="https://i.imgur.com/neHVP5j.jpg"
-                    userName="Resolved"
-                    category="League Of Legends"
-                    viewCount={144226}
-                  />
-                  <Button
-                    type={"link-type"}
-                    text={"Show more"}
-                    onClick={() => {}}
-                  />
-                </div>
-              </div>
-            </div>
+          <UserChannelList />
             <div className="main__content bg__color-vid">
               {/* <img className="bg__img" src={smBackground} alt="background"/> */}
               <div className="video__holder rr__flex-col rrf__jc-center rrf__ai-center bg__color-00">

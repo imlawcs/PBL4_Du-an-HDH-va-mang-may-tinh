@@ -2,6 +2,7 @@ import { useState } from "react";
 import MenuOptionBtn from "./MenuOptionBtn";
 import {
   faArrowRightFromBracket,
+  faCode,
   faUserGear,
   faWaveSquare,
 } from "@fortawesome/free-solid-svg-icons";
@@ -53,6 +54,11 @@ export default function ProfileMenu(props) {
               icon={faUserGear}
               optionName="Profile Settings"
               onClick={() => navigate("/accountSetting")}
+            />
+            <MenuOptionBtn
+              icon={faCode}
+              optionName="Test"
+              onClick={() => navigate("/test")}
             />
             <MenuOptionBtn
               icon={faArrowRightFromBracket}

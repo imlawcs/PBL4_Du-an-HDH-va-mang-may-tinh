@@ -30,7 +30,20 @@ export default function ChannelComp(props) {
     else if(props.type == "search"){
         return(
             <>
-                
+                <div className="cn__comp" onClick={props.onClick} style={{
+                    backgroundColor: "transparent",
+                }}>
+                    <div className="left__side-comp">
+                        <img src={props.profilePic} className="cn__avatar-2" />
+                        <div className="txt__content-holder" style={{
+                            rowGap: "0.3em",
+                            marginLeft: "0.5em"
+                        }}>
+                            <span className="league-spartan-semibold fs__normal-2 no__user-select">{props.userName}</span>
+                            <span className="league-spartan-light fs__normal-1"><b>{props.followers}</b> followers</span>
+                        </div>
+                    </div>
+                </div>
             </>
         )
     }
@@ -38,7 +51,7 @@ export default function ChannelComp(props) {
         const status = props.isOffline;
         if(!status)
             return(
-                <div className="cn__comp">
+                <div className="cn__comp" onClick={props.onClick}>
                     <div className="left__side-comp">
                         <img src={props.profilePic} className="cn__avatar" />
                         <div className="txt__content-holder">
@@ -53,10 +66,10 @@ export default function ChannelComp(props) {
                         {shortenNumber(props.viewCount)}
                     </div>
                 </div>
-            </div>
+                </div>
             )
         else return(
-            <div className="cn__comp">
+            <div className="cn__comp" onClick={props.onClick}>
                 <div className="left__side-comp">
                     <img src={props.profilePic} className="cn__avatar" />
                     <div className="txt__content-holder">

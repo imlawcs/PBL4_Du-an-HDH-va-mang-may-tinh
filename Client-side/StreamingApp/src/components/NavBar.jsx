@@ -10,18 +10,17 @@ import { useState, useEffect } from "react";
 import CustomModal from "./CustomModal";
 import Toast from "./Toast";
 import { useAuth } from "../hooks/AuthProvider";
-import { ApiConstants } from "../API/ApiConstants";
 export default function NavBar(props) {
   const route = props.routing;
   const auth = useAuth();
   const navigate = useNavigate();
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastPosition, setToastPosition] = useState("-100%");
   const [token, setToken] = useState(localStorage.getItem("site") || "");
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || "");
   useEffect(() => {
     let timer;
     if (showToast) {
@@ -39,10 +38,9 @@ export default function NavBar(props) {
   useEffect(() => {
     if (token) {
       setIsLoggedIn(true);
+      console.log(user);
     }
-    if(user){
-      console.log(JSON.stringify(user[ApiConstants.CLAIMS.EMAIL]));
-    }
+    
   }, []);
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -52,7 +50,15 @@ export default function NavBar(props) {
     setToastMessage(message);
     setShowToast(true);
   };
-
+  const renderProfileMenu = () => {
+    return (
+      <ProfileMenu
+        userName={user? user.userName : "null"}
+        imgLink={user.profilePic? user.profilePic : "https://i.imgur.com/neHVP5j.jpg"}
+        logout={handleLogout}
+      />
+    );
+  }
   if (route == "AS") {
     return (
       <>
@@ -71,11 +77,7 @@ export default function NavBar(props) {
           </div>
           <div className="middle__ch"></div>
           <div className="right__ch rrf__jc-center rrf__ai-center">
-            <ProfileMenu
-              userName="Resolved"
-              imgLink="https://i.imgur.com/neHVP5j.jpg"
-              logout={handleLogout}
-            />
+            {renderProfileMenu()}
           </div>
         </div>
       </>
@@ -99,11 +101,7 @@ export default function NavBar(props) {
           </div>
           <div className="middle__ch"></div>
           <div className="right__ch rrf__jc-center rrf__ai-center">
-            <ProfileMenu
-              userName="Resolved"
-              imgLink="https://i.imgur.com/neHVP5j.jpg"
-              logout={handleLogout}
-            />
+            {renderProfileMenu()}
           </div>
         </div>
       </>
@@ -146,7 +144,10 @@ export default function NavBar(props) {
             id="search__box"
           />
           <div className="search__btn citizenship">
-            <FontAwesomeIcon icon={faSearch} />
+            <FontAwesomeIcon icon={faSearch} onClick={() => {
+              const searchValue = document.getElementById("search__box").value;
+              navigate(`/searchResult?query=${encodeURIComponent(searchValue)}`);
+            }}/>
           </div>
         </div>
         <div
@@ -156,13 +157,7 @@ export default function NavBar(props) {
               : ""
           }`}
         >
-          {isLoggedIn ? (
-            <ProfileMenu
-              userName="Resolved"
-              imgLink="https://i.imgur.com/neHVP5j.jpg"
-              logout={handleLogout}
-            />
-          ) : (
+          {isLoggedIn ? renderProfileMenu() : (
             <>
               <Button
                 type={"default"}
