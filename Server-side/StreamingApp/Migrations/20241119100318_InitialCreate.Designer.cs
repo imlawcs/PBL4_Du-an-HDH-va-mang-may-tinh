@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace StreamingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241110070016_InitialCreate1")]
-    partial class InitialCreate1
+    [Migration("20241119100318_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,7 @@ namespace StreamingApp.Migrations
 
             modelBuilder.Entity("StreamingApp.Models.Entities.Blocked", b =>
                 {
-                    b.Property<int>("BlockerId")
+                    b.Property<int>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnOrder(0);
 
@@ -34,7 +34,7 @@ namespace StreamingApp.Migrations
                         .HasColumnType("int")
                         .HasColumnOrder(1);
 
-                    b.HasKey("BlockerId", "BlockedId");
+                    b.HasKey("ChannelId", "BlockedId");
 
                     b.HasIndex("BlockedId");
 
@@ -69,15 +69,15 @@ namespace StreamingApp.Migrations
                     b.Property<int>("FollowerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FolloweeId")
+                    b.Property<int>("ChannelId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsMuted")
                         .HasColumnType("bit");
 
-                    b.HasKey("FollowerId", "FolloweeId");
+                    b.HasKey("FollowerId", "ChannelId");
 
-                    b.HasIndex("FolloweeId");
+                    b.HasIndex("ChannelId");
 
                     b.ToTable("Followings");
                 });
@@ -304,7 +304,7 @@ namespace StreamingApp.Migrations
                             UserId = 1,
                             DisplayName = "admin",
                             Email = "admin@gmail.com",
-                            Password = "$2a$11$bJofIH.GvuqUrG9M/4P97OUTajXVLtWAu0rrJzp5/8bIwNCdY4yw.",
+                            Password = "$2a$11$F6ZL5Gntu7xtRBPWRqEZ9.JLITRsXUfLUUffy6WsY3LxQd7uCAs8.",
                             PhoneNumber = "1111111111",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "Admin Placeholder"
@@ -314,7 +314,7 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$.tN.DuN2./elqSMRchtWZeCt93ovfJQgSRrqHEPzqkLD9KpjMwp22",
+                            Password = "$2a$11$WMOBU6r4LZVAcyb5i4pOEe8.mIqtxM/ppp1k1Q0fkreIM0tAPNLuO",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin1"
@@ -324,7 +324,7 @@ namespace StreamingApp.Migrations
                             UserId = 3,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$o5Wdw9jor0d2URi7JGRtF.EFv7owQUTrdKv/GE5oJiArUZBvHPzOK",
+                            Password = "$2a$11$dya.wZkI9L0RYpD0mOeT9ukpcj3lshVN0cUW09GktKU5P21Jtyzcq",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin2"
@@ -334,7 +334,7 @@ namespace StreamingApp.Migrations
                             UserId = 4,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$D16xD3Ut6AB2XSKB9E30F.VJHzsmLZcLyCxeaCDKUSK6SCGmEYRIC",
+                            Password = "$2a$11$eGR4gqrOX.8HMOD3YZVFSuj1.7xqplLMca6KRJ8MXiHA8tuhQchWm",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin3"
@@ -394,7 +394,7 @@ namespace StreamingApp.Migrations
 
                     b.HasOne("StreamingApp.Models.Entities.User", "Blocker")
                         .WithMany("BlockedUsers")
-                        .HasForeignKey("BlockerId")
+                        .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -405,9 +405,9 @@ namespace StreamingApp.Migrations
 
             modelBuilder.Entity("StreamingApp.Models.Entities.Following", b =>
                 {
-                    b.HasOne("StreamingApp.Models.Entities.User", "Followee")
+                    b.HasOne("StreamingApp.Models.Entities.User", "Channel")
                         .WithMany("Followers")
-                        .HasForeignKey("FolloweeId")
+                        .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -417,7 +417,7 @@ namespace StreamingApp.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Followee");
+                    b.Navigation("Channel");
 
                     b.Navigation("Follower");
                 });
@@ -453,13 +453,13 @@ namespace StreamingApp.Migrations
             modelBuilder.Entity("StreamingApp.Models.Entities.StreamCategory", b =>
                 {
                     b.HasOne("StreamingApp.Models.Entities.Category", "Category")
-                        .WithMany()
+                        .WithMany("StreamCategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("StreamingApp.Models.Entities.Stream", "Stream")
-                        .WithMany()
+                        .WithMany("StreamCategories")
                         .HasForeignKey("StreamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -515,9 +515,19 @@ namespace StreamingApp.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("StreamingApp.Models.Entities.Category", b =>
+                {
+                    b.Navigation("StreamCategories");
+                });
+
             modelBuilder.Entity("StreamingApp.Models.Entities.Role", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("StreamingApp.Models.Entities.Stream", b =>
+                {
+                    b.Navigation("StreamCategories");
                 });
 
             modelBuilder.Entity("StreamingApp.Models.Entities.User", b =>

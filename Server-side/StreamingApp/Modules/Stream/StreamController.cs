@@ -11,12 +11,15 @@ namespace StreamingApp.Controllers
     {
         private readonly IStreamService _streamService;
         private readonly IStreamCategoryService _streamCategoryService;
+        private readonly IStreamTagService _streamTagService;
 
-        public StreamController(IStreamService streamService, IStreamCategoryService streamCategoryService)
+        public StreamController(IStreamService streamService, IStreamCategoryService streamCategoryService, IStreamTagService streamTagService)
         {
             _streamService = streamService;
             _streamCategoryService = streamCategoryService;
+            _streamTagService = streamTagService;
         }
+        
 
         [HttpGet]
         public async Task<IActionResult> GetAllStreamAsync()
@@ -45,21 +48,34 @@ namespace StreamingApp.Controllers
         public async Task<IActionResult> CreateStreamAsync([FromBody] StreamDTO model)
         {
             var streamModel = model.stream;
-            var streamCategory = model.streamCategory;
-
             var stream = await _streamService.CreateStreamAsync(streamModel);
-            var newStreamCategory = await _streamCategoryService.CreateStreamCategoryAsync(streamCategory);
-
             if(!stream.Succeeded)
             {
                 //không tạo thành công stream
                 return BadRequest(stream.Errors);
             }
 
+            var streamCategory = new StreamCategory { StreamId=streamModel.StreamId ,CategoryId = model.streamCategoryId };
+            var streamTag = new StreamTag { StreamId=streamModel.StreamId, TagId = model.streamTagId };
+
+            var newStreamCategory = await _streamCategoryService.CreateStreamCategoryAsync(streamCategory);
+            var newStreamTag = await _streamTagService.CreateStreamTagAsync(streamTag);
+            
             if(!newStreamCategory.Succeeded)
             {
                 //không tạo thành công stream category
-                return BadRequest(newStreamCategory.Errors + ". Stream created");
+                return BadRequest(newStreamCategory.Errors);
+            }
+            if(!newStreamCategory.Succeeded)
+            {
+                //không tạo thành công stream category
+                return BadRequest("Fail to create stream category. Stream created");
+            }
+            
+            if(!newStreamTag.Succeeded)
+            {
+                //không tạo thành công stream tag
+                return BadRequest("Fail to create stream tag. Stream created");
             }
             return Ok("Create stream successfully");
         }
