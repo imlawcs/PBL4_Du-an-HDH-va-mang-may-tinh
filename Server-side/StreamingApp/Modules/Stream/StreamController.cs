@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StreamingApp.Models.DTOs;
+using StreamingApp.Models.Entities;
 using StreamingApp.Services;
 
 namespace StreamingApp.Controllers
@@ -9,10 +10,12 @@ namespace StreamingApp.Controllers
     public class StreamController : ControllerBase
     {
         private readonly IStreamService _streamService;
+        private readonly IStreamCategoryService _streamCategoryService;
 
-        public StreamController(IStreamService streamService)
+        public StreamController(IStreamService streamService, IStreamCategoryService streamCategoryService)
         {
             _streamService = streamService;
+            _streamCategoryService = streamCategoryService;
         }
 
         [HttpGet]
@@ -39,13 +42,24 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateStreamAsync([FromBody] Models.Entities.Stream model)
+        public async Task<IActionResult> CreateStreamAsync([FromBody] StreamDTO model)
         {
-            var stream = await _streamService.CreateStreamAsync(model);
+            var streamModel = model.stream;
+            var streamCategory = model.streamCategory;
+
+            var stream = await _streamService.CreateStreamAsync(streamModel);
+            var newStreamCategory = await _streamCategoryService.CreateStreamCategoryAsync(streamCategory);
 
             if(!stream.Succeeded)
             {
+                //không tạo thành công stream
                 return BadRequest(stream.Errors);
+            }
+
+            if(!newStreamCategory.Succeeded)
+            {
+                //không tạo thành công stream category
+                return BadRequest(newStreamCategory.Errors + ". Stream created");
             }
             return Ok("Create stream successfully");
         }

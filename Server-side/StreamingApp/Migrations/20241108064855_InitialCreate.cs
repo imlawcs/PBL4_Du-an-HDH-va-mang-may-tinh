@@ -267,10 +267,10 @@ namespace StreamingApp.Migrations
                 columns: new[] { "UserId", "Bio", "DisplayName", "Email", "IsEmailNoti", "Password", "PhoneNumber", "ProfilePic", "RegisterDate", "UserName", "UserStatus" },
                 values: new object[,]
                 {
-                    { 1, null, "admin", "admin@gmail.com", null, "$2a$11$Nv2wnP//LvYKrM15k7L5aeeLWbd22FNETz4S1CVmCfSkYBZiCmb1e", "1111111111", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin Placeholder", null },
-                    { 2, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$vgdwYNRlcq1vBtDBBMF7PeuRrrHpkmA9.H.E0Xv3YRE/j33jMCw42", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
-                    { 3, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$AWbblPXxlniN/BArZPcWOO0HfUS8MN6ai8XZW5Szmf5dQm6QJql7q", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
-                    { 4, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$Ax0wmrxAdKoPZuqGWe.p6O1b7cbnBpahc2.l4xYsS8KdWYR4hBKfq", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
+                    { 1, null, "admin", "admin@gmail.com", null, "$2a$11$X/ojUmauyT7ZhQDL2C96vu5Cw7wJCHR65.F3IuMPx1zhfPZ8b/o66", "1111111111", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin Placeholder", null },
+                    { 2, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$iAcu.C6.DATn0DgcXqpnj.yHS56SFLf9LSXdb0LXWEh5s.POPHzSu", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
+                    { 3, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$FzV9jrRKnvyHi16nQPh.VOSpwvbiVIUCOiTQnXW63bvQATQGpdtv2", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
+                    { 4, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$7aJaWBMBcru7m4MqjBPfyewhBpcEvhQaXJjdylgN0T3Knm5xFTyaW", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
                 });
 
             migrationBuilder.InsertData(

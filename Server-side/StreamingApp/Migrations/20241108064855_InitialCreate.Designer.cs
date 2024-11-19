@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace StreamingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241104160729_InitialCreate")]
+    [Migration("20241108064855_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -304,7 +304,7 @@ namespace StreamingApp.Migrations
                             UserId = 1,
                             DisplayName = "admin",
                             Email = "admin@gmail.com",
-                            Password = "$2a$11$Nv2wnP//LvYKrM15k7L5aeeLWbd22FNETz4S1CVmCfSkYBZiCmb1e",
+                            Password = "$2a$11$X/ojUmauyT7ZhQDL2C96vu5Cw7wJCHR65.F3IuMPx1zhfPZ8b/o66",
                             PhoneNumber = "1111111111",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "Admin Placeholder"
@@ -314,7 +314,7 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$vgdwYNRlcq1vBtDBBMF7PeuRrrHpkmA9.H.E0Xv3YRE/j33jMCw42",
+                            Password = "$2a$11$iAcu.C6.DATn0DgcXqpnj.yHS56SFLf9LSXdb0LXWEh5s.POPHzSu",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin1"
@@ -324,7 +324,7 @@ namespace StreamingApp.Migrations
                             UserId = 3,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$AWbblPXxlniN/BArZPcWOO0HfUS8MN6ai8XZW5Szmf5dQm6QJql7q",
+                            Password = "$2a$11$FzV9jrRKnvyHi16nQPh.VOSpwvbiVIUCOiTQnXW63bvQATQGpdtv2",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin2"
@@ -334,7 +334,7 @@ namespace StreamingApp.Migrations
                             UserId = 4,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$Ax0wmrxAdKoPZuqGWe.p6O1b7cbnBpahc2.l4xYsS8KdWYR4hBKfq",
+                            Password = "$2a$11$7aJaWBMBcru7m4MqjBPfyewhBpcEvhQaXJjdylgN0T3Knm5xFTyaW",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin3"
