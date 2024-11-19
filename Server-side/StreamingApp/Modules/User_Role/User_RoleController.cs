@@ -63,7 +63,7 @@ namespace StreamingApp.Controllers
             if (user == null) return BadRequest("User not found");
 
             var roleResult = await _roleService.GetRoleByIdAsync(model.RoleId);
-            if (!roleResult.Succeeded) return BadRequest("Role not found");
+            if (roleResult == null) return BadRequest("Role not found");
 
             var channelOwner = await _userService.GetUserByIdAsync(model.ChannelOwnerId);
             if (channelOwner == null) return BadRequest("Channel Owner not found");
