@@ -1,0 +1,20 @@
+.admin__nav-container{
+    background-color: var(--primary-color);
+    justify-content: space-between;
+    padding: 0.5em 0.7em;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 0.16em var(--border-color) solid;
+    z-index: 9999;
+    width: 100%;
+    height: 3em;
+}
+.n__logo{
+    width: 2.4em;
+    height: 3em;
+    border-radius: var(--radius-scale);
+    
+}
+.n__logo:hover {
+    cursor: pointer;
+}

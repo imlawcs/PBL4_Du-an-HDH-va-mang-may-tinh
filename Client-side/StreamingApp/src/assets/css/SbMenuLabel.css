@@ -4,10 +4,12 @@
 
 .sb__option-label{
     display: flex;
+    width: 100%;
     flex-direction: row;
     background-color: var(--primary-color);
-    border-radius: var(--radius-scale);
-    padding: 0.5em;
+    
+    padding: 0.5em 0;
+    padding-right: 0;
     /* min-width: 15em; */
     height: auto;
 }
@@ -32,12 +34,16 @@
     align-items: center;
     color: white;
     display: flex;
+    padding: 0.2em;
+    margin-left: 0.5em;
 }
 .text{
     font-size: var(--font-2x);
     color: white;
-    text-align: center;
+    text-align: left;
     padding-top: 0.1em;
+    line-height: 2.3em;
+    user-select: none;
 }
 @keyframes sb__label {
     from{
@@ -50,10 +56,11 @@
     }
 }
 .sb__option-label_toggled {
+    width: 100%;
     display: flex;
     flex-direction: row;
-    border-radius: var(--radius-scale);
-    padding: 0.5em;
+    
+    padding: 0.5em 0;
     /* min-width: 15em; */
     height: auto;
     background-color: var(--secondary-color);

@@ -13,7 +13,7 @@ export default function SbMenuLabel(props) {
   if (props.type == "toggle")
     return (
       <>
-        <div className="sb__option-label_toggled" onClick={props.onClick}>
+        <div className="sb__option-label_toggled cur__pointer" onClick={props.onClick}>
           <div className="icon">
             <FontAwesomeIcon icon={props.icon} />
           </div>
@@ -23,7 +23,7 @@ export default function SbMenuLabel(props) {
     );
   else
     return (
-      <div className="sb__option-label" onClick={props.onClick}>
+      <div className="sb__option-label cur__pointer" onClick={props.onClick}>
         <div className="icon">
           <FontAwesomeIcon icon={props.icon} />
         </div>
