@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using StreamingApp.Models.Entities;
-using Stream = StreamingApp.Models.Entities.Stream;
 
 namespace StreamingApp.Models.DTOs
 {
-    public class StreamDTO
+    public class StreamUpdateDTO : StreamDTO
     {
-        public int UserId { get; set; }
+        public int StreamId { get; set; }
         public bool IsLive { get; set; }
         public string StreamTitle { get; set; }
         public string StreamDesc { get; set; }
