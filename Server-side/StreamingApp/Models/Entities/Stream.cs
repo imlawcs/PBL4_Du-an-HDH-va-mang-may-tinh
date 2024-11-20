@@ -20,5 +20,6 @@ namespace StreamingApp.Models.Entities {
 
         public ICollection<StreamCategory> StreamCategories { get; set; } = new List<StreamCategory>();
 
+        public ICollection<StreamTag> StreamTags { get; set; } = new List<StreamTag>();
     }
 }

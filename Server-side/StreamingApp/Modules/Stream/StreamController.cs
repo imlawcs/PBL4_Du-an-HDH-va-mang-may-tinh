@@ -59,35 +59,36 @@ namespace StreamingApp.Controllers
             {
                 //không tạo thành công stream
                 return BadRequest(stream.Errors);
+                //thông báo không tạo thành công kèm lỗi
+
             }
 
             var streamCategory = new StreamCategory { StreamId=streamModel.StreamId ,CategoryId = model.streamCategoryId };
-            var streamTag = new StreamTag { StreamId=streamModel.StreamId, TagId = model.streamTagId };
+            
+            foreach(int i in model.streamTagIds){
+                var streamTag = new StreamTag { StreamId=streamModel.StreamId, TagId = i };
+                var newStreamTag = await _streamTagService.CreateStreamTagAsync(streamTag);
+                if(!newStreamTag.Succeeded)
+                {
+                    //không tạo thành công stream tag
+                    return BadRequest(newStreamTag.Errors);
+                }
+            }
+        
 
             var newStreamCategory = await _streamCategoryService.CreateStreamCategoryAsync(streamCategory);
-            var newStreamTag = await _streamTagService.CreateStreamTagAsync(streamTag);
             
             if(!newStreamCategory.Succeeded)
             {
                 //không tạo thành công stream category
                 return BadRequest(newStreamCategory.Errors);
             }
-            if(!newStreamCategory.Succeeded)
-            {
-                //không tạo thành công stream category
-                return BadRequest("Fail to create stream category. Stream created");
-            }
-            
-            if(!newStreamTag.Succeeded)
-            {
-                //không tạo thành công stream tag
-                return BadRequest("Fail to create stream tag. Stream created");
-            }
+        
             return Ok("Create stream successfully");
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStreamAsync(int id,Models.Entities.Stream model)
+        public async Task<IActionResult> UpdateStreamAsync(int id, [FromBody] StreamUpdateDTO model)
         {
             var stream = await _streamService.GetStreamByIdAsync(id);
             if( stream == null) 
@@ -96,11 +97,67 @@ namespace StreamingApp.Controllers
             if(id!=model.StreamId) 
                 return BadRequest("Id is not match");
 
-            var result = await _streamService.UpdateStreamAsync(model);
+            var modelStream = new Models.Entities.Stream{
+                StreamId = model.StreamId,
+                UserId = model.UserId,
+                StreamDate = stream.StreamDate,
+                IsLive = model.IsLive,
+                StreamTitle = model.StreamTitle,
+                StreamDesc = model.StreamDesc
+            };
+
+            var result = await _streamService.UpdateStreamAsync(modelStream);
 
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
+            var currentTagIds = stream.StreamTags.Select(x => x.TagId).ToList();
+            var newTagIds = model.streamTagIds;
+
+            if (!currentTagIds.SequenceEqual(newTagIds))
+            {
+            // Remove tags that are no longer associated with the stream
+            var tagsToRemove = currentTagIds.Except(newTagIds).ToList();
+            foreach (var tagId in tagsToRemove)
+            {
+                await _streamTagService.DeleteStreamTagAsync(model.StreamId, tagId);
+            }
+
+            // Add new tags that are not already associated with the stream
+            var tagsToAdd = newTagIds.Except(currentTagIds).ToList();
+            foreach (var tagId in tagsToAdd)
+            {
+                var streamTag = new StreamTag { StreamId = model.StreamId, TagId = tagId };
+                var resultTag = await _streamTagService.CreateStreamTagAsync(streamTag);
+                if (!resultTag.Succeeded)
+                {
+                    //không tạo thành công stream tag
+                    return Ok(new
+                    {
+                        StreamCreated = true,
+                        StreamMessage = "Update stream successfully",
+                        StreamTagCreated = false,
+                        StreamTagMessage = string.Join(", ", resultTag.Errors)
+                    });
+                }
+            }}
+
+            if(model.streamCategoryId!= stream.StreamCategories.Select(x=>x.CategoryId).FirstOrDefault())
+            {
+                var streamCategory = new StreamCategory { StreamId=model.StreamId ,CategoryId = model.streamCategoryId };
+                var resultCategory = await _streamCategoryService.UpdateStreamCategoryAsync(model.StreamId, model.streamCategoryId, streamCategory);
+                if(!resultCategory.Succeeded)
+                {
+                //không tạo thành công stream category
+                return Ok(new
+                {
+                    StreamCreated = true,
+                    StreamMessage = "Update stream successfully",
+                    StreamCategoryCreated = false,
+                    StreamCategoryMessage = string.Join(", ", resultCategory.Errors)
+                });
+                }
+            }
             return Ok("Update stream successfully");
         }
 

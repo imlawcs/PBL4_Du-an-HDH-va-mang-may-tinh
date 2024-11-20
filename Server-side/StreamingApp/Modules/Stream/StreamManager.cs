@@ -17,11 +17,18 @@ namespace StreamingApp.Managers
         }
 
         public async Task<Models.Entities.Stream?> GetStreamByIdAsync(int id) {
-            return await _context.Streams.Include(s => s.User).FirstOrDefaultAsync(s => s.StreamId == id);
+            return await _context.Streams.Include(s => s.User)
+            .Include(s => s.StreamTags)
+            .Include(s => s.StreamCategories)
+            .FirstOrDefaultAsync(s => s.StreamId == id);
         }
 
+
         public async Task<IEnumerable<Models.Entities.Stream>> GetAllStreamsAsync() {
-            return await _context.Streams.Include(s => s.User).ToListAsync();
+            return await _context.Streams.Include(s => s.User)
+            .Include(s => s.StreamTags)
+            .Include(s => s.StreamCategories)
+            .ToListAsync();
         }
 
         public async Task<bool> DeleteStreamAsync(int id) {
