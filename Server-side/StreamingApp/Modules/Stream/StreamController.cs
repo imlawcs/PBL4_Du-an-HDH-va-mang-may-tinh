@@ -47,7 +47,13 @@ namespace StreamingApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateStreamAsync([FromBody] StreamDTO model)
         {
-            var streamModel = model.stream;
+            var streamModel = new Models.Entities.Stream{
+                UserId = model.UserId,
+                StreamDate = DateTime.Now,
+                IsLive = model.IsLive,
+                StreamTitle = model.StreamTitle,
+                StreamDesc = model.StreamDesc
+            };
             var stream = await _streamService.CreateStreamAsync(streamModel);
             if(!stream.Succeeded)
             {
