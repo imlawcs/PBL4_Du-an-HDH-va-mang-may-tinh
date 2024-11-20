@@ -1,34 +1,22 @@
-using System.ComponentModel.DataAnnotations;
 
-namespace StreamingApp.Models.DTOs
-{
-    public class UserUpdateDto
+namespace StreamingApp.Models.DTOs{
+    public class UserDto
     {
-        [Required]
-        public int UserId { get; set; }
-
-        [MaxLength(100)]
+        public int UserId { get; set; }            
         public string UserName { get; set; }
-
-        [MaxLength(100)]
         public string DisplayName { get; set; }
-
-        [MaxLength(100)]
+        
         public string? Bio { get; set; }
-
-        [MaxLength(100)]
+        
         public string? ProfilePic { get; set; }
-
-        [MaxLength(100)]
-        [EmailAddress]
+        public DateTime RegisterDate { get; set; }
+        
         public string Email { get; set; }
-
-        [MaxLength(100)]
-        [Phone]
+        
         public string PhoneNumber { get; set; }
-
         public bool? UserStatus { get; set; }
-
         public bool? IsEmailNoti { get; set; }
+
+        public IEnumerable<UserRoleDetailDto> Roles { get; set; }
     }
 }

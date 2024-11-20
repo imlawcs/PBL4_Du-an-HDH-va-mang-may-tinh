@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using StreamingApp.Exceptions;
 using Microsoft.AspNetCore.Authentication;
 using StreamingApp.Services;
+using StreamingApp.Managers;
 
 namespace StreamingApp.Controllers
 {
@@ -17,21 +18,23 @@ namespace StreamingApp.Controllers
     {
         private readonly IConfiguration _config;
         private readonly IAuthService _authService;
+        private readonly RoleManager _roleManager;
 
-        public AuthController(IConfiguration config, IAuthService authService)
+        public AuthController(IConfiguration config, IAuthService authService, RoleManager roleManager)
         {
             _config = config;
             _authService = authService;
+            _roleManager = roleManager;
         }
 
         // Tạo JWT token cho người dùng sau khi xác thực thành công
-        public string GenerateToken(User user)
+        public string GenerateToken(User user, int roleId)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), 
                 new Claim(ClaimTypes.Email, user.Email),
-                // new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                new Claim(ClaimTypes.Role, roleId.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -50,29 +53,35 @@ namespace StreamingApp.Controllers
         // Xác thực người dùng qua tên đăng nhập và mật khẩu
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult Login([FromBody] LoginModel loginModel)
+        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
             try
             {
-                var user = _authService.LoginUser(loginModel);
+                var user = await _authService.LoginUserAsync(loginModel); 
 
-                if (user != null)
+                if (user == null)
                 {
-                    var token = GenerateToken(user);
-                    return Ok(new { token });
+                    return Unauthorized(new { error = "Invalid username or password." });
                 }
 
-                return Unauthorized(new { error = "Invalid username or password." });
+                int roleId = await _roleManager.GetRoleByUserIdAsync(user.UserId);
+
+                Console.WriteLine(roleId);
+
+                var token = GenerateToken(user, roleId);
+                return Ok(new { token });
             }
             catch (CustomException ex)
             {
-                return BadRequest(new { error = ex.Message }); 
+                return BadRequest(new { error = ex.Message });
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return StatusCode(500, new { error = "Internal server error", details = ex.Message });
             }
         }
+
 
         // Đăng ký người dùng mới
         [HttpPost("register")]
@@ -104,112 +113,112 @@ namespace StreamingApp.Controllers
             }
         }
 
-        // Bắt đầu quy trình xác thực với Google
-        [HttpGet("oauth/google")]
-        [AllowAnonymous]
-        public IActionResult GoogleLogin(string returnUrl = "/")
-        {
-            var redirectUrl = Url.Action(nameof(HandleGoogleResponse), "Auth", new { returnUrl });
-            var properties = _authService.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
-            return Challenge(properties, "Google");
-        }
+        // // Bắt đầu quy trình xác thực với Google
+        // [HttpGet("oauth/google")]
+        // [AllowAnonymous]
+        // public IActionResult GoogleLogin(string returnUrl = "/")
+        // {
+        //     var redirectUrl = Url.Action(nameof(HandleGoogleResponse), "Auth", new { returnUrl });
+        //     var properties = _authService.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+        //     return Challenge(properties, "Google");
+        // }
 
-        // Bắt đầu quy trình xác thực với Facebook
-        [HttpGet("oauth/facebook")]
-        [AllowAnonymous]
-        public IActionResult FacebookLogin(string returnUrl = "/")
-        {
-            var redirectUrl = Url.Action(nameof(HandleFacebookResponse), "Auth", new { returnUrl });
-            var properties = _authService.ConfigureExternalAuthenticationProperties("Facebook", redirectUrl);
-            return Challenge(properties, "Facebook");
-        }
+        // // Bắt đầu quy trình xác thực với Facebook
+        // [HttpGet("oauth/facebook")]
+        // [AllowAnonymous]
+        // public IActionResult FacebookLogin(string returnUrl = "/")
+        // {
+        //     var redirectUrl = Url.Action(nameof(HandleFacebookResponse), "Auth", new { returnUrl });
+        //     var properties = _authService.ConfigureExternalAuthenticationProperties("Facebook", redirectUrl);
+        //     return Challenge(properties, "Facebook");
+        // }
 
-        // Bắt đầu quy trình xác thực với Twitter
-        [HttpGet("oauth/twitter")]
-        [AllowAnonymous]
-        public IActionResult TwitterLogin(string returnUrl = "/")
-        {
-            var redirectUrl = Url.Action(nameof(HandleTwitterResponse), "Auth", new { returnUrl });
-            var properties = _authService.ConfigureExternalAuthenticationProperties("Twitter", redirectUrl);
-            return Challenge(properties, "Twitter");
-        }
+        // // Bắt đầu quy trình xác thực với Twitter
+        // [HttpGet("oauth/twitter")]
+        // [AllowAnonymous]
+        // public IActionResult TwitterLogin(string returnUrl = "/")
+        // {
+        //     var redirectUrl = Url.Action(nameof(HandleTwitterResponse), "Auth", new { returnUrl });
+        //     var properties = _authService.ConfigureExternalAuthenticationProperties("Twitter", redirectUrl);
+        //     return Challenge(properties, "Twitter");
+        // }
 
-        // Xử lý phản hồi từ Google sau khi xác thực
-        [HttpGet("oauth/response")]
-        [AllowAnonymous]
-        public async Task<IActionResult> HandleGoogleResponse(string returnUrl = "/")
-        {
-            var result = await HttpContext.AuthenticateAsync("Google");
-            if (result.Succeeded)
-            {
-                var user = await _authService.ProcessExternalLogin(result.Principal, "Google");
-                var token = GenerateToken(user);
-                return Redirect(returnUrl + "?token=" + token);
-            }
-            return Redirect(returnUrl + "?error=login_failed");
-        }
+        // // Xử lý phản hồi từ Google sau khi xác thực
+        // [HttpGet("oauth/response")]
+        // [AllowAnonymous]
+        // public async Task<IActionResult> HandleGoogleResponse(string returnUrl = "/")
+        // {
+        //     var result = await HttpContext.AuthenticateAsync("Google");
+        //     if (result.Succeeded)
+        //     {
+        //         var user = await _authService.ProcessExternalLogin(result.Principal, "Google");
+        //         var token = GenerateToken(user);
+        //         return Redirect(returnUrl + "?token=" + token);
+        //     }
+        //     return Redirect(returnUrl + "?error=login_failed");
+        // }
 
-        // Xử lý phản hồi từ Facebook sau khi xác thực
-        [HttpGet("oauth/response/facebook")]
-        [AllowAnonymous]
-        public async Task<IActionResult> HandleFacebookResponse(string returnUrl = "/")
-        {
-            var result = await HttpContext.AuthenticateAsync("Facebook");
-            if (result.Succeeded)
-            {
-                var user = await _authService.ProcessExternalLogin(result.Principal, "Facebook");
-                var token = GenerateToken(user);
-                return Redirect(returnUrl + "?token=" + token);
-            }
-            return Redirect(returnUrl + "?error=login_failed");
-        }
+        // // Xử lý phản hồi từ Facebook sau khi xác thực
+        // [HttpGet("oauth/response/facebook")]
+        // [AllowAnonymous]
+        // public async Task<IActionResult> HandleFacebookResponse(string returnUrl = "/")
+        // {
+        //     var result = await HttpContext.AuthenticateAsync("Facebook");
+        //     if (result.Succeeded)
+        //     {
+        //         var user = await _authService.ProcessExternalLogin(result.Principal, "Facebook");
+        //         var token = GenerateToken(user);
+        //         return Redirect(returnUrl + "?token=" + token);
+        //     }
+        //     return Redirect(returnUrl + "?error=login_failed");
+        // }
 
-        // Xử lý phản hồi từ Twitter sau khi xác thực
-        [HttpGet("oauth/response/twitter")]
-        [AllowAnonymous]
-        public async Task<IActionResult> HandleTwitterResponse(string returnUrl = "/")
-        {
-            var result = await HttpContext.AuthenticateAsync("Twitter");
-            if (result.Succeeded)
-            {
-                var user = await _authService.ProcessExternalLogin(result.Principal, "Twitter");
-                var token = GenerateToken(user);
-                return Redirect(returnUrl + "?token=" + token);
-            }
-            return Redirect(returnUrl + "?error=login_failed");
-        }
+        // // Xử lý phản hồi từ Twitter sau khi xác thực
+        // [HttpGet("oauth/response/twitter")]
+        // [AllowAnonymous]
+        // public async Task<IActionResult> HandleTwitterResponse(string returnUrl = "/")
+        // {
+        //     var result = await HttpContext.AuthenticateAsync("Twitter");
+        //     if (result.Succeeded)
+        //     {
+        //         var user = await _authService.ProcessExternalLogin(result.Principal, "Twitter");
+        //         var token = GenerateToken(user);
+        //         return Redirect(returnUrl + "?token=" + token);
+        //     }
+        //     return Redirect(returnUrl + "?error=login_failed");
+        // }
 
-        // Lấy thông tin hồ sơ người dùng
-        [HttpGet("profile")]
-        public IActionResult GetUserProfile()
-        {
-            var userId = HttpContext.Items["User"];
-            if (userId == null)
-            {
-                return Unauthorized(new { message = "Unauthorized" });
-            }
+        // // Lấy thông tin hồ sơ người dùng
+        // [HttpGet("profile")]
+        // public IActionResult GetUserProfile()
+        // {
+        //     var userId = HttpContext.Items["User"];
+        //     if (userId == null)
+        //     {
+        //         return Unauthorized(new { message = "Unauthorized" });
+        //     }
 
-            return Ok(new { userId });
-        }
+        //     return Ok(new { userId });
+        // }
 
-        // Đăng xuất người dùng
-        [HttpPost("logout")]
-        [Authorize]
-        public IActionResult Logout()
-        {
-            // Thực hiện đăng xuất
-            HttpContext.SignOutAsync(); // Đăng xuất khỏi các nhà cung cấp xác thực
-            return Ok(new { message = "Logged out successfully." });
-        }
+        // // Đăng xuất người dùng
+        // [HttpPost("logout")]
+        // [Authorize]
+        // public IActionResult Logout()
+        // {
+        //     // Thực hiện đăng xuất
+        //     HttpContext.SignOutAsync(); // Đăng xuất khỏi các nhà cung cấp xác thực
+        //     return Ok(new { message = "Logged out successfully." });
+        // }
 
-        // Bắt đầu quy trình đăng nhập bên ngoài
-        [HttpGet("login/{provider}")]
-        [AllowAnonymous]
-        public IActionResult ExternalLogin(string provider, string redirectUrl)
-        {
-            var redirectUri = Url.Action("ExternalLoginCallback", "Auth", new { provider, redirectUrl });
-            var properties = _authService.ConfigureExternalAuthenticationProperties(provider, redirectUri);
-            return Challenge(properties, provider);
-        }
+        // // Bắt đầu quy trình đăng nhập bên ngoài
+        // [HttpGet("login/{provider}")]
+        // [AllowAnonymous]
+        // public IActionResult ExternalLogin(string provider, string redirectUrl)
+        // {
+        //     var redirectUri = Url.Action("ExternalLoginCallback", "Auth", new { provider, redirectUrl });
+        //     var properties = _authService.ConfigureExternalAuthenticationProperties(provider, redirectUri);
+        //     return Challenge(properties, provider);
+        // }
     }
 }

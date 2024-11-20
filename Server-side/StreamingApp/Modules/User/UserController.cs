@@ -21,7 +21,8 @@ namespace StreamingApp.Controllers
             try
             {
                 var users = await _userService.GetAllUsersAsync();
-                return Ok(users);
+                if (users == null) return NotFound();
+                return Content(users, "application/json");
             }
             catch (Exception ex)
             {
@@ -34,10 +35,9 @@ namespace StreamingApp.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null)
-                return NotFound("User not found");
-            return Ok(user);
+            var userJson = await _userService.GetUserByIdAsyncWithRole(id);
+            if (userJson == null) return NotFound();
+            return Content(userJson, "application/json");
         }
 
         [HttpGet("name={name}")]
@@ -46,7 +46,7 @@ namespace StreamingApp.Controllers
             var user = await _userService.GetUserByNameAsync(name);
             if (user == null)
                 return NotFound("User not found");
-            return Ok(user);
+            return Content(user, "application/json");
         }
 
         [HttpPut("{id}")]

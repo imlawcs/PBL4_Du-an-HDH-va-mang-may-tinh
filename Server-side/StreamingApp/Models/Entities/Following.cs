@@ -11,14 +11,14 @@ namespace StreamingApp.Models.Entities
 
         [Key]
         [Required]
-        public int FolloweeId { get; set; } //người được theo dõi
+        public int ChannelId { get; set; } //người được theo dõi
 
         [Required]
         public bool IsMuted {get; set;}
 
         public virtual User? Follower { get; set; }
 
-        public virtual User? Followee { get; set; }
+        public virtual User? Channel { get; set; }
 
     }
 }

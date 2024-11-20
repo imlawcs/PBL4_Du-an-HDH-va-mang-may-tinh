@@ -80,12 +80,12 @@ namespace StreamingApp.Migrations
                 name: "Blockeds",
                 columns: table => new
                 {
-                    BlockerId = table.Column<int>(type: "int", nullable: false),
+                    ChannelId = table.Column<int>(type: "int", nullable: false),
                     BlockedId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Blockeds", x => new { x.BlockerId, x.BlockedId });
+                    table.PrimaryKey("PK_Blockeds", x => new { x.ChannelId, x.BlockedId });
                     table.ForeignKey(
                         name: "FK_Blockeds_Users_BlockedId",
                         column: x => x.BlockedId,
@@ -93,8 +93,8 @@ namespace StreamingApp.Migrations
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Blockeds_Users_BlockerId",
-                        column: x => x.BlockerId,
+                        name: "FK_Blockeds_Users_ChannelId",
+                        column: x => x.ChannelId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -105,15 +105,15 @@ namespace StreamingApp.Migrations
                 columns: table => new
                 {
                     FollowerId = table.Column<int>(type: "int", nullable: false),
-                    FolloweeId = table.Column<int>(type: "int", nullable: false),
+                    ChannelId = table.Column<int>(type: "int", nullable: false),
                     IsMuted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Followings", x => new { x.FollowerId, x.FolloweeId });
+                    table.PrimaryKey("PK_Followings", x => new { x.FollowerId, x.ChannelId });
                     table.ForeignKey(
-                        name: "FK_Followings_Users_FolloweeId",
-                        column: x => x.FolloweeId,
+                        name: "FK_Followings_Users_ChannelId",
+                        column: x => x.ChannelId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
@@ -267,10 +267,10 @@ namespace StreamingApp.Migrations
                 columns: new[] { "UserId", "Bio", "DisplayName", "Email", "IsEmailNoti", "Password", "PhoneNumber", "ProfilePic", "RegisterDate", "UserName", "UserStatus" },
                 values: new object[,]
                 {
-                    { 1, null, "admin", "admin@gmail.com", null, "$2a$11$Nv2wnP//LvYKrM15k7L5aeeLWbd22FNETz4S1CVmCfSkYBZiCmb1e", "1111111111", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin Placeholder", null },
-                    { 2, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$vgdwYNRlcq1vBtDBBMF7PeuRrrHpkmA9.H.E0Xv3YRE/j33jMCw42", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
-                    { 3, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$AWbblPXxlniN/BArZPcWOO0HfUS8MN6ai8XZW5Szmf5dQm6QJql7q", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
-                    { 4, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$Ax0wmrxAdKoPZuqGWe.p6O1b7cbnBpahc2.l4xYsS8KdWYR4hBKfq", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
+                    { 1, null, "admin", "admin@gmail.com", null, "$2a$11$F6ZL5Gntu7xtRBPWRqEZ9.JLITRsXUfLUUffy6WsY3LxQd7uCAs8.", "1111111111", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin Placeholder", null },
+                    { 2, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$WMOBU6r4LZVAcyb5i4pOEe8.mIqtxM/ppp1k1Q0fkreIM0tAPNLuO", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
+                    { 3, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$dya.wZkI9L0RYpD0mOeT9ukpcj3lshVN0cUW09GktKU5P21Jtyzcq", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
+                    { 4, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$eGR4gqrOX.8HMOD3YZVFSuj1.7xqplLMca6KRJ8MXiHA8tuhQchWm", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
                 });
 
             migrationBuilder.InsertData(
@@ -289,9 +289,9 @@ namespace StreamingApp.Migrations
                 column: "BlockedId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Followings_FolloweeId",
+                name: "IX_Followings_ChannelId",
                 table: "Followings",
-                column: "FolloweeId");
+                column: "ChannelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_StreamerUserId",

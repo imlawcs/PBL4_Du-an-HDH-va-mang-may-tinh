@@ -10,9 +10,8 @@ namespace StreamingApp.Services {
 
         public RoleService(RoleManager roleManager)
         {
-            roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+            this.roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         }
-
 
         public Task<(bool Succeeded, string[] Errors)> AssignRole(int channelId, int userId, int roleId)
         {
@@ -38,19 +37,24 @@ namespace StreamingApp.Services {
             return roleManager.AssignChannelModAsync(channelId, userId);
         }
 
-        public Task<(bool Succeeded, string[] Errors)> IsRoleAssigned(int channelId, int userId, int roleId)
-        {
-            return roleManager.IsRoleAssigned(channelId, userId, roleId);
-        }
-
         public Task<(bool Succeeded, string[] Errors)> RemoveChannelModAsync(int channelId, int userId)
         {
             return roleManager.RemoveChannelModAsync(channelId, userId);
         }
 
-        public Task<(bool Succeeded, string[] Errors)> GetRoleByIdAsync(int roleId)
+        public Task<Role?> GetRoleByIdAsync(int roleId)
         {
             return roleManager.GetRoleByIdAsync(roleId);
+        }
+
+        public Task<int> GetRoleByUserIdAsync(int userId)
+        {
+            return roleManager.GetRoleByUserIdAsync(userId);
+        }
+
+        public Task<Role[]?> GetAllRoles()
+        {
+            return roleManager.GetAllRoles();
         }
     }
 }
