@@ -10,6 +10,7 @@ import SearchResult from "./pages/SearchResult";
 import AuthProvider from "./hooks/AuthProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import ComponentTest from "./pages/ComponentTest";
+import AdminPage from "./pages/Admin";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           </Route>
           <Route path="searchResult" element={<SearchResult />} />
           <Route path="browsing" element={<Browsing />} />
+          <Route path="admin" element={<AdminPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

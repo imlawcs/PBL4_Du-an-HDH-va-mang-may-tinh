@@ -1,0 +1,11 @@
+.admin__page-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+}
+.admin__page-content{
+    display: flex;
+    flex-direction: row;
+    overflow-y: hidden;
+}
