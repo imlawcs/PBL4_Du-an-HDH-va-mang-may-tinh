@@ -7,6 +7,7 @@ import {
   faLink,
   faPhone,
   faTowerBroadcast,
+  faTriangleExclamation,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import smBackground from "../assets/img/background_sm-home.png";
@@ -31,6 +32,7 @@ import { SignalRTest } from "../scripts/webrtcTemp";
 import UserChannelList from "./UserChannelList";
 import { UserRoutes } from "../API/User.routes";
 import defaultImage from "../assets/img/Logo__Sieufix.png";
+import { StreamRoutes } from "../API/Stream.route";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -46,7 +48,7 @@ export default function Sidebar(props) {
               <div className="sb__label league-spartan-semibold">
                 {props.name}
               </div>
-              <div className="sb__option-holder">
+              <div className="sb__option-holder no__padding-lr">
                 <SbMenuLabel
                   type={option == 0 ? "toggle" : ""}
                   text="Home"
@@ -716,16 +718,16 @@ export default function Sidebar(props) {
                   renderLoading() 
                   : 
                   userList
-                  .filter(user => user.userName.includes(search) || user.displayName.includes(search))
+                  .filter(user => user.UserName.includes(search) || user.DisplayName.includes(search))
                   .map((user, index) => (
                       <>
                       <ChannelComp type="search"
                         key={index}
-                        profilePic={user.profilePic? user.profilePic : defaultImage}
-                        userName={user.userName}
+                        profilePic={user.ProfilePic? user.ProfilePic : defaultImage}
+                        userName={user.UserName}
                         followers={user.followers? user.followers : 0}
                         onClick={() => {
-                          navigate(`/user/${user.userName}`);
+                          navigate(`/user/${user.UserName}`);
                         }}
                       />
                       </>
@@ -775,7 +777,26 @@ export default function Sidebar(props) {
     const [messages, setMessages] = useState([]);
     const [userList, setUserList] = useState([]);
     const connection = SignalRTest.getConnection();
+    const [user, setUser] = useState("");
+    useEffect(() => {
+      try{
+        UserRoutes.getUserByName(props.userRoute).then((res) => {
+            console.log(res);
+            setUser(res);
+            console.log(JSON.stringify(user));
+        });
+        if(user != null && user != ""){
+            StreamRoutes.getStreamById(user.UserId).then((res) => {
 
+            })
+        }
+      }
+      catch(e){
+        console.log(e);
+      }
+        
+    }, []);
+    
     useEffect(() => {
       if(connection == null) return;
       connection.on("sendMessage", (username, message, badge) => {
@@ -800,7 +821,7 @@ export default function Sidebar(props) {
       }
     }, [connection]);
     
-
+    if(user != null && user != ""){
     return (
       <>
         <div className="main__position">
@@ -822,7 +843,7 @@ export default function Sidebar(props) {
               </div>
 
               <StreamUserInfo
-                userName={props.userRoute}
+                userName={user.DisplayName}
                 title="Hello guys"
                 category="osu!"
                 profilePic="https://i.imgur.com/neHVP5j.jpg"
@@ -835,5 +856,41 @@ export default function Sidebar(props) {
         </div>
       </>
     );
+    }
+    else return(
+      <>
+        <div className="main__position">
+          <div className="sidebar bg__color-2 rr__flex-row">
+          <UserChannelList />
+            <div className="main__content bg__color-00 rr__flex-col">
+              {/* <img className="bg__img" src={smBackground} alt="background"/> */}
+              <div className="fl__content-holder rr__flex-col">
+                
+                <div className="rr__flex-row rrf__ai-center">
+                <FontAwesomeIcon style={{
+                  padding: "0.5em",
+                  paddingLeft: "0",
+                  fontSize: "3em",
+                }} icon={faTriangleExclamation} color="#47FFD3"/>
+                <div className="rr__flex-col">
+                  <span className="fs__title-4 league-spartan-semibold citizenship ta__center fill__container">
+                    Cannot find user {props.userRoute}
+                  </span>
+                  <span className="fs__normal-3 league-spartan-regular citizenship">
+                    This user may have been banned or does not exist
+                  </span>
+                </div>
+                </div>
+                  
+                
+                
+              </div>
+
+              
+            </div>
+          </div>
+        </div>
+      </>
+    )
   }
 }

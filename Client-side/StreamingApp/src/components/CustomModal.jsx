@@ -357,7 +357,7 @@ export default function CustomModal(props) {
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
                         
-                        SignalRTest.start(userGlobal.userName);
+                        SignalRTest.start(userGlobal.UserName);
                         setServerStatus(true);
                         console.log("Status: " + serverStatus);
                         //truyền context.username vào đây
@@ -476,8 +476,8 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type == "account__setting profile-settings") {
-    const [displayName, setDisplayName] = useState(userGlobal.displayName);
-    const [bio, setBio] = useState(userGlobal.bio || "");
+    const [displayName, setDisplayName] = useState(userGlobal.DisplayName);
+    const [bio, setBio] = useState(userGlobal.Bio || "");
     return (
       <>
         <div className="modal__layout rr__flex-col def-pad-2em bg__color-2">
@@ -526,8 +526,7 @@ export default function CustomModal(props) {
             </div>
             <hr className="fill__container" />
             <Button type="default" text="Save" onClick={() => {
-              setUserGlobal({...userGlobal, displayName, bio});
-              localStorage.setItem("user", JSON.stringify({...userGlobal, displayName, bio}));
+              
             }} />
           </div>
         </div>

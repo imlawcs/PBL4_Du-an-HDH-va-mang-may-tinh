@@ -53,8 +53,8 @@ export default function NavBar(props) {
   const renderProfileMenu = () => {
     return (
       <ProfileMenu
-        userName={user? user.userName : "null"}
-        imgLink={user.profilePic? user.profilePic : "https://i.imgur.com/neHVP5j.jpg"}
+        userName={user? user.DisplayName : "null"}
+        imgLink={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
         logout={handleLogout}
       />
     );

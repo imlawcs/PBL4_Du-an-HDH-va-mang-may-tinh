@@ -1,8 +1,21 @@
 export default function DashBoard(){
     const defaultHeight = "10em";
+    const getRandomColorHex = () => {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    };
     const renderSampleDiv = (heightValue, flexData) => {
         return (
-            <div className="rr__bg-secondary fill__container" style={{height: heightValue? heightValue : defaultHeight, flex: flexData && flexData}}></div>
+            <div className="fill__container" 
+            style={{
+                height: heightValue? heightValue : defaultHeight, 
+                flex: flexData && flexData,
+                backgroundColor: getRandomColorHex(),
+            }}></div>
         )
     }
     return (
@@ -26,9 +39,9 @@ export default function DashBoard(){
                 <div className="rr__flex-col rrf__row-small fill__container fill__y" style={{
                     flex: 7,
                 }}>
-                    {renderSampleDiv()}
-                    {renderSampleDiv()}
-                    {renderSampleDiv()}
+                    {renderSampleDiv("auto", 1)}
+                    {renderSampleDiv("auto", 1)}
+                    {renderSampleDiv("auto", 1)}
                 </div>
             </div>
         </>
