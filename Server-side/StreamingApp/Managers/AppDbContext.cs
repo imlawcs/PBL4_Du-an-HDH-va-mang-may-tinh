@@ -24,11 +24,11 @@ public class AppDbContext : DbContext
 
     modelBuilder.Entity<Blocked>(entity =>
     {
-        entity.HasKey(b => new { b.BlockerId, b.BlockedId });
+        entity.HasKey(b => new { b.ChannelId, b.BlockedId });
 
         entity.HasOne(b => b.Blocker)
             .WithMany(u => u.BlockedUsers)
-            .HasForeignKey(b => b.BlockerId)
+            .HasForeignKey(b => b.ChannelId)
             .OnDelete(DeleteBehavior.Restrict);
 
         entity.HasOne(b => b.BlockedUser)
@@ -59,16 +59,16 @@ public class AppDbContext : DbContext
 
             modelBuilder.Entity<Following>(entity =>
         {
-            entity.HasKey(f => new { f.FollowerId, f.FolloweeId });
+            entity.HasKey(f => new { f.FollowerId, f.ChannelId });
 
             entity.HasOne(f => f.Follower)
                 .WithMany(u => u.Followings)
                 .HasForeignKey(f => f.FollowerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(f => f.Followee)
+            entity.HasOne(f => f.Channel)
                 .WithMany(u => u.Followers)
-                .HasForeignKey(f => f.FolloweeId)
+                .HasForeignKey(f => f.ChannelId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

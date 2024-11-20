@@ -17,5 +17,8 @@ namespace StreamingApp.Models.Entities {
 
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
+
+        public ICollection<StreamCategory> StreamCategories { get; set; } = new List<StreamCategory>();
+
     }
 }

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using StreamingApp.Models.DTOs;
 using StreamingApp.Services;
 using StreamingApp.Models.Entities;
+using System.Text.Json;
+using System;
 
 namespace StreamingApp.Controllers
 {
@@ -25,17 +27,19 @@ namespace StreamingApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUser_RoleAsync()
         {
-            try
+            var User_Roles = await _User_RoleService.GetAllUser_RolesAsync();
+            
+            if (User_Roles == null) return NotFound("User_Roles not found");
+            
+            var options = new JsonSerializerOptions
             {
-                _shouldIncludeUserId = true; 
-                var User_Roles = await _User_RoleService.GetAllUser_RolesAsync();
-                return Ok(User_Roles);
-            }
-            catch (Exception ex)
-            {
-                // Log lỗi chi tiết
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+                Converters = { new ConditionalChannelOwnerIdConverter() }
+            };
+
+            // Serialize với options
+            var jsonString = JsonSerializer.Serialize(User_Roles, options);
+            
+            return Content(jsonString, "application/json");
         }
 
         [HttpGet("{id}")]
@@ -43,27 +47,45 @@ namespace StreamingApp.Controllers
         {
             var User_Role = await _User_RoleService.GetListUser_RoleByIdAsync(id);
             if (User_Role==null) return NotFound("User_Roles not found");
-            else return Ok(User_Role);
+            var options = new JsonSerializerOptions
+            {
+                Converters = { new ConditionalChannelOwnerIdConverter() },
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+
+            var jsonString = JsonSerializer.Serialize(User_Role, options);
+
+            return Content(jsonString, "application/json");
         }
 
-        [HttpGet("{UserId}/{RoleId}/{ChannelOwnerId}")]
+        [HttpGet("UserId={UserId}/RoleId={RoleId}/ChannelOwnerId={ChannelOwnerId}")]
         public async Task<IActionResult> GetUser_RoleWithIdAsync(int UserId, int RoleId, int ChannelOwnerId)
         {
             var User_Role = await _User_RoleService.GetUser_RoleByIdAsync(UserId, RoleId, ChannelOwnerId);
             if (User_Role == null) return NotFound("User_Role not found");
-            else return Ok(User_Role);
+            
+            var options = new JsonSerializerOptions
+            {
+                Converters = { new ConditionalChannelOwnerIdConverter() }
+            };
+
+            // Serialize với options
+            var jsonString = JsonSerializer.Serialize(User_Role, options);
+            
+            return Content(jsonString, "application/json");
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateUser_RoleAsync([FromBody] User_Role model)
         {
-            Console.WriteLine($"Creating User_Role with UserId: {model.UserId}");
+            Console.WriteLine($"Creating User_Role with UserId: {model.UserId}, RoleId: {model.RoleId}, ChannelOwnerId: {model.ChannelOwnerId}");
 
             var user = await _userService.GetUserByIdAsync(model.UserId);
             if (user == null) return BadRequest("User not found");
 
             var roleResult = await _roleService.GetRoleByIdAsync(model.RoleId);
-            if (!roleResult.Succeeded) return BadRequest("Role not found");
+            if (roleResult == null) return BadRequest("Role not found");
 
             var channelOwner = await _userService.GetUserByIdAsync(model.ChannelOwnerId);
             if (channelOwner == null) return BadRequest("Channel Owner not found");
@@ -76,11 +98,14 @@ namespace StreamingApp.Controllers
             return Ok("Create User_Role successfully");
         }
 
-        [HttpPut("{UserId}/{RoleId}/{ChannelOwnerId}")]
-        public async Task<IActionResult> UpdateUser_RoleAsync(int UserId, int RoleId, int ChannelOwnerId,User_Role model)
+        [HttpPut("user={UserId}/role={RoleId}/channel={ChannelOwnerId}")]
+        public async Task<IActionResult> UpdateUser_RoleAsync(int UserId, int RoleId, int ChannelOwnerId, [FromBody] User_Role model)
         {
-            if(UserId!=model.UserId || RoleId != model.RoleId || ChannelOwnerId != model.ChannelOwnerId) 
+            if(UserId!=model.UserId)  
                 return BadRequest("Id is not match");
+            
+            if(RoleId != model.RoleId && ChannelOwnerId != model.ChannelOwnerId)
+                return BadRequest("Role Id or Channel Owner Id is not match");
 
             var result = await _User_RoleService.UpdateUser_RoleAsync(UserId, RoleId, ChannelOwnerId, model);
 
