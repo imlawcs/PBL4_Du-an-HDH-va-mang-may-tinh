@@ -55,6 +55,12 @@ namespace StreamingApp
             services.AddScoped<CategoryManager>();
             services.AddScoped<ICategoryService, CategoryService>();
 
+            services.AddScoped<StreamCategoryManager>();
+            services.AddScoped<IStreamCategoryService, StreamCategoryService>();
+
+            services.AddScoped<StreamTagManager>();
+            services.AddScoped<IStreamTagService, StreamTagService>();
+
             services.AddScoped<RoleManager>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<User_RoleManager>();
@@ -67,6 +73,8 @@ namespace StreamingApp
             services.AddScoped<TagManager>();
             services.AddScoped<ITagService, TagService>();
 
+            services.AddScoped<StreamManager>();
+            services.AddScoped<IStreamService, StreamService>();
 
 
 
@@ -150,11 +158,11 @@ namespace StreamingApp
             app.UseRouting();
             app.UseCors("ClientPermission");
            
-            app.UseAuthentication();
-            app.UseMiddleware<JwtMiddleware>();
-            app.UseMiddleware<ValidateMiddleware>();
-            app.UseMiddleware<AuthorizationMiddleware>();
-            app.UseAuthorization();
+            // app.UseAuthentication();
+            // app.UseMiddleware<JwtMiddleware>();
+            // app.UseMiddleware<ValidateMiddleware>();
+            // app.UseMiddleware<AuthorizationMiddleware>();
+            // app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import MenuOptionBtn from "./MenuOptionBtn";
 import {
   faArrowRightFromBracket,
+  faCode,
   faUserGear,
   faWaveSquare,
 } from "@fortawesome/free-solid-svg-icons";
@@ -54,10 +55,25 @@ export default function ProfileMenu(props) {
               optionName="Profile Settings"
               onClick={() => navigate("/accountSetting")}
             />
+            
+            {props.roleCheck && 
+            <>
+              <MenuOptionBtn
+                icon={faCode}
+                optionName="Test"
+                onClick={() => navigate("/test")}
+              />
+              <MenuOptionBtn
+                icon={faCode}
+                optionName="Admin"
+                onClick={() => navigate("/admin")}
+              />
+            </>
+            }
             <MenuOptionBtn
-              icon={faArrowRightFromBracket}
-              optionName="Log out"
-              onClick={props.logout}
+                icon={faArrowRightFromBracket}
+                optionName="Log out"
+                onClick={props.logout}
             />
           </div>
         </div>

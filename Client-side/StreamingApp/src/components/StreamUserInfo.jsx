@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { SignalRTest } from "../scripts/webrtcTemp";
 import { Colors } from "../constants/Colors";
 import Toast from "./Toast";
+import { UserRoutes } from "../API/User.routes";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
@@ -32,7 +33,6 @@ export default function StreamUserInfo(props) {
     const [showToast, setShowToast] = useState(false);
 
     const handleFollow = () => {
-
         setIsFollowed(!isFollowed);
         setShowToast(true);
     }

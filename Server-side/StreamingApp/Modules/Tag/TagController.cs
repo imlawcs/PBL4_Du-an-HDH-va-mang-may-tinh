@@ -9,7 +9,7 @@ namespace StreamingApp.Controllers
     [Route("api/[controller]")]
     public class TagController : ControllerBase
     {
-         private readonly ITagService _tagService;
+        private readonly ITagService _tagService;
 
         public TagController(ITagService tagService)
         {

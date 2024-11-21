@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -14,7 +15,13 @@ namespace StreamingApp
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>().ConfigureKestrel(serverOptions =>
+                          {
+                              serverOptions.ConfigureHttpsDefaults(httpsOptions =>
+                              {
+                                  httpsOptions.ServerCertificate = new X509Certificate2("./DevCert/_192.168.56.1_cert.pfx", "huukhoa");
+                              });
+                          });
                 });
     }
 }

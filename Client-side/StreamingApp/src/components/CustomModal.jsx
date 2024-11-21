@@ -23,11 +23,13 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { useAuth } from "../hooks/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { UserRoutes } from "../API/User.routes";
 
 
 export default function CustomModal(props) {
   const Auth = useAuth();
   const navigate = useNavigate();
+  const [userGlobal, setUserGlobal] = useState(props.user || "");
   if (props.type == "login") {
     const [Username, setUsername] = useState("");
     const [Password, setPassword] = useState("");
@@ -356,7 +358,7 @@ export default function CustomModal(props) {
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
                         
-                        SignalRTest.start("hello");
+                        SignalRTest.start(userGlobal.UserName);
                         setServerStatus(true);
                         console.log("Status: " + serverStatus);
                         //truyền context.username vào đây
@@ -380,6 +382,10 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type == "SMdesc__setting") {
+    
+    const handleStreamDesc = () => {
+
+    }
     return (
       <>
         <div className="smd__size rr__flex-col def-pad-1 bg__color-2 rrf__row-normal citizenship">
@@ -407,8 +413,20 @@ export default function CustomModal(props) {
                 placeholder="Search category..."
               />
             </div>
+            <div className="rr__flex-row">
+              <label className="smd__label fs__normal-2 league-spartan-regular">
+                Tags
+              </label>
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
+                type="text"
+                placeholder="Seperate tags with commas..."
+              />
+            </div>
             <div className="rr__flex-row-reverse">
-              <Button type="default" text="Save" onClick={() => {}} />
+              <Button type="default" text="Save" onClick={() => {
+
+              }} />
             </div>
           </div>
         </div>
@@ -430,6 +448,7 @@ export default function CustomModal(props) {
                 style={{ display: 'none' }}
                 onChange={(e) => {
                   const file = e.target.files[0];
+                  console.log(file.toString());
                   if (file) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -459,8 +478,9 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type == "account__setting profile-settings") {
-    const [displayName, setDisplayName] = useState(props.displayName);
-    const [bio, setBio] = useState(props.bio);
+    const [displayName, setDisplayName] = useState(userGlobal.DisplayName);
+    const [bio, setBio] = useState(userGlobal.Bio || "");
+    const [update, setUpdate] = useState("");
     return (
       <>
         <div className="modal__layout rr__flex-col def-pad-2em bg__color-2">
@@ -508,7 +528,23 @@ export default function CustomModal(props) {
               </div>
             </div>
             <hr className="fill__container" />
-            <Button type="default" text="Save" onClick={() => {}} />
+            <Button type="default" text="Save" onClick={async () => {
+                const postData = {
+                  userId: userGlobal.UserId,
+                  userName: userGlobal.UserName,
+                  displayName: displayName,
+                  email: userGlobal.Email,
+                  phoneNumber: userGlobal.PhoneNumber,
+                  bio: bio
+                }
+                await UserRoutes.updateUser(userGlobal.UserId, postData).then((res) => {
+                  Auth.updateUserData();
+                  setUpdate(res);
+                });
+            }} />
+            <span className="league-spartan-regular fs__normal-1 citizenship">
+              {update}
+            </span>
           </div>
         </div>
       </>

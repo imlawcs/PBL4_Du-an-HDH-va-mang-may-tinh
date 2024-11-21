@@ -7,7 +7,7 @@ namespace StreamingApp.Models.Entities
     {
         [Key, Column(Order = 0)]
         [Required]
-        public int BlockerId  { get; set; }
+        public int ChannelId  { get; set; }
 
         [Key, Column(Order = 1)]
         [Required]

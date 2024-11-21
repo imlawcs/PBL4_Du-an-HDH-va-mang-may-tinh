@@ -27,6 +27,8 @@ namespace StreamingApp.Models.DTOs
         [Phone]
         public string PhoneNumber { get; set; }
 
+        public bool? UserStatus { get; set; }
+
         public bool? IsEmailNoti { get; set; }
     }
 }
