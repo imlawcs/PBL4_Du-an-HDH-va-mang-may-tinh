@@ -17,7 +17,7 @@ namespace StreamingApp.Services
             StreamManager = streamManager ?? throw new ArgumentNullException(nameof(streamManager));
         }
 
-        public Task<(bool Succeeded, string[] Errors)> CreateStreamAsync(Models.Entities.Stream stream)
+        public Task<(bool Succeeded, string[] Errors, Models.Entities.Stream? Stream)> CreateStreamAsync(Models.Entities.Stream stream)
         {
             return StreamManager.CreateStreamAsync(stream);
         }
