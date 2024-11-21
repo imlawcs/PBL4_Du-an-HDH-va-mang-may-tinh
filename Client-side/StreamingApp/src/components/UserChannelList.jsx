@@ -60,7 +60,7 @@ export default function UserChannelList() {
                       key={user.UserId}
                       isOffline={user.UserStatus? false : true}
                       profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
-                      userName={user.UserName}
+                      userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
                       viewCount={user.ViewCount? user.ViewCount : 0}
                     />
@@ -90,7 +90,7 @@ export default function UserChannelList() {
                       }}
                       isOffline={user.UserStatus? false : true}
                       profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
-                      userName={user.UserName}
+                      userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
                       viewCount={user.ViewCount? user.ViewCount : 0}
                     />

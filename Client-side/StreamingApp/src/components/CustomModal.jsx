@@ -23,12 +23,13 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { useAuth } from "../hooks/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { UserRoutes } from "../API/User.routes";
 
 
 export default function CustomModal(props) {
   const Auth = useAuth();
   const navigate = useNavigate();
-  const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
+  const [userGlobal, setUserGlobal] = useState(props.user || "");
   if (props.type == "login") {
     const [Username, setUsername] = useState("");
     const [Password, setPassword] = useState("");
@@ -447,6 +448,7 @@ export default function CustomModal(props) {
                 style={{ display: 'none' }}
                 onChange={(e) => {
                   const file = e.target.files[0];
+                  console.log(file.toString());
                   if (file) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -478,6 +480,7 @@ export default function CustomModal(props) {
   } else if (props.type == "account__setting profile-settings") {
     const [displayName, setDisplayName] = useState(userGlobal.DisplayName);
     const [bio, setBio] = useState(userGlobal.Bio || "");
+    const [update, setUpdate] = useState("");
     return (
       <>
         <div className="modal__layout rr__flex-col def-pad-2em bg__color-2">
@@ -525,9 +528,23 @@ export default function CustomModal(props) {
               </div>
             </div>
             <hr className="fill__container" />
-            <Button type="default" text="Save" onClick={() => {
-              
+            <Button type="default" text="Save" onClick={async () => {
+                const postData = {
+                  userId: userGlobal.UserId,
+                  userName: userGlobal.UserName,
+                  displayName: displayName,
+                  email: userGlobal.Email,
+                  phoneNumber: userGlobal.PhoneNumber,
+                  bio: bio
+                }
+                await UserRoutes.updateUser(userGlobal.UserId, postData).then((res) => {
+                  Auth.updateUserData();
+                  setUpdate(res);
+                });
             }} />
+            <span className="league-spartan-regular fs__normal-1 citizenship">
+              {update}
+            </span>
           </div>
         </div>
       </>

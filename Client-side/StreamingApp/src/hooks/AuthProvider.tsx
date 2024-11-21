@@ -9,6 +9,7 @@ interface AuthContextType {
     logIn: (data: any) => Promise<void>;
     logOut: () => void;
     signUp: (data: any) => Promise<any>;
+    updateUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -79,10 +80,15 @@ const AuthProvider = ({ children }) => {
             console.log("Sign up request completed.");
           }
     };
+    const updateUserData = async () => {
+        const userData = await UserRoutes.fetchUser(token);
+        localStorage.setItem("user", JSON.stringify(userData));
+        // navigate(0);
+    }
 
     
     return (
-        <AuthContext.Provider value={{ token, logIn, logOut, signUp }}>
+        <AuthContext.Provider value={{ token, logIn, logOut, signUp, updateUserData }}>
             {children}
         </AuthContext.Provider>    
     );

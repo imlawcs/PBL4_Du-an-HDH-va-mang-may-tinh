@@ -54,6 +54,7 @@ export default function NavBar(props) {
     return (
       <ProfileMenu
         userName={user? user.DisplayName : "null"}
+        roleCheck={user.Roles? user.Roles.filter((role) => role.roleName === "Admin").length > 0 : false}
         imgLink={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
         logout={handleLogout}
       />

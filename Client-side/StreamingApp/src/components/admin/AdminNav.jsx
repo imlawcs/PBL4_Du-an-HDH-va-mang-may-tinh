@@ -14,8 +14,9 @@ export default function AdminNav(){
     const renderProfileMenu = () => {
         return (
           <ProfileMenu
-            userName={user? user.userName : "null"}
-            imgLink={user.profilePic? user.profilePic : "https://i.imgur.com/neHVP5j.jpg"}
+            userName={user? user.UserName : "null"}
+            roleCheck={user.Roles? user.Roles.filter((role) => role.roleName === "Admin").length > 0 : false}
+            imgLink={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
             logout={handleLogout}
           />
         );

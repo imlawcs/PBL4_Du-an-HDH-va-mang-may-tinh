@@ -137,6 +137,7 @@ export default function Sidebar(props) {
   } else if (props.routing == "Personalize") {
     const personalInfoRef = useRef(null);
     const connectionsRef = useRef(null);
+    const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     const scrollToPersonalInfo = () => {
       personalInfoRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -190,11 +191,11 @@ export default function Sidebar(props) {
                 <span className="fs__normal-2 league-spartan-semibold citizenship">
                   Profile Picture
                 </span>
-                <CustomModal type={"account__setting profile-pic"} />
+                <CustomModal type={"account__setting profile-pic"} user={userGlobal}/>
                 <span className="fs__normal-2 league-spartan-semibold citizenship">
                   Profile Settings
                 </span>
-                <CustomModal type={"account__setting profile-settings"} />
+                <CustomModal type={"account__setting profile-settings"} user={userGlobal} />
               </div>
             </div>
             <br />
@@ -213,20 +214,20 @@ export default function Sidebar(props) {
                   <IconCard
                     iconColor={"ic__default-color"}
                     icon={faPhone}
-                    text={"0727727727"}
+                    text={userGlobal.PhoneNumber}
                     onClick={() => {}}
                   />
                   <IconCard
                     iconColor={"ic__default-color"}
                     icon={faEnvelope}
-                    text={"huukhoa04@gmail.com"}
+                    text={userGlobal.Email}
                     onClick={() => {}}
                   />
                 </div>
-                <span className="fs__normal-2 league-spartan-semibold citizenship">
+                {/* <span className="fs__normal-2 league-spartan-semibold citizenship">
                   SNS
-                </span>
-                <div className="rr__flex-col rrf__row-normal">
+                </span> 
+                 <div className="rr__flex-col rrf__row-normal">
                   <IconCard
                     iconColor={"ic__facebook"}
                     icon={faFacebook}
@@ -246,7 +247,7 @@ export default function Sidebar(props) {
                       window.open("https://www.x.com/huukhoa004", "_blank")
                     }
                   />
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
