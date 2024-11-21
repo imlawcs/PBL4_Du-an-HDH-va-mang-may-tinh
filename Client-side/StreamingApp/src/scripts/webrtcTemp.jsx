@@ -1,3 +1,4 @@
+//@author: resolved
 import * as signalR from '@microsoft/signalr'
 import { sendMessage } from '@microsoft/signalr/dist/esm/Utils';
 import { ApiConstants } from '../API/ApiConstants';
@@ -31,8 +32,7 @@ const servers = {
     ]
 };
 let isServerOn = false;
-//get token from local storage
-let viewers;
+
 // const getToken = () => {
 //     const token = localStorage.getItem('token');
 //     if (!token) {

@@ -448,7 +448,7 @@ export default function CustomModal(props) {
                 style={{ display: 'none' }}
                 onChange={(e) => {
                   const file = e.target.files[0];
-                  console.log(file.toString());
+                  console.log(file);
                   if (file) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -549,6 +549,33 @@ export default function CustomModal(props) {
         </div>
       </>
     );
+  } else if (props.type == "update"){
+    const [value, setValue] = useState(props.currentValue);
+    return(
+      <div className="modal__holder">
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-normal">
+            <div className="rr__flex-col rrf__jc-center rrf__ai-center rrf__row-normal">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Update {props.updateLabel}
+              </span>
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                type="text"
+                placeholder={props.updateLabel}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              />
+              <div className="btn__holder rrf__jc-center">
+              <Button type="default" text="OK" onClick={() => {
+                props.update(value, props.updateLabel);
+              }} />
+              <Button type="default" text="Cancel" onClick={props.offModal} />
+            </div>
+            </div>
+          </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+    )
   }
 
 }

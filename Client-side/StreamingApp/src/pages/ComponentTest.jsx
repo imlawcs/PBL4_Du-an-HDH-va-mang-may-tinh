@@ -3,6 +3,7 @@ import '../assets/css/ComponentTest.css'
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import ChannelComp from "../components/ChannelComp";
+import CustomModal from "../components/CustomModal";
 export default function ComponentTest() {
   const navigate = useNavigate();
   return (
@@ -12,24 +13,7 @@ export default function ComponentTest() {
           navigate("/");
         }}/>
         <div className="test-comp__holder">
-        <ChatComp 
-          timeStamp="12:00" 
-          userName="User1" 
-          chatContext="Hello World!"
-          badge="moderator"
-        />
-        <ChatComp 
-          timeStamp="12:00" 
-          userName="User1" 
-          chatContext="Hello World!"
-          badge="owner"
-        />
-        <ChatComp 
-          timeStamp="12:00" 
-          userName="User1" 
-          chatContext="Hello World!"
-          badge="vip"
-        />
+          
         </div>
       </div>
     </>
