@@ -59,8 +59,6 @@ namespace StreamingApp.Controllers
             {
                 //không tạo thành công stream
                 return BadRequest(stream.Errors);
-                //thông báo không tạo thành công kèm lỗi
-
             }
 
             var streamCategory = new StreamCategory { StreamId=streamModel.StreamId ,CategoryId = model.streamCategoryId };
@@ -84,7 +82,12 @@ namespace StreamingApp.Controllers
                 return BadRequest(newStreamCategory.Errors);
             }
         
-            return Ok("Create stream successfully");
+            if (stream.Stream == null)
+            {
+                return StatusCode(500, "Stream creation failed.");
+            }
+            return Ok(stream.Stream.StreamId);
+            
         }
 
         [HttpPut("{id}")]
