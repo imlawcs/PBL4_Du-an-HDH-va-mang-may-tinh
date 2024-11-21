@@ -33,6 +33,7 @@ import UserChannelList from "./UserChannelList";
 import { UserRoutes } from "../API/User.routes";
 import defaultImage from "../assets/img/Logo__Sieufix.png";
 import { StreamRoutes } from "../API/Stream.route";
+import { useAuth } from "../hooks/AuthProvider";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -119,7 +120,7 @@ export default function Sidebar(props) {
                     Check your stream analytics here
                   </span>
                 </div>
-                <div class="rr__flex-row rrf__col-normal fill__container">
+                <div className="rr__flex-row rrf__col-normal fill__container">
                   <StatBox value={"123"} label={"Viewers"} />
                   <StatBox value={"123"} label={"Viewers"} />
                   <StatBox value={"123"} label={"Viewers"} />
@@ -137,6 +138,7 @@ export default function Sidebar(props) {
   } else if (props.routing == "Personalize") {
     const personalInfoRef = useRef(null);
     const connectionsRef = useRef(null);
+    const Auth = useAuth();
     const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     const scrollToPersonalInfo = () => {
       personalInfoRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -144,8 +146,39 @@ export default function Sidebar(props) {
     const scrollToConnections = () => {
       connectionsRef.current?.scrollIntoView({ behavior: "smooth" });
     };
-
+    const [phoneNumber, setPhoneNumber] = useState(userGlobal.PhoneNumber || "");
+    const [email, setEmail] = useState(userGlobal.Email || "");
+    const [model, setModel] = useState(0);
+    const setValue = async (value1) =>{
+      if(model === 1){
+        setPhoneNumber(value1);
+      }
+      else setEmail(value1);
+    }
+    const [update, setUpdate] = useState("");
+    const handleUpdate = async (value, updateLabel) => {
+      await setValue(value);
+        const postData = {
+          userId: userGlobal.UserId,
+          userName: userGlobal.UserName,
+          displayName: userGlobal.DisplayName,
+          email: (updateLabel === "email") ? value : userGlobal.Email,
+          phoneNumber: (updateLabel === "phonenumber") ? value : userGlobal.PhoneNumber,
+          bio: userGlobal.Bio,
+        };
+        await UserRoutes.updateUser(userGlobal.UserId, postData).then((res) => {
+          Auth.updateUserData();
+          console.log(res);
+          setUpdate(res);
+          setModel(0);
+        });
+    }
+    const handleModel = (value) => {
+      console.log(value);
+      setModel(value);
+    }
     return (
+      <>
       <div className="main__position">
         <div className="sidebar">
           <div className="border__r">
@@ -214,16 +247,21 @@ export default function Sidebar(props) {
                   <IconCard
                     iconColor={"ic__default-color"}
                     icon={faPhone}
-                    text={userGlobal.PhoneNumber}
-                    onClick={() => {}}
+                    text={phoneNumber}
+                    onClick={ 
+                      () => handleModel(1)
+                    }
                   />
                   <IconCard
                     iconColor={"ic__default-color"}
                     icon={faEnvelope}
-                    text={userGlobal.Email}
-                    onClick={() => {}}
+                    text={email}
+                    onClick={
+                      () => handleModel(2)
+                    }
                   />
                 </div>
+                
                 {/* <span className="fs__normal-2 league-spartan-semibold citizenship">
                   SNS
                 </span> 
@@ -252,7 +290,35 @@ export default function Sidebar(props) {
             </div>
           </div>
         </div>
+        
       </div>
+      {
+                model == 1?
+                <>
+                  <CustomModal 
+                  type={"update"} 
+                  updateLabel={"phonenumber"} 
+                  currentValue={phoneNumber}
+                  update={handleUpdate}
+                  offModal={() => handleModel(0)}
+                  />
+                </>
+                : 
+                model == 2 ?
+                <>
+                  <CustomModal 
+                  type={"update"} 
+                  updateLabel={"email"}
+                  currentValue={email}
+                  update={handleUpdate}
+                  offModal={() => handleModel(0)}
+                  />
+                </>
+                : 
+                <>
+                </>
+              }
+      </>
     );
   } else if (props.routing == "index") {
     const LazyVideoContent = lazy(
