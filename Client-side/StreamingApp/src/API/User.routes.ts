@@ -42,6 +42,29 @@ export const UserRoutes = {
             console.error(error);
         }
     },
+    updateUser: async (id: string, data: any) => {
+        try{
+            console.log(JSON.stringify(data));
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.USER.GET_USER_BY_ID + id, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Connection": "keep-alive"
+                },
+                body: JSON.stringify(data)
+            });
+            const responseText = await response.text();
+            if(!response.ok) {
+                throw new Error("Failed to update user with id:" + id);
+            }
+            return responseText;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    },
     fetchUser: async (token: string) => {
         try 
         {

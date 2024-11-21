@@ -12,4 +12,8 @@ export const ApiConstants = {
         GET_USER_BY_ID: '/api/User/',
         GET_USER_BY_NAME: '/api/User/name=',
     },
+    STREAM: {
+        GET_STREAMS: '/api/Stream',
+        GET_STREAM_BY_ID: '/api/Stream/',
+    }
 }

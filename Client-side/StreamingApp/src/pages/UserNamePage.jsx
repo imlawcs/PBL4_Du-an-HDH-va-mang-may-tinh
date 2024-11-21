@@ -12,7 +12,7 @@ export default function UserNamePage(props) {
     useEffect(() => {
         console.log("Start loading stream...");
         // SignalRTest.serverOff().then(() => {
-            SignalRTest.joinRoom(user.userName, params.username);
+            SignalRTest.joinRoom(user.UserName, params.username);
         // });
         return () => {
             console.log("Stop loading stream...");

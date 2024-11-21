@@ -10,7 +10,7 @@ export default function UserChannelList() {
     const [token, setToken] = useState(localStorage.getItem("site"));
     const navigate = useNavigate();
     function adminCheck(channel) {
-        if (channel.userName && (channel.userName.includes("admin") || channel.userName.includes("Admin"))) {
+        if (channel.Roles && channel.Roles.filter((role) => role.roleName === "Admin").length > 0) {
             return true;
         }
         return false;
@@ -55,14 +55,14 @@ export default function UserChannelList() {
                   .map((user) => (
                     <ChannelComp
                       onClick={() => {
-                        navigate(`/user/${user.userName}`);
+                        navigate(`/user/${user.UserName}`);
                       }}
-                      key={user.userId}
-                      isOffline={user.userStatus? false : true}
-                      profilePic={user.profilePic? user.profilePic : "https://i.imgur.com/neHVP5j.jpg"}
-                      userName={user.userName}
-                      category={user.category? user.category : "null"}
-                      viewCount={user.viewCount? user.viewCount : 0}
+                      key={user.UserId}
+                      isOffline={user.UserStatus? false : true}
+                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      userName={user.DisplayName}
+                      category={user.Category? user.Category : "null"}
+                      viewCount={user.ViewCount? user.ViewCount : 0}
                     />
                   ))}
                   <Button
@@ -84,12 +84,15 @@ export default function UserChannelList() {
                   .slice(0, 5)
                   .map((user) => (
                     <ChannelComp
-                      key={user.userId}
-                      isOffline={user.userStatus? false : true}
-                      profilePic={user.profilePic? user.profilePic : "https://i.imgur.com/neHVP5j.jpg"}
-                      userName={user.userName}
-                      category={user.category? user.category : "null"}
-                      viewCount={user.viewCount? user.viewCount : 0}
+                      key={user.UserId}
+                      onClick={() => {
+                        navigate(`/user/${user.UserName}`);
+                      }}
+                      isOffline={user.UserStatus? false : true}
+                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      userName={user.DisplayName}
+                      category={user.Category? user.Category : "null"}
+                      viewCount={user.ViewCount? user.ViewCount : 0}
                     />
                   ))}
                   <Button

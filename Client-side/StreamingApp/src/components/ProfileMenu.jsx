@@ -55,15 +55,25 @@ export default function ProfileMenu(props) {
               optionName="Profile Settings"
               onClick={() => navigate("/accountSetting")}
             />
+            
+            {props.roleCheck && 
+            <>
+              <MenuOptionBtn
+                icon={faCode}
+                optionName="Test"
+                onClick={() => navigate("/test")}
+              />
+              <MenuOptionBtn
+                icon={faCode}
+                optionName="Admin"
+                onClick={() => navigate("/admin")}
+              />
+            </>
+            }
             <MenuOptionBtn
-              icon={faCode}
-              optionName="Test"
-              onClick={() => navigate("/test")}
-            />
-            <MenuOptionBtn
-              icon={faArrowRightFromBracket}
-              optionName="Log out"
-              onClick={props.logout}
+                icon={faArrowRightFromBracket}
+                optionName="Log out"
+                onClick={props.logout}
             />
           </div>
         </div>
