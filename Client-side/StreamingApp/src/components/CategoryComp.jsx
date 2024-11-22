@@ -32,7 +32,22 @@ export default function CategoryComp(props) {
         </div>
       </>
     );
-  } else {
+  } 
+  else if(props.type === "datalist") {
+    return (
+      <>
+        <div className="category__list-comp rr__flex-row rrf__ai-center" value={props.categoryName} onClick={props.onClick}>
+          <span className="league-spartan-light rr__color-secondary fs__normal-2 ta__left" style={{
+            padding: "0.5em",
+          }}>
+            {props.categoryName}
+          </span>
+        </div>
+      </>
+    )
+  }
+  
+  else {
     return (
       <>
         <div

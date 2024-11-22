@@ -15,5 +15,13 @@ export const ApiConstants = {
     STREAM: {
         GET_STREAMS: '/api/Stream',
         GET_STREAM_BY_ID: '/api/Stream/',
+    },
+    CATEGORY: {
+        GET_CATEGORIES: '/api/Category',
+        GET_CATEGORIES_BY_ID: '/api/Category/',
+    },
+    TAG: {
+        GET_TAGS: '/api/Tag',
+        GET_TAG_BY_ID: '/api/Tag/',
     }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "./Button";
 import "../assets/css/CustomModal.css";
 import "../assets/css/NavBar.css";
@@ -14,6 +14,7 @@ import {
   faCross,
   faVideo,
   faTrash,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebook,
@@ -24,6 +25,10 @@ import {
 import { useAuth } from "../hooks/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { UserRoutes } from "../API/User.routes";
+import { TagRoutes } from "../API/Tag.routes";
+import { CategoryRoutes } from "../API/Category.routes";
+import CustomDatalist from "./CustomDatalist";
+import TagCard from "./TagCard";
 
 
 export default function CustomModal(props) {
@@ -382,50 +387,325 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type == "SMdesc__setting") {
+    //fetched data
+    const [tagDataList, setTagDataList] = useState([]);
+    const [categoryDataList, setCategoryDataList] = useState([]);
+    //input value
+    const [title, setTitle] = useState("");
+    const [inputCategory, setInputCategory] = useState("");
+    const [inputTag, setInputTag] = useState("");
+    const [inputTagStandAlone, setInputTagStandAlone] = useState("");
+    const [inputDesc, setInputDesc] = useState("");
+    //data for stream submit
+    const [selectedCategory, setSelectedCategory] = useState({});
+    const [inputTagList, setInputTagList] = useState([]);
     
-    const handleStreamDesc = () => {
+    //string handling
+    //input ref
+    const cateRef = useRef(null);
+    const tagRef = useRef(null);
+    const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0 });
+    //trigger datalist
+    const [mouseDown, setMouseDown] = useState(false); //for datalist
+    const [focus, setFocus] = useState(0); // 0: none, 1: category, 2: tag
+    //fetch data
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          await TagRoutes.getAllTags().then((res) => {
+            setTagDataList(res || []);
+          });
+          await CategoryRoutes.getAllCategories().then((res) => {
+            setCategoryDataList(res || []);
+          });
+        } catch (error) {
+          console.error("Error fetching tags and categories:", error);
+        }
+      };
+      fetchData();
+    }, [])
+    //datalist position
+    useEffect(() => {
+      if (focus === 1 && cateRef.current) {
+        const rect = cateRef.current.getBoundingClientRect();
+        setInputPosition({ top: rect.bottom - 1.5, left: rect.left - 1, height: rect.height, width: rect.width - 2 });
+      }
+      else if(focus === 2 && tagRef.current){
+        const rect = tagRef.current.getBoundingClientRect();
+        setInputPosition({ top: rect.bottom - 1.5, left: rect.left - 1, height: rect.height, width: rect.width - 2 });
+      }
+      
+    }, [focus]);
+    //debug useEffect
+    useEffect(() => {
+      console.log("TagDataList: ", inputTagList);
+    }, [inputTagList])
 
+
+    //handle selecting value
+    const handleSelectCategory = (value, id) => {
+      console.log("Selected:", value, id);
+      setInputCategory(value);
+      setSelectedCategory({
+        categoryId: id,
+        categoryName: value
+      });
+      setFocus(0);
+    }
+    const handleSelectTag = (value, id) => {
+      console.log("Selected:", value, id);
+      setInputTagStandAlone(inputTagStandAlone + value);
+      setInputTag(value);
+      // setSelectedCategory(id);
+      setFocus(0);
+    }
+    //form validating
+    const [error, setError] = useState([]);
+    const formCheck = () => {
+      let newErrors = [];
+
+      const tagListTemp = inputTagStandAlone.split(",")
+      .map((value) => value.trim())
+      .filter((value) => value !== "")
+      .filter((name, index, self) => self.indexOf(name) === index);
+
+      if (title.trim() === "") {
+      newErrors.push("Title is required");
+      }
+      if(tagListTemp.length > 5) newErrors.push("Tag list must be less than 5 tags");
+      if (inputCategory.trim() === "") {
+      newErrors.push("Category is required");
+      }
+      setError(newErrors);
+      return newErrors.length === 0;
+    };
+    const handleStreamCreate = () => {
+        const inputTagListCheck = () => {
+          const tagIdList = [];
+          tagDataList.forEach((tag) => {
+            if(inputTagList.includes(tag.tagName)) {
+              tagIdList.push(tag.tagId); //tag existed
+            }
+            else{ //tag doesn't exist
+              TagRoutes.createTag(tag.tagName).then((res) => {
+                tagIdList.push(res.tagId);
+              });
+            }
+          });
+        }
+        
     }
     return (
       <>
-        <div className="smd__size rr__flex-col def-pad-1 bg__color-2 rrf__row-normal citizenship">
+        <div className="smd__size rr__flex-col def-pad-1 bg__color-2 rrf__row-normal citizenship" style={{
+        }}>
           <span className="fs__large-1 league-spartan-semibold">
             <FontAwesomeIcon icon={faPenToSquare} /> Description
           </span>
-          <div className="rr__flex-col fill__container rrf__row-normal">
+          <div className="rr__flex-col fill__container rrf__row-normal" style={{
+              width: "40em",
+            }}>
             <div className="rr__flex-row">
               <label className="smd__label fs__normal-2 league-spartan-regular">
                 Title
               </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "0.5em",
+              }}>
               <input
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Enter title here..."
+                onFocus={() => {
+                  setError([]);
+                }}
               />
+              <span className="league-spartan-light fs__normal-1 citizenship">
+                Title must be less than 100 characters
+              </span>
+              </div>
+            </div>
+            <div className="rr__flex-row">
+              <label className="smd__label fs__normal-2 league-spartan-regular">
+                Description
+              </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "0.5em",
+              }}>
+              <textarea
+                className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
+                type="text"
+                placeholder="Enter description here..."
+                style={{
+                  height: "7em",
+                  resize: "none",
+                }}
+                onFocus={() => {
+                  setError([]);
+                }}
+                value={inputDesc}
+                onChange={(e) => setInputDesc(e.target.value)}
+              />
+              <span className="league-spartan-light fs__normal-1 citizenship">
+                Description must be less than 100 characters
+              </span>
+              </div>
             </div>
             <div className="rr__flex-row">
               <label className="smd__label fs__normal-2 league-spartan-regular">
                 Category
               </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "0.5em",
+              }}>
               <input
+                style={{
+                  zIndex: 100,
+                }}
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Search category..."
+                value={inputCategory}
+                ref={cateRef}
+                onFocus={() => {
+                  setError([]);
+                  setFocus(1);
+                  
+                }}
+                onBlur={() => {
+                  if(!mouseDown)
+                  {
+                    setFocus(0); 
+                  
+                  }
+                }}
+                onChange={(e) => setInputCategory(e.target.value)}
               />
+              <CustomDatalist 
+                id="categoryList" 
+                type="category"
+                data={categoryDataList}
+                inputValue={inputCategory}
+                styles={{
+                  display: focus === 1 ? "flex" : "none",
+                  position: "absolute",
+                  top: `${inputPosition.top}px`,
+                  left: `${inputPosition.left}px`,
+                  width: `${inputPosition.width}px`,
+                }}
+                onMouseDown={() => setMouseDown(true)}
+                onMouseUp={() => {
+                  setMouseDown(false)
+                  setFocus(0);
+                }}
+                onClick={handleSelectCategory}
+              />
+              <span className="league-spartan-light fs__normal-1 citizenship">
+                Select a category for your stream
+              </span>
+              </div>
             </div>
             <div className="rr__flex-row">
               <label className="smd__label fs__normal-2 league-spartan-regular">
                 Tags
               </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "1em",
+              }}>
               <input
+              style={{
+                zIndex: 100,
+              }}
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Seperate tags with commas..."
+                value={inputTagStandAlone}
+                ref={tagRef}
+                onFocus={() => {
+                  setError([]);
+                  setFocus(2);
+                }}
+                onBlur={() => {
+                  if(!mouseDown)
+                  {
+                    setFocus(0);
+                  }
+                }}
+                onChange={(e) => {
+                  setInputTagStandAlone(e.target.value);
+                  console.log("input: " + inputTagStandAlone.split(",")
+                  .map((value) => value.trim())
+                  .slice(-1)[0])
+                  
+                }}
               />
+              <CustomDatalist 
+                id="tagList"
+                type="tag"
+                data={tagDataList}
+                inputValue={inputTagStandAlone.split(",")
+                  .map((value) => value.trim())
+                  .filter((value) => value !== "").slice(-1)[0] === undefined? 
+                  ''
+                  :
+                  inputTagStandAlone.split(",")
+                  .map((value) => value.trim())
+                  .slice(-1)[0]
+                } //get last tag
+                styles={{
+                  display: focus === 2 ? "flex" : "none",
+                  position: "absolute",
+                  top: `${inputPosition.top}px`,
+                  left: `${inputPosition.left}px`,
+                  width: `${inputPosition.width}px`,
+                }}
+                onMouseDown={() => setMouseDown(true)}
+                onMouseUp={() => {
+                  setMouseDown(false)
+                  setFocus(0);
+                }}
+                onClick={handleSelectTag}
+              />
+              <div className="rr__flex-row" style={{
+                
+              }}>
+                <label className="smd__label fs__normal-1 league-spartan-light">
+                  Selected tags: 
+                </label>
+                {inputTagStandAlone.split(",")
+                .map((value) => value.trim())
+                .filter((value) => value !== "")
+                .filter((name, index, self) => self.indexOf(name) === index) //trim value
+                .map((tag, index) => (
+                  <TagCard key={index} name={tag}/>
+                ))}
+              </div>
+              </div>
+              
+            </div>
+            <div className="rr__flex-row rrf__ai-center">
+              {error.length > 0 && <FontAwesomeIcon icon={faTriangleExclamation} style={{
+                color: "#47FFD3",
+                fontSize: "1.5em",
+                paddingRight: "0.5em",
+              }}/>}
+              <div className="rr__flex-col">
+                {error.map((err, index) => (
+                  <span className="league-spartan-semibold fs__normal-1 rr__color-secondary" key={index}>
+                    {err}
+                  </span>
+                ))}
+                
+              </div>
+              
             </div>
             <div className="rr__flex-row-reverse">
               <Button type="default" text="Save" onClick={() => {
-
+                //set tag data
+                const check = formCheck();
+                console.log(error);
+                if(!check) return;
+                handleStreamCreate();
               }} />
             </div>
           </div>
