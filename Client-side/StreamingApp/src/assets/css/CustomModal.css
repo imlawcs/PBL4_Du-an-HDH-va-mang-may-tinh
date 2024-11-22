@@ -106,3 +106,6 @@
 .str__status::-webkit-scrollbar{
     display: none;
 }
+.datalist__styling{
+    background-color: transparent;
+}
