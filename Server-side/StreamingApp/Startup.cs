@@ -39,11 +39,15 @@ namespace StreamingApp
             {
                 options.AddPolicy("ClientPermission", policy =>
                 {
-                    policy.WithOrigins(Configuration["ClientSide:Url"])
-                        .SetIsOriginAllowedToAllowWildcardSubdomains()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
+                    var clientSideUrl = Configuration["ClientSide:Url"];
+                    if (!string.IsNullOrEmpty(clientSideUrl))
+                    {
+                        policy.WithOrigins(clientSideUrl);
+                    }
+                        // .SetIsOriginAllowedToAllowWildcardSubdomains()
+                        // .AllowAnyHeader()
+                        // .AllowAnyMethod()
+                        // .AllowCredentials();
                 });
             });
 
@@ -55,26 +59,11 @@ namespace StreamingApp
             services.AddScoped<CategoryManager>();
             services.AddScoped<ICategoryService, CategoryService>();
 
-            services.AddScoped<StreamCategoryManager>();
-            services.AddScoped<IStreamCategoryService, StreamCategoryService>();
-
-            services.AddScoped<StreamTagManager>();
-            services.AddScoped<IStreamTagService, StreamTagService>();
-
             services.AddScoped<RoleManager>();
             services.AddScoped<IRoleService, RoleService>();
-
             services.AddScoped<User_RoleManager>();
             services.AddScoped<IUser_RoleService, User_RoleService>();  
 
-            services.AddScoped<NotificationManager>();
-            services.AddScoped<INotificationService, NotificationService>();
-
-            services.AddScoped<BlockedManager>();
-            services.AddScoped<IBlockedService, BlockedService>();
-
-            services.AddScoped<FollowingManager>();
-            services.AddScoped<IFollowingService, FollowingService>();
 
             // services.AddScoped<ModManager>();
             // services.AddScoped<IModService, ModService>();
@@ -82,12 +71,11 @@ namespace StreamingApp
             services.AddScoped<TagManager>();
             services.AddScoped<ITagService, TagService>();
 
-            services.AddScoped<StreamManager>();
-            services.AddScoped<IStreamService, StreamService>();
 
-            services.AddScoped<IEmailService, EmailService>();
+
 
             services.AddSingleton<MainHub>();
+            services.AddScoped<NotificationHub>();
             services.AddScoped<UserManager>();
 
             // Đăng ký JWT Authentication
@@ -176,6 +164,7 @@ namespace StreamingApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notification");
                 endpoints.MapHub<MainHub>("/webrtc");
 
             });
