@@ -27,6 +27,11 @@ namespace StreamingApp.Managers{
             return tag;
         }
 
+        public async Task<Tag?> GetTagWithName(string tagName){
+            var tag = await _context.Tags.FirstOrDefaultAsync(tag => tag.TagName == tagName);
+            return tag;
+        }
+
         //read list tag
         public async Task<IEnumerable<Tag>> GetListTag(){
             return await _context.Tags.ToListAsync<Tag>();
