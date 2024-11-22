@@ -22,15 +22,15 @@ namespace StreamingApp.Controllers
             return BadRequest(result.Errors);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetFollowingsByFollowerIdAsync(int followerId) {
-            var followings = await followingService.GetFollowingsByFollowerIdAsync(followerId);
-            return Ok(followings);
-        }
+        // [HttpGet]
+        // public async Task<IActionResult> GetFollowingsByFollowerIdAsync(int followerId) {
+        //     var followings = await followingService.GetFollowingsByFollowerIdAsync(followerId);
+        //     return Ok(followings);
+        // }
 
         [HttpGet]
         public async Task<IActionResult> GetFollowingsByChannelIdAsync(int channelId) {
-            var followings = await followingService.GetFollowingsByChannelIdAsync(channelId);
+            var followings = await followingService.GetFollowingByChannelIdAsync(channelId);
             return Ok(followings);
         }
 

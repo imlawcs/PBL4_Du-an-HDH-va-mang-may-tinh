@@ -63,9 +63,18 @@ namespace StreamingApp
 
             services.AddScoped<RoleManager>();
             services.AddScoped<IRoleService, RoleService>();
+
             services.AddScoped<User_RoleManager>();
             services.AddScoped<IUser_RoleService, User_RoleService>();  
 
+            services.AddScoped<NotificationManager>();
+            services.AddScoped<INotificationService, NotificationService>();
+
+            services.AddScoped<BlockedManager>();
+            services.AddScoped<IBlockedService, BlockedService>();
+
+            services.AddScoped<FollowingManager>();
+            services.AddScoped<IFollowingService, FollowingService>();
 
             // services.AddScoped<ModManager>();
             // services.AddScoped<IModService, ModService>();
@@ -76,7 +85,7 @@ namespace StreamingApp
             services.AddScoped<StreamManager>();
             services.AddScoped<IStreamService, StreamService>();
 
-
+            services.AddScoped<IEmailService, EmailService>();
 
             services.AddSingleton<MainHub>();
             services.AddScoped<UserManager>();

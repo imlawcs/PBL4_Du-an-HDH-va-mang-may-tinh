@@ -2,7 +2,7 @@ using StreamingApp.Models.Entities;
 using StreamingApp.Managers;
 
 namespace StreamingApp.Services {
-    public class FollowingService {
+    public class FollowingService : IFollowingService {
         private readonly FollowingManager followingManager;
 
         public FollowingService(FollowingManager followingManager) {
@@ -13,11 +13,11 @@ namespace StreamingApp.Services {
             return followingManager.FollowUser(followerId, channelId);
         }
 
-        public Task<Following[]> GetFollowingsByFollowerIdAsync(int followerId) {
-            return followingManager.GetFollowingsByFollowerIdAsync(followerId);
-        }
+        // public Task<Following[]> GetFollowingByFollowerIdAsync(int followerId) {
+        //     return followingManager.GetFollowingsByFollowerIdAsync(followerId);
+        // }
 
-        public Task<Following[]> GetFollowingsByChannelIdAsync(int channelId) {
+        public Task<Following[]> GetFollowingByChannelIdAsync(int channelId) {
             return followingManager.GetFollowingsByChannelIdAsync(channelId);
         }
 

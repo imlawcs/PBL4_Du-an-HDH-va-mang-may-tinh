@@ -22,11 +22,11 @@ namespace StreamingApp.Managers
             return (true, Array.Empty<string>());
         }
 
-        public async Task<Following[]> GetFollowingsByFollowerIdAsync(int followerId) {
-            return await dbContext.Followings
-                .Where(f => f.FollowerId == followerId)
-                .ToArrayAsync();
-        }
+        // public async Task<Following[]> GetFollowingsByIdAsync(int followerId) {
+        //     return await dbContext.Followings
+        //         .Where(f => f.FollowerId == followerId)
+        //         .ToArrayAsync();
+        // }
 
         public async Task<Following[]> GetFollowingsByChannelIdAsync(int channelId) {
             return await dbContext.Followings
