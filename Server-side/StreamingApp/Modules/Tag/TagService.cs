@@ -38,6 +38,11 @@ namespace StreamingApp.Services
             return TagManager.GetTagWithId(id);
         }
 
+        public Task<Tag?> GetTagWithName(string name)
+        {
+            return TagManager.GetTagWithName(name);
+        }
+
         public Task<(bool Succeeded, string[] Errors)> UpdateTagAsync(int id, Tag model)
         {
             return TagManager.UpdateTag(id,model);
