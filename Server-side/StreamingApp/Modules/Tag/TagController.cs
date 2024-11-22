@@ -43,9 +43,9 @@ namespace StreamingApp.Controllers
         public async Task<IActionResult> CreateTagAsync([FromBody] Tag model)
         {
             var tag = await _tagService.CreateTagAsync(model);
-            if(tag == null)
+            if(!tag.Succeeded)
             {
-                return BadRequest("Create tag failed");
+                return BadRequest(tag.Errors);
             }
             return Ok("Create tag successfully");
         }

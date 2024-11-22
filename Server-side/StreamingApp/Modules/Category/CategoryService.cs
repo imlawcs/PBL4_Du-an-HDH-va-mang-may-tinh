@@ -12,7 +12,7 @@ namespace StreamingApp.Services
         {
             CategoryManager = categoryManager ?? throw new ArgumentNullException(nameof(categoryManager));
         }
-        public Task<Category> CreateCategoryAsync(Category model)
+        public Task<(bool Succeeded, string[] Errors, Category? category)> CreateCategoryAsync(Category model)
         {
             return CategoryManager.CreateCategoryAsync(model);
         }
