@@ -11,11 +11,17 @@ namespace StreamingApp.Managers
             _context = context;
         }
 
-        public async Task<Category> CreateCategoryAsync(Category category)
+        public bool CategoryExists(string categoryName)
         {
+            return _context.Categories.Any(c => c.CategoryName == categoryName);
+        }
+
+        public async Task<(bool Succeeded, string[] Errors, Category? category)> CreateCategoryAsync(Category category)
+        {
+            if (CategoryExists(category.CategoryName)) return (false, new string[] { "Category name already exists" }, null);
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
-            return category;
+            return (true, new string[] { }, category);
         }
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync()
@@ -35,10 +41,15 @@ namespace StreamingApp.Managers
             var categoryToUpdate = await _context.Categories.FindAsync(id);
             if (categoryToUpdate == null) return (false, new string[] { "Category not found" });
             
+            if(CategoryExists(category.CategoryName))
+            {
+                return (false, new string[] { "Category name already exists" });
+            }
+
             categoryToUpdate.CategoryName = category.CategoryName;
             categoryToUpdate.CategoryDesc = category.CategoryDesc;
             await _context.SaveChangesAsync();
-            return (true, new string[] { });
+            return (true, new string[] {"Update category successfully"});
         }
 
         public async Task<bool> DeleteCategoryAsync(int id)

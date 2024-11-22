@@ -45,9 +45,9 @@ namespace StreamingApp.Controllers
         public async Task<IActionResult> CreateCategoryAsync([FromBody] Category model)
         {
             var category = await _categoryService.CreateCategoryAsync(model);
-            if(category == null)
+            if(!category.Succeeded)
             {
-                return BadRequest("Create category failed");
+                return BadRequest(category.Errors);
             }
             return Ok("Create category successfully");
         }
