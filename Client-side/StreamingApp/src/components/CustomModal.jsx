@@ -29,6 +29,7 @@ import { TagRoutes } from "../API/Tag.routes";
 import { CategoryRoutes } from "../API/Category.routes";
 import CustomDatalist from "./CustomDatalist";
 import TagCard from "./TagCard";
+import { StreamRoutes } from "../API/Stream.route";
 
 
 export default function CustomModal(props) {
@@ -399,7 +400,6 @@ export default function CustomModal(props) {
     //data for stream submit
     const [selectedCategory, setSelectedCategory] = useState({});
     const [inputTagList, setInputTagList] = useState([]);
-    
     //string handling
     //input ref
     const cateRef = useRef(null);
@@ -472,13 +472,16 @@ export default function CustomModal(props) {
       if (title.trim() === "") {
       newErrors.push("Title is required");
       }
-      if(tagListTemp.length > 5) newErrors.push("Tag list must be less than 5 tags");
+      if(tagListTemp.length > 3) newErrors.push("Tag list must be less than 3 tags");
+      if(inputCategory.includes(",")) newErrors.push("Category must be a single value");
+      if(categoryDataList.filter((cate) => cate.categoryName === inputCategory).length === 0) newErrors.push("Category must be one of value in available list");
       if (inputCategory.trim() === "") {
       newErrors.push("Category is required");
       }
       setError(newErrors);
       return newErrors.length === 0;
     };
+    //create or update stream
     const handleStreamCreate = () => {
         const inputTagListCheck = () => {
           const tagIdList = [];
@@ -488,12 +491,37 @@ export default function CustomModal(props) {
             }
             else{ //tag doesn't exist
               TagRoutes.createTag(tag.tagName).then((res) => {
-                tagIdList.push(res.tagId);
+                tagIdList.push(res);
               });
             }
+            return tagIdList;
           });
         }
-        
+        try{
+          const tagListTemp = inputTagListCheck();
+          const data = {
+            UserId: userGlobal.UserId,
+            StreamTitle: title,
+            StreamDesc: inputDesc,
+            streamCategoryId: selectedCategory.categoryId,
+            streamTagIds: tagListTemp,
+          }
+          //create stream
+          if(!localStorage.getItem("streamId")) {
+            StreamRoutes.createStream(data).then((res) => {
+              console.log(res);
+              localStorage.setItem("streamId", res);
+            });
+          }
+          else {
+            StreamRoutes.updateStream(localStorage.getItem("streamId"), data).then((res) => {
+              console.log(res);
+            });
+          }
+        }
+        catch(error){
+          console.error("Error creating stream: ", error);
+        }
     }
     return (
       <>
