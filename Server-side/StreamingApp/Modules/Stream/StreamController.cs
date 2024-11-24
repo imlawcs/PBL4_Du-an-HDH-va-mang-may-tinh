@@ -115,7 +115,7 @@ namespace StreamingApp.Controllers
                 return BadRequest(result.Errors);
 
             var currentTagIds = stream.StreamTags.Select(x => x.TagId).ToList();
-            var newTagIds = model.streamTagIds;
+            var newTagIds = model.StreamTagIds;
 
             if (!currentTagIds.SequenceEqual(newTagIds))
             {
@@ -145,10 +145,10 @@ namespace StreamingApp.Controllers
                 }
             }}
 
-            if(model.streamCategoryId!= stream.StreamCategories.Select(x=>x.CategoryId).FirstOrDefault())
+            if(model.StreamCategoryId!= stream.StreamCategories.Select(x=>x.CategoryId).FirstOrDefault())
             {
-                var streamCategory = new StreamCategory { StreamId=model.StreamId ,CategoryId = model.streamCategoryId };
-                var resultCategory = await _streamCategoryService.UpdateStreamCategoryAsync(model.StreamId, model.streamCategoryId, streamCategory);
+                var streamCategory = new StreamCategory { StreamId=model.StreamId ,CategoryId = model.StreamCategoryId };
+                var resultCategory = await _streamCategoryService.UpdateStreamCategoryAsync(model.StreamId, model.StreamCategoryId, streamCategory);
                 if(!resultCategory.Succeeded)
                 {
                 //không tạo thành công stream category
