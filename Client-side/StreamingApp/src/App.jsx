@@ -11,6 +11,7 @@ import AuthProvider from "./hooks/AuthProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import ComponentTest from "./pages/ComponentTest";
 import AdminPage from "./pages/Admin";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route index element={<Home />} />
-          <Route path="category" element={<Category />} />
+          <Route path="category/:categoryid" element={<Category />} />
           <Route path="/user/:username" element={<UserNamePage />} />
           <Route element={<PrivateRoute />}>
             <Route path="test" element={<ComponentTest />} />
@@ -29,6 +30,7 @@ function App() {
           <Route path="searchResult" element={<SearchResult />} />
           <Route path="browsing" element={<Browsing />} />
           <Route path="admin" element={<AdminPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

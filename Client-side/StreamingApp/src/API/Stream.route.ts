@@ -1,5 +1,9 @@
 import { ApiConstants } from "./ApiConstants";
-
+export enum StreamStatus {
+    FINISHED,
+    UNFINISHED,
+    ERROR,
+}
 export const StreamRoutes = {
     getAllStreams: async () => {
         try{
@@ -72,12 +76,33 @@ export const StreamRoutes = {
         }
     },
     getMostRecentStreamByUser: async (userid: string) => {
-        await StreamRoutes.getAllStreams().then((streams) => {
-            const userStreams = streams.filter((stream: any) => stream.userId === userid);
-            const mostRecentStream = userStreams.reduce((prev: any, current: any) => {
-                return (new Date(prev.streamDate) > new Date(current.streamDate)) ? prev : current;
+        try {
+            await StreamRoutes.getAllStreams().then((streams) => {
+                if(streams.length > 0) {
+                    const userStreams = streams.filter((stream: any) => stream.userId === userid);
+                    if(userStreams.length > 0)
+                    {
+                        const mostRecentStream = userStreams.reduce((prev: any, current: any) => {
+                        return (new Date(prev.streamDate) > new Date(current.streamDate)) ? prev : current;
+                    });
+                    return mostRecentStream;
+                    }
+                }
             });
-            return mostRecentStream;
-        });
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    getStreamsWithCategory: async (categoryId: string) => {
+        try {
+            await StreamRoutes.getAllStreams().then((streams) => {
+                if(streams.length > 0) {
+                    const categoryStreams = streams.filter((stream: any) => stream.streamCategories[0].categoryId === categoryId);
+                    return categoryStreams;
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 }

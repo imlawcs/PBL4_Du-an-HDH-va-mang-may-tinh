@@ -38,7 +38,7 @@ export default function NavBar(props) {
   useEffect(() => {
     if (token) {
       setIsLoggedIn(true);
-      console.log(user);
+      // console.log(user);
     }
     
   }, []);
