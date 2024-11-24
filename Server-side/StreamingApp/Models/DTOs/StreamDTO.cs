@@ -13,7 +13,8 @@ namespace StreamingApp.Models.DTOs
         public bool IsLive { get; set; }
         public string StreamTitle { get; set; }
         public string StreamDesc { get; set; }
-        public int streamCategoryId { get; set; }
-        public List<int> streamTagIds { get; set; }
+        public int StreamCategoryId { get; set; }
+        public int StreamStatus { get; set; }
+        public List<int> StreamTagIds { get; set; }
     }
 }
