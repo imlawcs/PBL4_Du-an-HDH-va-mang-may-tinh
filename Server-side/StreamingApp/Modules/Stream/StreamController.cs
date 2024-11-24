@@ -61,9 +61,9 @@ namespace StreamingApp.Controllers
                 return BadRequest(stream.Errors);
             }
 
-            var streamCategory = new StreamCategory { StreamId=streamModel.StreamId ,CategoryId = model.streamCategoryId };
+            var streamCategory = new StreamCategory { StreamId=streamModel.StreamId ,CategoryId = model.StreamCategoryId };
             
-            foreach(int i in model.streamTagIds){
+            foreach(int i in model.StreamTagIds){
                 var streamTag = new StreamTag { StreamId=streamModel.StreamId, TagId = i };
                 var newStreamTag = await _streamTagService.CreateStreamTagAsync(streamTag);
                 if(!newStreamTag.Succeeded)
