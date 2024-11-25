@@ -106,7 +106,8 @@ namespace StreamingApp.Controllers
                 StreamDate = stream.StreamDate,
                 IsLive = model.IsLive,
                 StreamTitle = model.StreamTitle,
-                StreamDesc = model.StreamDesc
+                StreamDesc = model.StreamDesc,
+                StreamStatus = model.StreamStatus
             };
 
             var result = await _streamService.UpdateStreamAsync(modelStream);
