@@ -41,6 +41,7 @@ export default function Sidebar(props) {
   const [option, setOption] = useState(0);
   if (props.routing == "SM") {
     const [isOffline, setOffline] = useState(true);
+    const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     return (
       <div className="main__position">
         <div className="sidebar">
@@ -100,10 +101,10 @@ export default function Sidebar(props) {
                         </span>
                       
                     </div>
-                    <CustomModal type={"SMdesc__setting"} />
+                    <CustomModal type={"SMdesc__setting"} user={userGlobal}/>
                   </div>
                   <div className="rr__flex-col">
-                    <CustomModal type={"SM"} />
+                    <CustomModal type={"SM"} user={userGlobal}/>
                   </div>
                 </div>
               </div>
@@ -637,6 +638,19 @@ export default function Sidebar(props) {
       </>
     );
   } else if (props.routing == "category") {
+    const [currentCategory, setCurrentCategory] = useState({});
+    const [streamList, setStreamList] = useState([]);
+    useEffect(() => {
+      StreamRoutes.getCategoryById(props.category).then((res) => {
+        setCurrentCategory(res || {});
+      });
+      if(currentCategory.length > 0){
+        StreamRoutes.getStreamsWithCategory(currentCategory.CategoryId).then((res) => {
+          console.log(res);
+          setStreamList(res || []);
+        });
+      }
+    },[]);
     return (
       <>
         <div className="main__position">
@@ -648,94 +662,23 @@ export default function Sidebar(props) {
                 <CategoryComp
                   cateViewCount={12727}
                   type={"default"}
-                  categoryName="Bach Khoa"
+                  categoryName={currentCategory.CategoryName}
                   categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                  categoryDesc={lorem}
+                  categoryDesc={currentCategory.CategoryDesc}
                 />
                 <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
                   Live channels of this category
                 </span>
                 <div className="def-pad-1"></div>
                 <div className="sh__content-holder rr__flex-row">
-                  {[
-                    {
-                      title: "MY FIRST STREAM",
-                      thumbnail: "https://i.imgur.com/mUaz2eC.jpg",
-                      profilePic: "https://i.imgur.com/JcLIDUe.jpg",
-                      userName: "nauts",
-                      category: "League Of Legends",
-                    },
-                    {
-                      title: "ROAD TO CHALLENGER",
-                      thumbnail: "https://i.imgur.com/pQrIBFY.jpg",
-                      profilePic: "https://i.imgur.com/A3jLXXN.jpg",
-                      userName: "pro_gamer123",
-                      category: "League Of Legends",
-                    },
-                    {
-                      title: "CHILL STREAM",
-                      thumbnail: "https://i.imgur.com/ZGfCkYC.jpg",
-                      profilePic: "https://i.imgur.com/M7uPcKN.jpg",
-                      userName: "relaxed_streamer",
-                      category: "Just Chatting",
-                    },
-                    {
-                      title: "RANKED GRIND",
-                      thumbnail: "https://i.imgur.com/8TZvZJO.jpg",
-                      profilePic: "https://i.imgur.com/K2HdEji.jpg",
-                      userName: "competitive_player",
-                      category: "Valorant",
-                    },
-                    {
-                      title: "SPEEDRUN ATTEMPT",
-                      thumbnail: "https://i.imgur.com/nXYWoZS.jpg",
-                      profilePic: "https://i.imgur.com/L8zGJU2.jpg",
-                      userName: "speed_demon",
-                      category: "Minecraft",
-                    },
-                    {
-                      title: "ESPORTS TOURNAMENT",
-                      thumbnail: "https://i.imgur.com/qR3VbVY.jpg",
-                      profilePic: "https://i.imgur.com/F2XU58M.jpg",
-                      userName: "esports_pro",
-                      category: "Counter-Strike: Global Offensive",
-                    },
-                    {
-                      title: "STRATEGY GUIDE",
-                      thumbnail: "https://i.imgur.com/T8KYYmU.jpg",
-                      profilePic: "https://i.imgur.com/W9XUx7E.jpg",
-                      userName: "strategy_master",
-                      category: "Starcraft II",
-                    },
-                    {
-                      title: "CASUAL GAMEPLAY",
-                      thumbnail: "https://i.imgur.com/3XZhJLU.jpg",
-                      profilePic: "https://i.imgur.com/Q9ZXuZY.jpg",
-                      userName: "casual_gamer",
-                      category: "The Sims 4",
-                    },
-                    {
-                      title: "HORROR NIGHT",
-                      thumbnail: "https://i.imgur.com/7ZjU9L2.jpg",
-                      profilePic: "https://i.imgur.com/X6Y3VNm.jpg",
-                      userName: "scared_streamer",
-                      category: "Resident Evil Village",
-                    },
-                    {
-                      title: "RETRO GAMING",
-                      thumbnail: "https://i.imgur.com/1KZqPjq.jpg",
-                      profilePic: "https://i.imgur.com/P9ZkL7H.jpg",
-                      userName: "retro_lover",
-                      category: "Super Mario World",
-                    },
-                  ].map((content, index) => (
+                  {streamList.map((content, index) => (
                     <VideoContent
                       key={index}
-                      title={content.title}
-                      thumbnail={content.thumbnail}
-                      profilePic={content.profilePic}
-                      userName={content.userName}
-                      category={content.category}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      userName={content.user.userName}
+                      category={currentCategory.CategoryName}
                     />
                   ))}
                 </div>

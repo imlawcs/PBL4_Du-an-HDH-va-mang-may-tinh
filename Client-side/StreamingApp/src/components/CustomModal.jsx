@@ -29,7 +29,7 @@ import { TagRoutes } from "../API/Tag.routes";
 import { CategoryRoutes } from "../API/Category.routes";
 import CustomDatalist from "./CustomDatalist";
 import TagCard from "./TagCard";
-import { StreamRoutes } from "../API/Stream.route";
+import { StreamRoutes, StreamStatus } from "../API/Stream.route";
 
 
 export default function CustomModal(props) {
@@ -365,6 +365,7 @@ export default function CustomModal(props) {
                       <Button type="default" text={"Start"} onClick={() => {
                         
                         SignalRTest.start(userGlobal.UserName);
+                        
                         setServerStatus(true);
                         console.log("Status: " + serverStatus);
                         //truyền context.username vào đây
@@ -391,6 +392,7 @@ export default function CustomModal(props) {
     //fetched data
     const [tagDataList, setTagDataList] = useState([]);
     const [categoryDataList, setCategoryDataList] = useState([]);
+    const [prevStreamData, setPrevStreamData] = useState({});
     //input value
     const [title, setTitle] = useState("");
     const [inputCategory, setInputCategory] = useState("");
@@ -408,6 +410,9 @@ export default function CustomModal(props) {
     //trigger datalist
     const [mouseDown, setMouseDown] = useState(false); //for datalist
     const [focus, setFocus] = useState(0); // 0: none, 1: category, 2: tag
+    //information logging
+    const [error, setError] = useState([]);
+    const [info, setInfo] = useState([]);
     //fetch data
     useEffect(() => {
       const fetchData = async () => {
@@ -418,11 +423,29 @@ export default function CustomModal(props) {
           await CategoryRoutes.getAllCategories().then((res) => {
             setCategoryDataList(res || []);
           });
+          await StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+            console.log("Prev Stream Data: ", res);
+            setPrevStreamData(res || {});
+          });
         } catch (error) {
-          console.error("Error fetching tags and categories:", error);
+          console.error("Error fetching data:", error);
         }
       };
       fetchData();
+      console.log("Prev Stream Data: ", prevStreamData);
+      if(prevStreamData.length > 0) {
+        setTitle(prevStreamData.StreamTitle || "");
+        setInputDesc(prevStreamData.StreamDesc, "");
+        CategoryRoutes.getCategoryById(prevStreamData.streamCategories[0]).then((res) => {
+          setInputCategory(res.categoryName || "");
+          setSelectedCategory({
+            categoryId: res.categoryId,
+            categoryName: res.categoryName
+          } || {});
+        });
+        setInputTagList(prevStreamData.streamTags.map((tag) => tag.tagId) || []);
+        setInputTagStandAlone(inputTagList.map((tagId) => tagDataList.filter((tag) => tag.tagId === tagId)[0].tagName).join(", ") || "");
+      }
     }, [])
     //datalist position
     useEffect(() => {
@@ -460,7 +483,6 @@ export default function CustomModal(props) {
       setFocus(0);
     }
     //form validating
-    const [error, setError] = useState([]);
     const formCheck = () => {
       let newErrors = [];
 
@@ -481,6 +503,11 @@ export default function CustomModal(props) {
       setError(newErrors);
       return newErrors.length === 0;
     };
+    const infoLog = (logData) => {
+      let newInfo = [];
+      newInfo.push(logData);
+      setInfo([...info, newInfo].filter((value, index, self) => self.indexOf(value) === index)); //remove duplicate
+    }
     //create or update stream
     const handleStreamCreate = () => {
         const inputTagListCheck = () => {
@@ -499,23 +526,42 @@ export default function CustomModal(props) {
         }
         try{
           const tagListTemp = inputTagListCheck();
+          //body data
           const data = {
             UserId: userGlobal.UserId,
             StreamTitle: title,
             StreamDesc: inputDesc,
             streamCategoryId: selectedCategory.categoryId,
             streamTagIds: tagListTemp,
+            streamStatus: StreamStatus.UNFINISHED,
           }
           //create stream
-          if(!localStorage.getItem("streamId")) {
+          if(prevStreamData.streamStatus == StreamStatus.FINISHED || prevStreamData == {}) {
             StreamRoutes.createStream(data).then((res) => {
               console.log(res);
+              //reset prevStreamData
+              StreamRoutes.getStreamById(res).then((res1) => {
+                console.log(res1);
+                setPrevStreamData(res1);
+              });
               localStorage.setItem("streamId", res);
             });
           }
           else {
-            StreamRoutes.updateStream(localStorage.getItem("streamId"), data).then((res) => {
-              console.log(res);
+            //update stream
+            const data = {
+              streamId: prevStreamData.streamId,
+              UserId: userGlobal.UserId,
+              StreamTitle: title,
+              StreamDesc: inputDesc,
+              streamCategoryId: selectedCategory.categoryId,
+              streamTagIds: tagListTemp,
+            }
+            StreamRoutes.updateStream(prevStreamData.streamId, data).then((res) => {
+              StreamRoutes.getStreamById(prevStreamData.streamId).then((res) => {
+                setPrevStreamData(res);
+              });
+              infoLog(res);
             });
           }
         }
@@ -546,6 +592,7 @@ export default function CustomModal(props) {
                 placeholder="Enter title here..."
                 onFocus={() => {
                   setError([]);
+                  setInfo([]);
                 }}
               />
               <span className="league-spartan-light fs__normal-1 citizenship">
@@ -570,6 +617,7 @@ export default function CustomModal(props) {
                 }}
                 onFocus={() => {
                   setError([]);
+                  setInfo([]);
                 }}
                 value={inputDesc}
                 onChange={(e) => setInputDesc(e.target.value)}
@@ -597,6 +645,7 @@ export default function CustomModal(props) {
                 ref={cateRef}
                 onFocus={() => {
                   setError([]);
+                  setInfo([]);
                   setFocus(1);
                   
                 }}
@@ -604,7 +653,7 @@ export default function CustomModal(props) {
                   if(!mouseDown)
                   {
                     setFocus(0); 
-                  
+                    
                   }
                 }}
                 onChange={(e) => setInputCategory(e.target.value)}
@@ -651,6 +700,7 @@ export default function CustomModal(props) {
                 ref={tagRef}
                 onFocus={() => {
                   setError([]);
+                  setInfo([]);
                   setFocus(2);
                 }}
                 onBlur={() => {
@@ -716,7 +766,16 @@ export default function CustomModal(props) {
                 color: "#47FFD3",
                 fontSize: "1.5em",
                 paddingRight: "0.5em",
-              }}/>}
+              }}/>
+              }
+              {
+                info.length > 0 && <FontAwesomeIcon icon={faTriangleExclamation} style={{
+                  color: "#47FFD3",
+                  fontSize: "1.5em",
+                  paddingRight: "0.5em",
+                }}/>
+              }
+
               <div className="rr__flex-col">
                 {error.map((err, index) => (
                   <span className="league-spartan-semibold fs__normal-1 rr__color-secondary" key={index}>
