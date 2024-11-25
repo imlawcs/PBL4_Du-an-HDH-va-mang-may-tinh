@@ -24,10 +24,10 @@ export default function CategoryComp(props) {
                 {props.categoryDesc}
               </span>
             </div>
-            <div className="tag__holder rr__flex-row">
+            {/* <div className="tag__holder rr__flex-row">
               <TagCard name="English" />
               <TagCard name="Vietnamese" />
-            </div>
+            </div> */}
           </div>
         </div>
       </>
@@ -64,10 +64,10 @@ export default function CategoryComp(props) {
             <span className="cate__vc league-spartan-light fs__small-3 citizenship">
               {props.cateViewCount} viewers
             </span>
-            <div className="tag__holder rr__flex-row">
+            {/* <div className="tag__holder rr__flex-row">
               <TagCard name="English" />
               <TagCard name="Vietnamese" />
-            </div>
+            </div> */}
           </div>
         </div>
       </>

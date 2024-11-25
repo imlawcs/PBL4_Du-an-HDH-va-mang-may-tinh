@@ -396,12 +396,10 @@ export default function CustomModal(props) {
     //input value
     const [title, setTitle] = useState("");
     const [inputCategory, setInputCategory] = useState("");
-    const [inputTag, setInputTag] = useState("");
     const [inputTagStandAlone, setInputTagStandAlone] = useState("");
     const [inputDesc, setInputDesc] = useState("");
     //data for stream submit
     const [selectedCategory, setSelectedCategory] = useState({});
-    const [inputTagList, setInputTagList] = useState([]);
     //string handling
     //input ref
     const cateRef = useRef(null);
@@ -415,9 +413,12 @@ export default function CustomModal(props) {
     const [info, setInfo] = useState([]);
     //fetch data
     useEffect(() => {
+      let tempStandAloneList = [];
+      let tempDataList = [];
       const fetchData = async () => {
         try {
           await TagRoutes.getAllTags().then((res) => {
+            tempDataList.push(...res);
             setTagDataList(res || []);
           });
           await CategoryRoutes.getAllCategories().then((res) => {
@@ -426,26 +427,29 @@ export default function CustomModal(props) {
           await StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
             console.log("Prev Stream Data: ", res);
             setPrevStreamData(res || {});
+              setTitle(res.streamTitle || "");
+              setInputDesc(res.streamDesc, "");
+              CategoryRoutes.getCategoryById(res.streamCategories[0].categoryId).then((res1) => {
+                setInputCategory(res1.categoryName || "");
+                setSelectedCategory({
+                  categoryId: res1.categoryId,
+                  categoryName: res1.categoryName
+                } || {});
+              });
+              const tempTagList = res.streamTags.map((tag) => tag.tagId) || [];
+              console.log(tempDataList);
+              tempDataList.forEach((tag) => {
+                if(tempTagList.indexOf(tag.tagId) > -1) tempStandAloneList.push(tag.tagName);
+              });
+              console.log("TempStandAloneList: ", tempStandAloneList);
+              handleTagsLoading(tempStandAloneList);
           });
         } catch (error) {
           console.error("Error fetching data:", error);
         }
       };
+      console.log("Userglobal: "+ JSON.stringify(userGlobal));
       fetchData();
-      console.log("Prev Stream Data: ", prevStreamData);
-      if(prevStreamData.length > 0) {
-        setTitle(prevStreamData.StreamTitle || "");
-        setInputDesc(prevStreamData.StreamDesc, "");
-        CategoryRoutes.getCategoryById(prevStreamData.streamCategories[0]).then((res) => {
-          setInputCategory(res.categoryName || "");
-          setSelectedCategory({
-            categoryId: res.categoryId,
-            categoryName: res.categoryName
-          } || {});
-        });
-        setInputTagList(prevStreamData.streamTags.map((tag) => tag.tagId) || []);
-        setInputTagStandAlone(inputTagList.map((tagId) => tagDataList.filter((tag) => tag.tagId === tagId)[0].tagName).join(", ") || "");
-      }
     }, [])
     //datalist position
     useEffect(() => {
@@ -459,13 +463,20 @@ export default function CustomModal(props) {
       }
       
     }, [focus]);
-    //debug useEffect
+    // debug useEffect
     useEffect(() => {
-      console.log("TagDataList: ", inputTagList);
-    }, [inputTagList])
-
+      console.log("TagDataList: ", tagDataList);
+    }, [tagDataList]);
+    
 
     //handle selecting value
+    const handleTagsLoading = (data) => {
+      console.log("Data: ", data);
+      console.log("Data: ", data.length);
+      const stringdata = data.join(", ");
+      console.log("StringData: ", stringdata);
+      setInputTagStandAlone(stringdata || "");
+    }
     const handleSelectCategory = (value, id) => {
       console.log("Selected:", value, id);
       setInputCategory(value);
@@ -478,7 +489,7 @@ export default function CustomModal(props) {
     const handleSelectTag = (value, id) => {
       console.log("Selected:", value, id);
       setInputTagStandAlone(inputTagStandAlone + value);
-      setInputTag(value);
+      // setInputTag(value);
       // setSelectedCategory(id);
       setFocus(0);
     }
@@ -511,21 +522,30 @@ export default function CustomModal(props) {
     //create or update stream
     const handleStreamCreate = () => {
         const inputTagListCheck = () => {
+          console.log("inputtagcheck");
           const tagIdList = [];
-          tagDataList.forEach((tag) => {
-            if(inputTagList.includes(tag.tagName)) {
-              tagIdList.push(tag.tagId); //tag existed
+          const inputTagsList = inputTagStandAlone.split(",")
+          .map((value) => value.trim())
+          .filter((value) => value !== "")
+          .filter((name, index, self) => self.indexOf(name) === index);
+          //ex: ["tag1", "tag2", "tag3"]
+          const filterTagList = tagDataList.map((tag) => tag.tagName); //ex: ["tag1", "tag2", "tag3"]
+          inputTagsList.forEach((tag) => {
+            if(filterTagList.indexOf(tag) > -1) {
+              const neededtagId = tagDataList.filter((tagData) => tagData.tagName === tag)[0].tagId;
+              tagIdList.push(neededtagId); //tag existed
             }
             else{ //tag doesn't exist
-              TagRoutes.createTag(tag.tagName).then((res) => {
+              TagRoutes.createTag({tagName: tag}).then((res) => {
                 tagIdList.push(res);
               });
             }
-            return tagIdList;
           });
+          return tagIdList;
         }
         try{
           const tagListTemp = inputTagListCheck();
+          // console.log("TagListTemp: ", tagListTemp);
           //body data
           const data = {
             UserId: userGlobal.UserId,
@@ -536,7 +556,10 @@ export default function CustomModal(props) {
             streamStatus: StreamStatus.UNFINISHED,
           }
           //create stream
-          if(prevStreamData.streamStatus == StreamStatus.FINISHED || prevStreamData == {}) {
+          console.log(data);
+          console.log(prevStreamData);
+          if(!(prevStreamData)){
+            console.log("Create stream 1");
             StreamRoutes.createStream(data).then((res) => {
               console.log(res);
               //reset prevStreamData
@@ -547,13 +570,27 @@ export default function CustomModal(props) {
               localStorage.setItem("streamId", res);
             });
           }
-          else {
+          else
+          if(prevStreamData.streamStatus === StreamStatus.FINISHED) {
+            console.log("Create stream 2");
+            StreamRoutes.createStream(data).then((res) => {
+              console.log(res);
+              //reset prevStreamData
+              StreamRoutes.getStreamById(res).then((res1) => {
+                console.log(res1);
+                setPrevStreamData(res1);
+              });
+              localStorage.setItem("streamId", res);
+            });
+          }
+          else if(prevStreamData.streamStatus === StreamStatus.UNFINISHED) {
             //update stream
+            console.log("Update stream");
             const data = {
               streamId: prevStreamData.streamId,
-              UserId: userGlobal.UserId,
-              StreamTitle: title,
-              StreamDesc: inputDesc,
+              // UserId: userGlobal.UserId,
+              streamTitle: title,
+              streamDesc: inputDesc,
               streamCategoryId: selectedCategory.categoryId,
               streamTagIds: tagListTemp,
             }
@@ -564,6 +601,7 @@ export default function CustomModal(props) {
               infoLog(res);
             });
           }
+          else console.error("Stream status error");
         }
         catch(error){
           console.error("Error creating stream: ", error);
@@ -590,6 +628,8 @@ export default function CustomModal(props) {
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Enter title here..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 onFocus={() => {
                   setError([]);
                   setInfo([]);
@@ -782,9 +822,14 @@ export default function CustomModal(props) {
                     {err}
                   </span>
                 ))}
-                
               </div>
-              
+              <div className="rr__flex-col">
+                {info.map((inf, index) => (
+                  <span className="league-spartan-semibold fs__normal-1 rr__color-secondary" key={index}>
+                    {inf}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className="rr__flex-row-reverse">
               <Button type="default" text="Save" onClick={() => {
@@ -794,6 +839,10 @@ export default function CustomModal(props) {
                 if(!check) return;
                 handleStreamCreate();
               }} />
+              {/* <Button type="default" text="Test" onClick={() => {
+                console.log(prevStreamData);
+                console.log("title: " + title);
+              }}/> */}
             </div>
           </div>
         </div>
@@ -909,6 +958,7 @@ export default function CustomModal(props) {
                   setUpdate(res);
                 });
             }} />
+            
             <span className="league-spartan-regular fs__normal-1 citizenship">
               {update}
             </span>
@@ -937,6 +987,7 @@ export default function CustomModal(props) {
                 props.update(value, props.updateLabel);
               }} />
               <Button type="default" text="Cancel" onClick={props.offModal} />
+
             </div>
             </div>
           </div>

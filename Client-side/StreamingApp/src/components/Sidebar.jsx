@@ -34,6 +34,7 @@ import { UserRoutes } from "../API/User.routes";
 import defaultImage from "../assets/img/Logo__Sieufix.png";
 import { StreamRoutes } from "../API/Stream.route";
 import { useAuth } from "../hooks/AuthProvider";
+import { CategoryRoutes } from "../API/Category.routes";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -552,6 +553,16 @@ export default function Sidebar(props) {
       </>
     );
   } else if (props.routing == "browsing") {
+    const [categoryList, setCategoryList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    useEffect(() => {
+      CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+      });
+      StreamRoutes.getAllStreams().then((res) => {
+        setStreamList(res);
+      });
+    }, [])
     const [flBtn, setFlBtn] = useState(true);
     return (
       <>
