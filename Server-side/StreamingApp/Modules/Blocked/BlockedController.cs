@@ -1,5 +1,6 @@
 using StreamingApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using StreamingApp.Models.DTOs;
 
 namespace StreamingApp.Controllers
 {
@@ -38,9 +39,9 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost("unblock")]
-        public async Task<IActionResult> UnblockUser(int channelId, int userId)
+        public async Task<IActionResult> UnblockUser([FromBody] BlockDTO blockDTO)
         {
-            var result = await _blockedService.UnblockUser(channelId, userId);
+            var result = await _blockedService.UnblockUser(blockDTO.ChannelId, blockDTO.UserId);
 
             if (!result.Succeeded)
             {
@@ -51,9 +52,9 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost("block")]
-        public async Task<IActionResult> BlockUser(int channelId, int userId)
+        public async Task<IActionResult> BlockUser([FromBody] BlockDTO blockDTO)
         {
-            var result = await _blockedService.BlockUser(channelId, userId);
+            var result = await _blockedService.BlockUser(blockDTO.ChannelId, blockDTO.UserId);
 
             if (!result.Succeeded)
             {

@@ -1,21 +1,23 @@
 using StreamingApp.Services;
 using StreamingApp.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using StreamingApp.Models.DTOs;
 
 namespace StreamingApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class FollowingController : ControllerBase {
-        private readonly FollowingService followingService;
+        private readonly IFollowingService _followingService;
 
-        public FollowingController(FollowingService followingService) {
-            this.followingService = followingService;
+        public FollowingController(IFollowingService followingService)
+        {
+            _followingService = followingService;
         }
 
         [HttpPost("follow")]
-        public async Task<IActionResult> FollowUser(int followerId, int channelId) {
-            var result = await followingService.FollowUser(followerId, channelId);
+        public async Task<IActionResult> FollowUser([FromBody] FollowDTO followDTO) {
+            var result = await _followingService.FollowUser(followDTO.FollowerId, followDTO.ChannelId);
             if (result.Succeeded) {
                 return Ok();
             }
@@ -28,21 +30,21 @@ namespace StreamingApp.Controllers
         //     return Ok(followings);
         // }
 
-        [HttpGet]
+        [HttpGet("{channelId}")]
         public async Task<IActionResult> GetFollowingsByChannelIdAsync(int channelId) {
-            var followings = await followingService.GetFollowingByChannelIdAsync(channelId);
+            var followings = await _followingService.GetFollowingByChannelIdAsync(channelId);
             return Ok(followings);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllFollowings() {
-            var followings = await followingService.GetAllFollowings();
+            var followings = await _followingService.GetAllFollowings();
             return Ok(followings);
         }
 
         [HttpPost("unfollow")]
-        public async Task<IActionResult> UnfollowUser(int followerId, int channelId) {
-            var result = await followingService.UnfollowUser(followerId, channelId);
+        public async Task<IActionResult> UnfollowUser([FromBody] FollowDTO followDTO) {
+            var result = await _followingService.UnfollowUser(followDTO.FollowerId, followDTO.ChannelId);
             if (result.Succeeded) {
                 return Ok();
             }
