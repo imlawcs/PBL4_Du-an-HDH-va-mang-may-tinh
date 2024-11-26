@@ -9,10 +9,13 @@ import { SignalRTest } from "../scripts/webrtcTemp";
 import { Colors } from "../constants/Colors";
 import Toast from "./Toast";
 import { UserRoutes } from "../API/User.routes";
+import { TagRoutes } from "../API/Tag.routes";
+import { CategoryRoutes } from "../API/Category.routes";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
     }
+
     function shortenNumber(number) {
         if(number >= 1000000000){
             return (number / 1000000000).toFixed(1) + "B";
@@ -31,7 +34,8 @@ export default function StreamUserInfo(props) {
     const [isFollowed, setIsFollowed] = useState(false); 
       //show toast
     const [showToast, setShowToast] = useState(false);
-
+   
+    
     const handleFollow = () => {
         setIsFollowed(!isFollowed);
         setShowToast(true);
@@ -49,7 +53,7 @@ export default function StreamUserInfo(props) {
                         
                         <div className="uih__context-holder rr__flex-col">
                             <div className="uihc__h-username league-spartan-semibold fs__large-1 citizenship">
-                                {props.userName}
+                                {props.status? props.userName: `${props.userName} (offline)`}
                             </div>
                             <div className="uihc__h-title league-spartan-semibold fs__normal-2 citizenship">
                                 {props.title}
@@ -59,10 +63,10 @@ export default function StreamUserInfo(props) {
                                     {props.category}
                                 </div>
                                 <div className="uihc__h-tag__holder rr__flex-row">
-                                    {/* map tag here */}
-                                    <TagCard name="English"/>
-                                    <TagCard name="Vietnamese"/>
-                                    <TagCard name="RPG"/>
+                                    {props.tagList.length > 0 && props.tagList.map((tag, index) => (
+                                        <TagCard key={index} name={tag}/>
+                                    ))}
+                                    
                                 </div>
                             </div>
                         </div>
@@ -85,7 +89,7 @@ export default function StreamUserInfo(props) {
                     <div className="uah__context-holder rr__flex-col">
                         <span className="fs__normal-3 league-spartan-regular">{shortenNumber(props.flCount)} Followers</span>
                         <div className="uah__desc league-spartan-light fs__normal-2">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure, minima? Enim, ex fuga, eligendi consequatur quis alias ipsum est omnis velit, porro rerum. Veniam eius ullam quod voluptates mollitia molestiae.
+                            {props.desc || `This is ${props.userName}'s stream. Enjoy!`}
                         </div>
                         <div className="uihr__btn-holder rr__flex-col">
                             <Button type={"link-type"} text={"btn_1"} onClick={doNothing()}/>

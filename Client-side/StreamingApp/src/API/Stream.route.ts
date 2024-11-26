@@ -4,6 +4,15 @@ export enum StreamStatus {
     FINISHED,
     ERROR,
 }
+export function isEmpty(obj: any): boolean {
+    for (const prop in obj) {
+      if (Object.hasOwn(obj, prop)) {
+        return false;
+      }
+    }
+  
+    return true;
+}
 export function compareDates(date1: Date, date2: Date): boolean {
     if (date1.getFullYear() !== date2.getFullYear()) {
         return date1.getFullYear() > date2.getFullYear();

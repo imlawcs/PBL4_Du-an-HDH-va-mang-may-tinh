@@ -29,7 +29,7 @@ import { TagRoutes } from "../API/Tag.routes";
 import { CategoryRoutes } from "../API/Category.routes";
 import CustomDatalist from "./CustomDatalist";
 import TagCard from "./TagCard";
-import { StreamRoutes, StreamStatus } from "../API/Stream.route";
+import { isEmpty, StreamRoutes, StreamStatus } from "../API/Stream.route";
 
 
 export default function CustomModal(props) {
@@ -523,7 +523,7 @@ export default function CustomModal(props) {
     const handleStreamCreate = () => {
         const inputTagListCheck = () => {
           console.log("inputtagcheck");
-          const tagIdList = [];
+          let tagIdList = [];
           const inputTagsList = inputTagStandAlone.split(",")
           .map((value) => value.trim())
           .filter((value) => value !== "")
@@ -537,7 +537,7 @@ export default function CustomModal(props) {
             }
             else{ //tag doesn't exist
               TagRoutes.createTag({tagName: tag}).then((res) => {
-                tagIdList.push(res);
+                tagIdList.push(Number(res));
               });
             }
           });
@@ -545,6 +545,8 @@ export default function CustomModal(props) {
         }
         try{
           const tagListTemp = inputTagListCheck();
+          console.log(tagListTemp);
+          console.log(prevStreamData);
           // console.log("TagListTemp: ", tagListTemp);
           //body data
           const data = {
@@ -558,7 +560,7 @@ export default function CustomModal(props) {
           //create stream
           console.log(data);
           console.log(prevStreamData);
-          if(!(prevStreamData)){
+          if(isEmpty(prevStreamData)) {
             console.log("Create stream 1");
             StreamRoutes.createStream(data).then((res) => {
               console.log(res);

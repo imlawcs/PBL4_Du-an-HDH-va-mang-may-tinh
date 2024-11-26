@@ -35,6 +35,7 @@ import defaultImage from "../assets/img/Logo__Sieufix.png";
 import { StreamRoutes } from "../API/Stream.route";
 import { useAuth } from "../hooks/AuthProvider";
 import { CategoryRoutes } from "../API/Category.routes";
+import { TagRoutes } from "../API/Tag.routes";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -797,20 +798,32 @@ export default function Sidebar(props) {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
     const [messages, setMessages] = useState([]);
     const [userList, setUserList] = useState([]);
+    const [streamData, setStreamData] = useState({});
     const connection = SignalRTest.getConnection();
     const [user, setUser] = useState("");
+    const [currentCategory, setCurrentCategory] = useState("");
+    const [currentTags, setCurrentTags] = useState([]);
     useEffect(() => {
       try{
         UserRoutes.getUserByName(props.userRoute).then((res) => {
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
+            StreamRoutes.getMostRecentStreamByUser(res.UserId).then((res1) => {
+              console.log(res1);
+              TagRoutes.getAllTags().then((res2) => {
+                const tagIdList = res1.streamTags.map((item) => item.tagId);
+                const tagList = res2.filter((item) => tagIdList.includes(item.tagId));
+                setCurrentTags(tagList.map((item) => item.tagName) || []);
+              });
+              CategoryRoutes.getCategoryById(res1.streamCategories[0].categoryId).then((res2) => {
+                setCurrentCategory(res2.categoryName);
+              });
+              setStreamData(res1|| {});
+              console.log(JSON.stringify(streamData));
+          })
         });
-        if(user != null && user != ""){
-            StreamRoutes.getStreamById(user.UserId).then((res) => {
-
-            })
-        }
+        
       }
       catch(e){
         console.log(e);
@@ -842,7 +855,6 @@ export default function Sidebar(props) {
       }
     }, [connection]);
     
-    if(user != null && user != ""){
     return (
       <>
         <div className="main__position">
@@ -865,11 +877,14 @@ export default function Sidebar(props) {
 
               <StreamUserInfo
                 userName={user.DisplayName}
-                title="Hello guys"
-                category="osu!"
+                title={streamData.streamTitle}
+                desc={streamData.streamDesc}
+                category={currentCategory || "error"}
+                tagList={currentTags}
                 profilePic="https://i.imgur.com/neHVP5j.jpg"
                 viewCount={userList.length}
                 flCount={12342}
+                status={streamData.isLive !== undefined ? streamData.isLive : false}
               />
             </div>
             <StreamChat messages={messages} userList={userList}/>
@@ -877,41 +892,41 @@ export default function Sidebar(props) {
         </div>
       </>
     );
-    }
-    else return(
-      <>
-        <div className="main__position">
-          <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
-            <div className="main__content bg__color-00 rr__flex-col">
-              {/* <img className="bg__img" src={smBackground} alt="background"/> */}
-              <div className="fl__content-holder rr__flex-col">
+    
+    // return(
+    //   <>
+    //     <div className="main__position">
+    //       <div className="sidebar bg__color-2 rr__flex-row">
+    //       <UserChannelList />
+    //         <div className="main__content bg__color-00 rr__flex-col">
+    //           {/* <img className="bg__img" src={smBackground} alt="background"/> */}
+    //           <div className="fl__content-holder rr__flex-col">
                 
-                <div className="rr__flex-row rrf__ai-center">
-                <FontAwesomeIcon style={{
-                  padding: "0.5em",
-                  paddingLeft: "0",
-                  fontSize: "3em",
-                }} icon={faTriangleExclamation} color="#47FFD3"/>
-                <div className="rr__flex-col">
-                  <span className="fs__title-4 league-spartan-semibold citizenship ta__center fill__container">
-                    Cannot find user {props.userRoute}
-                  </span>
-                  <span className="fs__normal-3 league-spartan-regular citizenship">
-                    This user may have been banned or does not exist
-                  </span>
-                </div>
-                </div>
+    //             <div className="rr__flex-row rrf__ai-center">
+    //             <FontAwesomeIcon style={{
+    //               padding: "0.5em",
+    //               paddingLeft: "0",
+    //               fontSize: "3em",
+    //             }} icon={faTriangleExclamation} color="#47FFD3"/>
+    //             <div className="rr__flex-col">
+    //               <span className="fs__title-4 league-spartan-semibold citizenship ta__center fill__container">
+    //                 Cannot find user {props.userRoute}
+    //               </span>
+    //               <span className="fs__normal-3 league-spartan-regular citizenship">
+    //                 This user may have been banned or does not exist
+    //               </span>
+    //             </div>
+    //             </div>
                   
                 
                 
-              </div>
+    //           </div>
 
               
-            </div>
-          </div>
-        </div>
-      </>
-    )
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </>
+    // )
   }
 }
