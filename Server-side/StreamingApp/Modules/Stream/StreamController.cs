@@ -146,10 +146,12 @@ namespace StreamingApp.Controllers
                 }
             }}
 
-            if(model.StreamCategoryId!= stream.StreamCategories.Select(x=>x.CategoryId).FirstOrDefault())
+            int categoryIdbefore = stream.StreamCategories.Select(x=>x.CategoryId).FirstOrDefault();
+            int categoryIdafter = model.StreamCategoryId;
+            if(categoryIdbefore!=categoryIdafter)
             {
                 var streamCategory = new StreamCategory { StreamId=model.StreamId ,CategoryId = model.StreamCategoryId };
-                var resultCategory = await _streamCategoryService.UpdateStreamCategoryAsync(model.StreamId, model.StreamCategoryId, streamCategory);
+                var resultCategory = await _streamCategoryService.UpdateStreamCategoryAsync(model.StreamId, categoryIdbefore, streamCategory);
                 if(!resultCategory.Succeeded)
                 {
                 //không tạo thành công stream category
