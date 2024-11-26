@@ -71,8 +71,17 @@ namespace StreamingApp
             services.AddScoped<TagManager>();
             services.AddScoped<ITagService, TagService>();
 
+            services.AddScoped<FollowingManager>();
+            services.AddScoped<IFollowingService, FollowingService>();
 
+            services.AddScoped<NotificationManager>();
+            services.AddScoped<INotificationService, NotificationService>();
 
+            services.AddScoped<EmailService>();
+            services.AddScoped<IEmailService, EmailService>();
+
+            services.AddScoped<BlockedManager>();
+            services.AddScoped<IBlockedService, BlockedService>();
 
             services.AddSingleton<MainHub>();
             services.AddScoped<NotificationHub>();

@@ -22,7 +22,12 @@ namespace StreamingApp.Controllers
         [HttpPost()]
         public async Task SendNotificationAsync([FromBody] NotiDTO notiDTO)
         {
-            await _notificationService.SendNotificationAsync(notiDTO.UserId, notiDTO.Message, notiDTO.Type);
+            try {
+                await _notificationService.SendNotificationAsync(notiDTO.UserId, notiDTO.Message, notiDTO.Type);
+            }
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
         }
 
 
@@ -38,11 +43,11 @@ namespace StreamingApp.Controllers
             await _notificationService.MarkAsReadAsync(notificationId);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SendNotification(string message)
-        {
-            await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
-            return Ok();
-        }
+        // [HttpPost]
+        // public async Task<IActionResult> SendNotification(string message)
+        // {
+        //     await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
+        //     return Ok();
+        // }
     }
 }

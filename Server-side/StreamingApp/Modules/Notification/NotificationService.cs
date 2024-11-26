@@ -10,7 +10,12 @@ namespace StreamingApp.Services {
         }
 
         public async Task SendNotificationAsync(int userId, string message, string type) {
-            await _notificationManager.CreateNotificationAsync(userId, message, type);
+            try {
+                await _notificationManager.CreateNotificationAsync(userId, message, type);
+            }
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<List<Notification>> GetUserNotificationsAsync(string userId) {
