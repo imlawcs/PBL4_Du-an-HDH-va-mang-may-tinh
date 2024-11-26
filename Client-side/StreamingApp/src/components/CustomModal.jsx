@@ -63,29 +63,6 @@ export default function CustomModal(props) {
 
     const handleLogin = async () => {
       if (validateForm()) {
-        // try {
-        //   const response = await fetch("https://localhost:3001/api/auth/login", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({ Username, Password }),
-        //   });
-
-        //   if (response.ok) {
-        //     const data = await response.json();
-        //     localStorage.setItem("token", data.token); // Store the JWT token
-        //     props.login(Username, Password); // Call the login function passed via props
-        //   } else {
-        //     const errorData = await response.json();
-        //     setErrors({ form: errorData.message });
-        //   }
-        // } catch (error) {
-        //   setErrors({ form: "An error occurred. Please try again." });
-        // } finally {
-        //   setLoading(false);
-        // }
-        // props.login(Username, Password);
         await Auth.logIn({Username, Password});
       }
     };
@@ -307,7 +284,88 @@ export default function CustomModal(props) {
     const [option, setOption] = useState(0);
     const [isClose, setIsClose] = useState(false);
     const [serverStatus, setServerStatus] = useState(false);
+    const [previewStatus, setPreviewStatus] = useState(false);
+    const [infoLog, setInfoLog] = useState([]);
+    const handleStream = async (status) => {
+      let info = [];
+      if (status === "start") {
+         console.log("Start");
+         StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+          if (res.streamStatus === StreamStatus.FINISHED) {
+            console.log("finished case");
+            info.push(`${new Date().toLocaleString()}: ` + "You need to re-save your stream description in order to start a new stream" + "\n");
+          }
+          else if(res.streamStatus === StreamStatus.UNFINISHED) {
+            if(res.isLive) {
+              info.push(`${new Date().toLocaleString()}: ` + "You are already streaming" + "\n");
+            }
+            else {
+              
+              if(!previewStatus) {
+                info.push(`${new Date().toLocaleString()}: ` + "Preview stream first" + "\n");
+              }
+              else {
+                const data = {
+                  streamId: res.streamId,
+                  streamTitle: res.streamTitle,
+                  streamDesc: res.streamDesc,
+                  streamCategoryId: res.streamCategories[0].categoryId,
+                  streamTagIds: res.streamTags.map((tag) => tag.tagId),
+                  isLive: true,
+                }
+                
+                StreamRoutes.updateStream(res.streamId, data).then((res1) => {
+                  info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
+                  info.push(`${new Date().toLocaleString()}: ` + "Stream starting" + "\n");
+                  SignalRTest.start(userGlobal.UserName);
+                  setServerStatus(true);
+                });
+              }
+            }
+          }
+          else {
+            info.push(`${new Date().toLocaleString()}: ` + "Wut de hell??? start" + "\n");
+          }
+         });
+      } else if (status === "stop") {
+        console.log("Stop");
+        StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+          if (res.streamStatus === StreamStatus.FINISHED) {
+            info.push(`${new Date().toLocaleString()}: ` + "Stopped" + "\n") ;
+          }
+          else if(res.streamStatus === StreamStatus.UNFINISHED) {
+            if(res.isLive) {
+              const data = {
+                streamId: res.streamId,
+                streamTitle: res.streamTitle,
+                streamDesc: res.streamDesc,
+                streamCategoryId: res.streamCategories[0].categoryId,
+                streamTagIds: res.streamTags.map((tag) => tag.tagId),
+                isLive: false,
+                streamStatus: StreamStatus.FINISHED,
+              }
+              StreamRoutes.updateStream(res.streamId, data).then((res1) => {
+                info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
+                info.push(`${new Date().toLocaleString()}: ` + "Stream stopping" + "\n");
+                SignalRTest.stop();
+                setServerStatus(false);
+                setPreviewStatus(false);
+                document.getElementById('offline_label').style.display = 'block';
+              });
+            }
+            else {
+              info.push(`${new Date().toLocaleString()}: ` + "You are not streaming");
+            }
+          }
+          else {
+            info.push(`${new Date().toLocaleString()}: ` + "Wut de hell??? stop");
+          }
+         });
+      }
+      setInfoLog(info);
+    }
     
+    // console.log(localStorage.getItem("streamId"));
     return (
       <>
         <div className="modal__layout bg__color-2">
@@ -341,40 +399,36 @@ export default function CustomModal(props) {
                       Stream Status
                     </span>
                     <pre className="str__status bg__color-00 def-pad-1 citizenship">
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                      Iure eum maiores quae et nesciunt ipsam explicabo quia,
-                      odit, commodi voluptatem ea quos nostrum alias expedita
-                      velit doloremque perferendis soluta vitae!
+                      {infoLog.map((log, index) => (
+                        <span key={index}>{log}</span>
+                      ))}
                     </pre>
                     <div className="fill__container rr__flex-row rrf__col-small">
                       {serverStatus ? 
                       <>
                         <Button type="default" text={"Stop"} onClick={() => {
-                          SignalRTest.stop();
-                          setServerStatus(false);
-                          document.getElementById('offline_label').style.display = 'block';
+                          
+                            handleStream("stop");
+                          
                         }}/>
                       </> : 
                       <>
                       <Button type="default" text={"Preview Stream"} onClick={() => {
-                        
+                        setPreviewStatus(true);
                         SignalRTest.preview();
                         document.getElementById('offline_label').style.display = 'none';
                         
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
                         
-                        SignalRTest.start(userGlobal.UserName);
-                        
-                        setServerStatus(true);
-                        console.log("Status: " + serverStatus);
+                          handleStream("start");
                         //truyền context.username vào đây
                         
                       }}/>
                       </>}
                       
                     </div>
-                  </>
+                    </>
                 ) : (
                   <>
                     <span className="fs__normal-3 league-spartan-regular citizenship fill__container ta__center">
@@ -520,8 +574,8 @@ export default function CustomModal(props) {
       setInfo([...info, newInfo].filter((value, index, self) => self.indexOf(value) === index)); //remove duplicate
     }
     //create or update stream
-    const handleStreamCreate = () => {
-        const inputTagListCheck = () => {
+    const handleStreamCreate = async () => {
+       
           console.log("inputtagcheck");
           let tagIdList = [];
           const inputTagsList = inputTagStandAlone.split(",")
@@ -530,21 +584,23 @@ export default function CustomModal(props) {
           .filter((name, index, self) => self.indexOf(name) === index);
           //ex: ["tag1", "tag2", "tag3"]
           const filterTagList = tagDataList.map((tag) => tag.tagName); //ex: ["tag1", "tag2", "tag3"]
-          inputTagsList.forEach((tag) => {
-            if(filterTagList.indexOf(tag) > -1) {
+          const createTagPromises = inputTagsList.map((tag) => {
+            if (filterTagList.indexOf(tag) > -1) {
               const neededtagId = tagDataList.filter((tagData) => tagData.tagName === tag)[0].tagId;
-              tagIdList.push(neededtagId); //tag existed
-            }
-            else{ //tag doesn't exist
-              TagRoutes.createTag({tagName: tag}).then((res) => {
+              tagIdList.push(neededtagId); // tag existed
+              return Promise.resolve(); // Return a resolved promise for existing tags
+            } else { // tag doesn't exist
+              return TagRoutes.createTag({ tagName: tag }).then((res) => {
                 tagIdList.push(Number(res));
               });
             }
           });
-          return tagIdList;
-        }
+        
+          // Wait for all promises to resolve
+          await Promise.all(createTagPromises);
+          
         try{
-          const tagListTemp = inputTagListCheck();
+          const tagListTemp = tagIdList;
           console.log(tagListTemp);
           console.log(prevStreamData);
           // console.log("TagListTemp: ", tagListTemp);
@@ -596,6 +652,7 @@ export default function CustomModal(props) {
               streamCategoryId: selectedCategory.categoryId,
               streamTagIds: tagListTemp,
             }
+            // console.log("update data: " + JSON.stringify(data));
             StreamRoutes.updateStream(prevStreamData.streamId, data).then((res) => {
               StreamRoutes.getStreamById(prevStreamData.streamId).then((res) => {
                 setPrevStreamData(res);
