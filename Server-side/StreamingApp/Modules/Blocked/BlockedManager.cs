@@ -11,20 +11,6 @@ namespace StreamingApp.Managers
             _context = context;
         }
 
-        public async Task<(bool Succeeded, string[] Errors)> BlockUser(int channelId, int userId)
-        {
-            var blocked = new Blocked
-            {
-                ChannelId = channelId,
-                BlockedId = userId
-            };
-
-            _context.Blockeds.Add(blocked);
-            await _context.SaveChangesAsync();
-
-            return (true, Array.Empty<string>());
-        }
-
         public async Task<Blocked[]> GetBlockedByChannelIdAsync(int channelId)
         {
             return await _context.Blockeds.Where(b => b.ChannelId == channelId).ToArrayAsync();
@@ -40,6 +26,20 @@ namespace StreamingApp.Managers
             return await _context.Blockeds.FirstOrDefaultAsync(b => b.ChannelId == blockedId);
         }
 
+        public async Task<(bool Succeeded, string[] Errors)> BlockUser(int channelId, int userId)
+        {
+            var blocked = new Blocked
+            {
+                ChannelId = channelId,
+                BlockedId = userId
+            };
+
+            _context.Blockeds.Add(blocked);
+            await _context.SaveChangesAsync();
+
+            return (true, Array.Empty<string>());
+        }
+
         public async Task<(bool Succeeded, string[] Errors)> UnblockUser(int channelId, int userId)
         {
             var blocked = await _context.Blockeds.FirstOrDefaultAsync(b => b.ChannelId == channelId && b.BlockedId == userId);
@@ -53,6 +53,10 @@ namespace StreamingApp.Managers
             await _context.SaveChangesAsync();
 
             return (true, Array.Empty<string>());
+        }
+
+        public async Task<bool> IsBlocked(int channelId, int userId) {
+            return await _context.Blockeds.AnyAsync(b => b.ChannelId == channelId && b.BlockedId == userId);
         }
     }
 }

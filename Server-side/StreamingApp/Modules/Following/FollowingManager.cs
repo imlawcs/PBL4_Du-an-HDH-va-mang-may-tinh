@@ -10,6 +10,16 @@ namespace StreamingApp.Managers
             this.dbContext = dbContext;
         }
 
+        public async Task<Following[]> GetFollowingsByChannelIdAsync(int channelId) {
+            return await dbContext.Followings
+                .Where(f => f.ChannelId == channelId)
+                .ToArrayAsync();
+        }
+
+        public async Task<Following[]> GetAllFollowings() {
+            return await dbContext.Followings.ToArrayAsync();
+        }
+
         public async Task<(bool Succeeded, string[] Errors)> FollowUser(int followerId, int channelId) {
             var following = new Following {
                 FollowerId = followerId,
@@ -20,22 +30,6 @@ namespace StreamingApp.Managers
             await dbContext.SaveChangesAsync();
 
             return (true, Array.Empty<string>());
-        }
-
-        // public async Task<Following[]> GetFollowingsByIdAsync(int followerId) {
-        //     return await dbContext.Followings
-        //         .Where(f => f.FollowerId == followerId)
-        //         .ToArrayAsync();
-        // }
-
-        public async Task<Following[]> GetFollowingsByChannelIdAsync(int channelId) {
-            return await dbContext.Followings
-                .Where(f => f.ChannelId == channelId)
-                .ToArrayAsync();
-        }
-
-        public async Task<Following[]> GetAllFollowings() {
-            return await dbContext.Followings.ToArrayAsync();
         }
 
         public async Task<(bool Succeeded, string[] Errors)> UnfollowUser(int followerId, int channelId) {
@@ -51,6 +45,11 @@ namespace StreamingApp.Managers
             await dbContext.SaveChangesAsync();
 
             return (true, Array.Empty<string>());
+        }
+
+        public async Task<bool> IsFollowing(int followerId, int channelId) {
+            return await dbContext.Followings
+                .AnyAsync(f => f.FollowerId == followerId && f.ChannelId == channelId);
         }
     }
 }

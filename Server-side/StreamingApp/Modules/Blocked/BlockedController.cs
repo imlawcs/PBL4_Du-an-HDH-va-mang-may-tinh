@@ -8,16 +8,21 @@ namespace StreamingApp.Controllers
     [Route("api/[controller]")]
     public class BlockedController : ControllerBase {
         private readonly IBlockedService _blockedService;
+        private readonly IUserService userService;
 
-        public BlockedController(IBlockedService blockedService)
+        public BlockedController(IBlockedService blockedService, IUserService userService)
         {
             _blockedService = blockedService;
+            this.userService = userService;
         }
 
         [HttpGet("{channelId}")]
         public async Task<IActionResult> GetBlockedByChannelId(int channelId)
         {
             var result = await _blockedService.GetBlockedByChannelIdAsync(channelId);
+            if(result.Length == 0) {
+                return NotFound("Channel has no blocking user");
+            }
 
             return Ok(result);
         }
@@ -26,14 +31,9 @@ namespace StreamingApp.Controllers
         public async Task<IActionResult> GetAllBlocked()
         {
             var result = await _blockedService.GetAllBlocked();
-
-            return Ok(result);
-        }
-
-        [HttpGet("blocked/{blockedId}")]
-        public async Task<IActionResult> GetBlockedById(int blockedId)
-        {
-            var result = await _blockedService.GetBlockedByIdAsync(blockedId);
+            if(result.Length == 0) {
+                return NotFound("Blocked User not found");
+            }
 
             return Ok(result);
         }
@@ -41,6 +41,16 @@ namespace StreamingApp.Controllers
         [HttpPost("unblock")]
         public async Task<IActionResult> UnblockUser([FromBody] BlockDTO blockDTO)
         {
+            var channelExist = await userService.GetUserByIdAsync(blockDTO.ChannelId);
+            var userExist = await userService.GetUserByIdAsync(blockDTO.UserId);
+            if(channelExist == null || userExist == null) {
+                return NotFound("User not found");
+            }
+
+            bool isBlocked = await _blockedService.IsBlocked(blockDTO.ChannelId, blockDTO.UserId);
+            if(!isBlocked) {
+                return BadRequest("User is not blocked");
+            }
             var result = await _blockedService.UnblockUser(blockDTO.ChannelId, blockDTO.UserId);
 
             if (!result.Succeeded)
@@ -48,12 +58,23 @@ namespace StreamingApp.Controllers
                 return BadRequest(result.Errors);
             }
 
-            return Ok();
+            return Ok("Unblock successfully");
         }
 
         [HttpPost("block")]
         public async Task<IActionResult> BlockUser([FromBody] BlockDTO blockDTO)
         {
+            var channelExist = await userService.GetUserByIdAsync(blockDTO.ChannelId);
+            var userExist = await userService.GetUserByIdAsync(blockDTO.UserId);
+            if(channelExist == null || userExist == null) {
+                return NotFound("User not found");
+            }
+
+            bool isBlocked = await _blockedService.IsBlocked(blockDTO.ChannelId, blockDTO.UserId);
+            if(isBlocked) {
+                return BadRequest("User is already blocked");
+            }
+
             var result = await _blockedService.BlockUser(blockDTO.ChannelId, blockDTO.UserId);
 
             if (!result.Succeeded)
@@ -61,7 +82,7 @@ namespace StreamingApp.Controllers
                 return BadRequest(result.Errors);
             }
 
-            return Ok();
+            return Ok("Block successfully");
         }
     }
 }

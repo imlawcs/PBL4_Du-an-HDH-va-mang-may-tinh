@@ -9,10 +9,6 @@ namespace StreamingApp.Services {
             this.followingManager = followingManager ?? throw new ArgumentNullException(nameof(followingManager));
         }
 
-        // public Task<Following[]> GetFollowingByFollowerIdAsync(int followerId) {
-        //     return followingManager.GetFollowingsByFollowerIdAsync(followerId);
-        // }
-
         public Task<Following[]> GetFollowingByChannelIdAsync(int channelId) {
             return followingManager.GetFollowingsByChannelIdAsync(channelId);
         }
@@ -27,6 +23,10 @@ namespace StreamingApp.Services {
 
         public Task<(bool Succeeded, string[] Errors)> UnfollowUser(int followerId, int channelId) {
             return followingManager.UnfollowUser(followerId, channelId);
+        }
+
+        public Task<bool> IsFollowing(int followerId, int channelId) {
+            return followingManager.IsFollowing(followerId, channelId);
         }
     }
 }
