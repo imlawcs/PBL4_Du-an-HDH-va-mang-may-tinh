@@ -39,7 +39,7 @@ import { TagRoutes } from "../API/Tag.routes";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
-  //   const navigate = useNavigate();
+    const navigate = useNavigate();
   const [option, setOption] = useState(0);
   if (props.routing == "SM") {
     const [isOffline, setOffline] = useState(true);
@@ -324,12 +324,30 @@ export default function Sidebar(props) {
       </>
     );
   } else if (props.routing == "index") {
-    const LazyVideoContent = lazy(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve(import("./VideoContent")), 200)
-        )
-    );
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(async () => {
+      const fetchData = 
+        await StreamRoutes.getAllStreams().then((res) => {
+          setStreamList(res.filter((item) => item.isLive === true));
+          return Promise.resolve();
+        });
+      const fetchTags = await TagRoutes.getAllTags().then((res) => {
+        setTagList(res);
+        return Promise.resolve();
+      })
+      const fetchCategories = await CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+        return Promise.resolve();
+      });
+
+        Promise.all([fetchData, fetchTags, fetchCategories]).then(() => {
+          setLoading(false);
+        });
+        
+    }, [])
     return (
       <div className="main__position">
         <div className="sidebar bg__color-2 rr__flex-row">
@@ -347,49 +365,7 @@ export default function Sidebar(props) {
             </div>
             <div className="sh__content-holder rr__flex-row">
               {/* map stream here */}
-              <Suspense
-                fallback={
-                  <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                    Loading...
-                  </div>
-                }
-              >
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-              </Suspense>
+              
             </div>
             <div className="btn__holder">
               <div className="sepe__line"></div>
@@ -406,50 +382,34 @@ export default function Sidebar(props) {
               Livestream you may like
             </div>
             <div className="sh__content-holder rr__flex-row">
+              {loading?
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                Loading...
+              </span>
+              :
+              <>
+               {streamList.map((content, index) => (
+                <VideoContent
+                  key={index}
+                  title={content.streamTitle}
+                  thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                  profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                  displayName={content.user.DisplayName}
+                  category={categoryList.filter((item) => item.CategoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                  tag={tagList.filter((item) => content.streamTags.includes(item.tagId))}
+                  userName={content.user.UserName}
+                  onClick={() => {
+                    navigate(`/user/${content.user.UserName}`);
+                  }}
+                  navigateCategory={() => {
+                    navigate(`/category/${content.streamCategories[0].categoryId}`);
+                  }}
+                />
+               ))}
+              </>
+              }
               {/* map stream here */}
-              <Suspense
-                fallback={
-                  <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                    Loading...
-                  </div>
-                }
-              >
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-              </Suspense>
+              
             </div>
             <div className="btn__holder">
               <div className="sepe__line"></div>

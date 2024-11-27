@@ -11,6 +11,7 @@ export default function VideoContent(props) {
             style={{
               backgroundImage: `url(${props.thumbnail})`,
             }}
+            onClick={props.onClick}
           >
             <div className="live__tag league-spartan-regular fs__normal-1">
               LIVE
@@ -21,7 +22,9 @@ export default function VideoContent(props) {
               <div className="league-spartan-bold fs__normal-3 citizenship vc__username">
                 {props.userName}
               </div>
-              <div className="vc__category league-spartan-semibold fs__normal-1 citizenship">
+              <div className="vc__category league-spartan-semibold fs__normal-1 citizenship"
+                onClick={props.navigateCategory}
+              >
                 {props.category}
               </div>
               <div className="fs__normal-1 league-spartan-light citizenship">
@@ -31,9 +34,9 @@ export default function VideoContent(props) {
                 {props.title}
               </div>
               <div className="tag__holder rr__flex-row">
-                <TagCard name="English" />
-                <TagCard name="Vietnamese" />
-                <TagCard name="RPG" />
+              {props.tags.map((tag, index) => (
+                <TagCard key={index} name={tag.tagName} id={tag.tagId}/>
+              ))}
               </div>
             </div>
           </div>
@@ -43,7 +46,7 @@ export default function VideoContent(props) {
   } else {
   }
   return (
-    <div className="vc__holder">
+    <div className="vc__holder" onClick={props.onClick}>
       <div
         className="thumbnail"
         style={{
@@ -65,15 +68,17 @@ export default function VideoContent(props) {
             <div className="vc__username league-spartan-light fs__small-3 citizenship">
               {props.userName}
             </div>
-            <div className="vc__category league-spartan-light fs__small-3 citizenship">
+            <div className="vc__category league-spartan-light fs__small-3 citizenship"
+              onClick={props.navigateCategory}
+            >
               {props.category}
             </div>
           </div>
         </div>
         <div className="tag__holder rr__flex-row">
-          <TagCard name="English" />
-          <TagCard name="Vietnamese" />
-          <TagCard name="RPG" />
+          {props.tags.map((tag, index) => (
+            <TagCard key={index} name={tag.tagName} id={tag.tagId}/>
+          ))}
         </div>
       </div>
     </div>
