@@ -11,6 +11,9 @@ export default defineConfig({
       cert: fs.readFileSync(path.resolve(__dirname, "certs/localhost.pem")),
     },
     host: true,
-  }
+  },
+  // esbuild: {
+  //   drop: ['console', 'debugger'],
+  // },
   
 })

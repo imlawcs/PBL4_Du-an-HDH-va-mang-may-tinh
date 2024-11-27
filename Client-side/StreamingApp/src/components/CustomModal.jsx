@@ -29,7 +29,7 @@ import { TagRoutes } from "../API/Tag.routes";
 import { CategoryRoutes } from "../API/Category.routes";
 import CustomDatalist from "./CustomDatalist";
 import TagCard from "./TagCard";
-import { StreamRoutes, StreamStatus } from "../API/Stream.route";
+import { isEmpty, StreamRoutes, StreamStatus } from "../API/Stream.route";
 
 
 export default function CustomModal(props) {
@@ -63,29 +63,6 @@ export default function CustomModal(props) {
 
     const handleLogin = async () => {
       if (validateForm()) {
-        // try {
-        //   const response = await fetch("https://localhost:3001/api/auth/login", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({ Username, Password }),
-        //   });
-
-        //   if (response.ok) {
-        //     const data = await response.json();
-        //     localStorage.setItem("token", data.token); // Store the JWT token
-        //     props.login(Username, Password); // Call the login function passed via props
-        //   } else {
-        //     const errorData = await response.json();
-        //     setErrors({ form: errorData.message });
-        //   }
-        // } catch (error) {
-        //   setErrors({ form: "An error occurred. Please try again." });
-        // } finally {
-        //   setLoading(false);
-        // }
-        // props.login(Username, Password);
         await Auth.logIn({Username, Password});
       }
     };
@@ -307,7 +284,88 @@ export default function CustomModal(props) {
     const [option, setOption] = useState(0);
     const [isClose, setIsClose] = useState(false);
     const [serverStatus, setServerStatus] = useState(false);
+    const [previewStatus, setPreviewStatus] = useState(false);
+    const [infoLog, setInfoLog] = useState([]);
+    const handleStream = async (status) => {
+      let info = [];
+      if (status === "start") {
+         console.log("Start");
+         StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+          if (res.streamStatus === StreamStatus.FINISHED) {
+            console.log("finished case");
+            info.push(`${new Date().toLocaleString()}: ` + "You need to re-save your stream description in order to start a new stream" + "\n");
+          }
+          else if(res.streamStatus === StreamStatus.UNFINISHED) {
+            if(res.isLive) {
+              info.push(`${new Date().toLocaleString()}: ` + "You are already streaming" + "\n");
+            }
+            else {
+              
+              if(!previewStatus) {
+                info.push(`${new Date().toLocaleString()}: ` + "Preview stream first" + "\n");
+              }
+              else {
+                const data = {
+                  streamId: res.streamId,
+                  streamTitle: res.streamTitle,
+                  streamDesc: res.streamDesc,
+                  streamCategoryId: res.streamCategories[0].categoryId,
+                  streamTagIds: res.streamTags.map((tag) => tag.tagId),
+                  isLive: true,
+                }
+                
+                StreamRoutes.updateStream(res.streamId, data).then((res1) => {
+                  info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
+                  info.push(`${new Date().toLocaleString()}: ` + "Stream starting" + "\n");
+                  SignalRTest.start(userGlobal.UserName);
+                  setServerStatus(true);
+                });
+              }
+            }
+          }
+          else {
+            info.push(`${new Date().toLocaleString()}: ` + "Wut de hell??? start" + "\n");
+          }
+         });
+      } else if (status === "stop") {
+        console.log("Stop");
+        StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+          if (res.streamStatus === StreamStatus.FINISHED) {
+            info.push(`${new Date().toLocaleString()}: ` + "Stopped" + "\n") ;
+          }
+          else if(res.streamStatus === StreamStatus.UNFINISHED) {
+            if(res.isLive) {
+              const data = {
+                streamId: res.streamId,
+                streamTitle: res.streamTitle,
+                streamDesc: res.streamDesc,
+                streamCategoryId: res.streamCategories[0].categoryId,
+                streamTagIds: res.streamTags.map((tag) => tag.tagId),
+                isLive: false,
+                streamStatus: StreamStatus.FINISHED,
+              }
+              StreamRoutes.updateStream(res.streamId, data).then((res1) => {
+                info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
+                info.push(`${new Date().toLocaleString()}: ` + "Stream stopping" + "\n");
+                SignalRTest.stop();
+                setServerStatus(false);
+                setPreviewStatus(false);
+                document.getElementById('offline_label').style.display = 'block';
+              });
+            }
+            else {
+              info.push(`${new Date().toLocaleString()}: ` + "You are not streaming");
+            }
+          }
+          else {
+            info.push(`${new Date().toLocaleString()}: ` + "Wut de hell??? stop");
+          }
+         });
+      }
+      setInfoLog(info);
+    }
     
+    // console.log(localStorage.getItem("streamId"));
     return (
       <>
         <div className="modal__layout bg__color-2">
@@ -341,40 +399,36 @@ export default function CustomModal(props) {
                       Stream Status
                     </span>
                     <pre className="str__status bg__color-00 def-pad-1 citizenship">
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                      Iure eum maiores quae et nesciunt ipsam explicabo quia,
-                      odit, commodi voluptatem ea quos nostrum alias expedita
-                      velit doloremque perferendis soluta vitae!
+                      {infoLog.map((log, index) => (
+                        <span key={index}>{log}</span>
+                      ))}
                     </pre>
                     <div className="fill__container rr__flex-row rrf__col-small">
                       {serverStatus ? 
                       <>
                         <Button type="default" text={"Stop"} onClick={() => {
-                          SignalRTest.stop();
-                          setServerStatus(false);
-                          document.getElementById('offline_label').style.display = 'block';
+                          
+                            handleStream("stop");
+                          
                         }}/>
                       </> : 
                       <>
                       <Button type="default" text={"Preview Stream"} onClick={() => {
-                        
+                        setPreviewStatus(true);
                         SignalRTest.preview();
                         document.getElementById('offline_label').style.display = 'none';
                         
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
                         
-                        SignalRTest.start(userGlobal.UserName);
-                        
-                        setServerStatus(true);
-                        console.log("Status: " + serverStatus);
+                          handleStream("start");
                         //truyền context.username vào đây
                         
                       }}/>
                       </>}
                       
                     </div>
-                  </>
+                    </>
                 ) : (
                   <>
                     <span className="fs__normal-3 league-spartan-regular citizenship fill__container ta__center">
@@ -396,12 +450,10 @@ export default function CustomModal(props) {
     //input value
     const [title, setTitle] = useState("");
     const [inputCategory, setInputCategory] = useState("");
-    const [inputTag, setInputTag] = useState("");
     const [inputTagStandAlone, setInputTagStandAlone] = useState("");
     const [inputDesc, setInputDesc] = useState("");
     //data for stream submit
     const [selectedCategory, setSelectedCategory] = useState({});
-    const [inputTagList, setInputTagList] = useState([]);
     //string handling
     //input ref
     const cateRef = useRef(null);
@@ -415,9 +467,12 @@ export default function CustomModal(props) {
     const [info, setInfo] = useState([]);
     //fetch data
     useEffect(() => {
+      let tempStandAloneList = [];
+      let tempDataList = [];
       const fetchData = async () => {
         try {
           await TagRoutes.getAllTags().then((res) => {
+            tempDataList.push(...res);
             setTagDataList(res || []);
           });
           await CategoryRoutes.getAllCategories().then((res) => {
@@ -426,26 +481,29 @@ export default function CustomModal(props) {
           await StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
             console.log("Prev Stream Data: ", res);
             setPrevStreamData(res || {});
+              setTitle(res.streamTitle || "");
+              setInputDesc(res.streamDesc, "");
+              CategoryRoutes.getCategoryById(res.streamCategories[0].categoryId).then((res1) => {
+                setInputCategory(res1.categoryName || "");
+                setSelectedCategory({
+                  categoryId: res1.categoryId,
+                  categoryName: res1.categoryName
+                } || {});
+              });
+              const tempTagList = res.streamTags.map((tag) => tag.tagId) || [];
+              console.log(tempDataList);
+              tempDataList.forEach((tag) => {
+                if(tempTagList.indexOf(tag.tagId) > -1) tempStandAloneList.push(tag.tagName);
+              });
+              console.log("TempStandAloneList: ", tempStandAloneList);
+              handleTagsLoading(tempStandAloneList);
           });
         } catch (error) {
           console.error("Error fetching data:", error);
         }
       };
+      console.log("Userglobal: "+ JSON.stringify(userGlobal));
       fetchData();
-      console.log("Prev Stream Data: ", prevStreamData);
-      if(prevStreamData.length > 0) {
-        setTitle(prevStreamData.StreamTitle || "");
-        setInputDesc(prevStreamData.StreamDesc, "");
-        CategoryRoutes.getCategoryById(prevStreamData.streamCategories[0]).then((res) => {
-          setInputCategory(res.categoryName || "");
-          setSelectedCategory({
-            categoryId: res.categoryId,
-            categoryName: res.categoryName
-          } || {});
-        });
-        setInputTagList(prevStreamData.streamTags.map((tag) => tag.tagId) || []);
-        setInputTagStandAlone(inputTagList.map((tagId) => tagDataList.filter((tag) => tag.tagId === tagId)[0].tagName).join(", ") || "");
-      }
     }, [])
     //datalist position
     useEffect(() => {
@@ -459,13 +517,20 @@ export default function CustomModal(props) {
       }
       
     }, [focus]);
-    //debug useEffect
+    // debug useEffect
     useEffect(() => {
-      console.log("TagDataList: ", inputTagList);
-    }, [inputTagList])
-
+      console.log("TagDataList: ", tagDataList);
+    }, [tagDataList]);
+    
 
     //handle selecting value
+    const handleTagsLoading = (data) => {
+      console.log("Data: ", data);
+      console.log("Data: ", data.length);
+      const stringdata = data.join(", ");
+      console.log("StringData: ", stringdata);
+      setInputTagStandAlone(stringdata || "");
+    }
     const handleSelectCategory = (value, id) => {
       console.log("Selected:", value, id);
       setInputCategory(value);
@@ -478,7 +543,7 @@ export default function CustomModal(props) {
     const handleSelectTag = (value, id) => {
       console.log("Selected:", value, id);
       setInputTagStandAlone(inputTagStandAlone + value);
-      setInputTag(value);
+      // setInputTag(value);
       // setSelectedCategory(id);
       setFocus(0);
     }
@@ -509,23 +574,36 @@ export default function CustomModal(props) {
       setInfo([...info, newInfo].filter((value, index, self) => self.indexOf(value) === index)); //remove duplicate
     }
     //create or update stream
-    const handleStreamCreate = () => {
-        const inputTagListCheck = () => {
-          const tagIdList = [];
-          tagDataList.forEach((tag) => {
-            if(inputTagList.includes(tag.tagName)) {
-              tagIdList.push(tag.tagId); //tag existed
-            }
-            else{ //tag doesn't exist
-              TagRoutes.createTag(tag.tagName).then((res) => {
-                tagIdList.push(res);
+    const handleStreamCreate = async () => {
+       
+          console.log("inputtagcheck");
+          let tagIdList = [];
+          const inputTagsList = inputTagStandAlone.split(",")
+          .map((value) => value.trim())
+          .filter((value) => value !== "")
+          .filter((name, index, self) => self.indexOf(name) === index);
+          //ex: ["tag1", "tag2", "tag3"]
+          const filterTagList = tagDataList.map((tag) => tag.tagName); //ex: ["tag1", "tag2", "tag3"]
+          const createTagPromises = inputTagsList.map((tag) => {
+            if (filterTagList.indexOf(tag) > -1) {
+              const neededtagId = tagDataList.filter((tagData) => tagData.tagName === tag)[0].tagId;
+              tagIdList.push(neededtagId); // tag existed
+              return Promise.resolve(); // Return a resolved promise for existing tags
+            } else { // tag doesn't exist
+              return TagRoutes.createTag({ tagName: tag }).then((res) => {
+                tagIdList.push(Number(res));
               });
             }
-            return tagIdList;
           });
-        }
+        
+          // Wait for all promises to resolve
+          await Promise.all(createTagPromises);
+          
         try{
-          const tagListTemp = inputTagListCheck();
+          const tagListTemp = tagIdList;
+          console.log(tagListTemp);
+          console.log(prevStreamData);
+          // console.log("TagListTemp: ", tagListTemp);
           //body data
           const data = {
             UserId: userGlobal.UserId,
@@ -536,7 +614,10 @@ export default function CustomModal(props) {
             streamStatus: StreamStatus.UNFINISHED,
           }
           //create stream
-          if(prevStreamData.streamStatus == StreamStatus.FINISHED || prevStreamData == {}) {
+          console.log(data);
+          console.log(prevStreamData);
+          if(isEmpty(prevStreamData)) {
+            console.log("Create stream 1");
             StreamRoutes.createStream(data).then((res) => {
               console.log(res);
               //reset prevStreamData
@@ -547,16 +628,31 @@ export default function CustomModal(props) {
               localStorage.setItem("streamId", res);
             });
           }
-          else {
+          else
+          if(prevStreamData.streamStatus === StreamStatus.FINISHED) {
+            console.log("Create stream 2");
+            StreamRoutes.createStream(data).then((res) => {
+              console.log(res);
+              //reset prevStreamData
+              StreamRoutes.getStreamById(res).then((res1) => {
+                console.log(res1);
+                setPrevStreamData(res1);
+              });
+              localStorage.setItem("streamId", res);
+            });
+          }
+          else if(prevStreamData.streamStatus === StreamStatus.UNFINISHED) {
             //update stream
+            console.log("Update stream");
             const data = {
               streamId: prevStreamData.streamId,
-              UserId: userGlobal.UserId,
-              StreamTitle: title,
-              StreamDesc: inputDesc,
+              // UserId: userGlobal.UserId,
+              streamTitle: title,
+              streamDesc: inputDesc,
               streamCategoryId: selectedCategory.categoryId,
               streamTagIds: tagListTemp,
             }
+            // console.log("update data: " + JSON.stringify(data));
             StreamRoutes.updateStream(prevStreamData.streamId, data).then((res) => {
               StreamRoutes.getStreamById(prevStreamData.streamId).then((res) => {
                 setPrevStreamData(res);
@@ -564,6 +660,7 @@ export default function CustomModal(props) {
               infoLog(res);
             });
           }
+          else console.error("Stream status error");
         }
         catch(error){
           console.error("Error creating stream: ", error);
@@ -590,6 +687,8 @@ export default function CustomModal(props) {
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Enter title here..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 onFocus={() => {
                   setError([]);
                   setInfo([]);
@@ -782,9 +881,14 @@ export default function CustomModal(props) {
                     {err}
                   </span>
                 ))}
-                
               </div>
-              
+              <div className="rr__flex-col">
+                {info.map((inf, index) => (
+                  <span className="league-spartan-semibold fs__normal-1 rr__color-secondary" key={index}>
+                    {inf}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className="rr__flex-row-reverse">
               <Button type="default" text="Save" onClick={() => {
@@ -794,6 +898,10 @@ export default function CustomModal(props) {
                 if(!check) return;
                 handleStreamCreate();
               }} />
+              {/* <Button type="default" text="Test" onClick={() => {
+                console.log(prevStreamData);
+                console.log("title: " + title);
+              }}/> */}
             </div>
           </div>
         </div>
@@ -909,6 +1017,7 @@ export default function CustomModal(props) {
                   setUpdate(res);
                 });
             }} />
+            
             <span className="league-spartan-regular fs__normal-1 citizenship">
               {update}
             </span>
@@ -937,6 +1046,7 @@ export default function CustomModal(props) {
                 props.update(value, props.updateLabel);
               }} />
               <Button type="default" text="Cancel" onClick={props.offModal} />
+
             </div>
             </div>
           </div>
