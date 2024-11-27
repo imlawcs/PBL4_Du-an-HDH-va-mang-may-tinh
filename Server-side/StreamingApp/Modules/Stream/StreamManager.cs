@@ -42,15 +42,15 @@ namespace StreamingApp.Managers
             return true;
         }
 
-        public async Task<(bool Succeeded, string[] Errors)> CreateStreamAsync(Models.Entities.Stream stream) {
+        public async Task<(bool Succeeded, string[] Errors, Models.Entities.Stream? Stream)> CreateStreamAsync(Models.Entities.Stream stream) {
             var user = await _userManager.GetUserById(stream.UserId);
             if (user == null) {
-                return (false, new []{"User not found"});
+                return (false, new []{"User not found"}, null);
             }
 
             _context.Streams.Add(stream);
             await _context.SaveChangesAsync();
-            return (true, new []{"Create stream successfully"});
+            return (true, new []{"Create stream successfully"}, stream);
         }
 
         public async Task<(bool Succeeded, string[] Errors)> UpdateStreamAsync(Models.Entities.Stream stream) {
@@ -62,6 +62,7 @@ namespace StreamingApp.Managers
             streamToUpdate.StreamTitle = stream.StreamTitle;
             streamToUpdate.StreamDesc= stream.StreamDesc;
             streamToUpdate.IsLive = stream.IsLive;
+            streamToUpdate.StreamStatus = stream.StreamStatus;
 
             await _context.SaveChangesAsync();
             return (true, new [] {"Update stream successfully"});

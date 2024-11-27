@@ -39,7 +39,7 @@ namespace StreamingApp
             {
                 options.AddPolicy("ClientPermission", policy =>
                 {
-                    policy.WithOrigins(Configuration["ClientSide:Url"])
+                    policy.WithOrigins(Configuration["ClientSide:Url"], "https://localhost:5173")
                         .SetIsOriginAllowedToAllowWildcardSubdomains()
                         .AllowAnyHeader()
                         .AllowAnyMethod()

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "./Button";
 import "../assets/css/CustomModal.css";
 import "../assets/css/NavBar.css";
@@ -14,6 +14,7 @@ import {
   faCross,
   faVideo,
   faTrash,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebook,
@@ -24,6 +25,11 @@ import {
 import { useAuth } from "../hooks/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { UserRoutes } from "../API/User.routes";
+import { TagRoutes } from "../API/Tag.routes";
+import { CategoryRoutes } from "../API/Category.routes";
+import CustomDatalist from "./CustomDatalist";
+import TagCard from "./TagCard";
+import { isEmpty, StreamRoutes, StreamStatus } from "../API/Stream.route";
 
 
 export default function CustomModal(props) {
@@ -57,29 +63,6 @@ export default function CustomModal(props) {
 
     const handleLogin = async () => {
       if (validateForm()) {
-        // try {
-        //   const response = await fetch("https://localhost:3001/api/auth/login", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({ Username, Password }),
-        //   });
-
-        //   if (response.ok) {
-        //     const data = await response.json();
-        //     localStorage.setItem("token", data.token); // Store the JWT token
-        //     props.login(Username, Password); // Call the login function passed via props
-        //   } else {
-        //     const errorData = await response.json();
-        //     setErrors({ form: errorData.message });
-        //   }
-        // } catch (error) {
-        //   setErrors({ form: "An error occurred. Please try again." });
-        // } finally {
-        //   setLoading(false);
-        // }
-        // props.login(Username, Password);
         await Auth.logIn({Username, Password});
       }
     };
@@ -301,7 +284,88 @@ export default function CustomModal(props) {
     const [option, setOption] = useState(0);
     const [isClose, setIsClose] = useState(false);
     const [serverStatus, setServerStatus] = useState(false);
+    const [previewStatus, setPreviewStatus] = useState(false);
+    const [infoLog, setInfoLog] = useState([]);
+    const handleStream = async (status) => {
+      let info = [];
+      if (status === "start") {
+         console.log("Start");
+         StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+          if (res.streamStatus === StreamStatus.FINISHED) {
+            console.log("finished case");
+            info.push(`${new Date().toLocaleString()}: ` + "You need to re-save your stream description in order to start a new stream" + "\n");
+          }
+          else if(res.streamStatus === StreamStatus.UNFINISHED) {
+            if(res.isLive) {
+              info.push(`${new Date().toLocaleString()}: ` + "You are already streaming" + "\n");
+            }
+            else {
+              
+              if(!previewStatus) {
+                info.push(`${new Date().toLocaleString()}: ` + "Preview stream first" + "\n");
+              }
+              else {
+                const data = {
+                  streamId: res.streamId,
+                  streamTitle: res.streamTitle,
+                  streamDesc: res.streamDesc,
+                  streamCategoryId: res.streamCategories[0].categoryId,
+                  streamTagIds: res.streamTags.map((tag) => tag.tagId),
+                  isLive: true,
+                }
+                
+                StreamRoutes.updateStream(res.streamId, data).then((res1) => {
+                  info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
+                  info.push(`${new Date().toLocaleString()}: ` + "Stream starting" + "\n");
+                  SignalRTest.start(userGlobal.UserName);
+                  setServerStatus(true);
+                });
+              }
+            }
+          }
+          else {
+            info.push(`${new Date().toLocaleString()}: ` + "Wut de hell??? start" + "\n");
+          }
+         });
+      } else if (status === "stop") {
+        console.log("Stop");
+        StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+          if (res.streamStatus === StreamStatus.FINISHED) {
+            info.push(`${new Date().toLocaleString()}: ` + "Stopped" + "\n") ;
+          }
+          else if(res.streamStatus === StreamStatus.UNFINISHED) {
+            if(res.isLive) {
+              const data = {
+                streamId: res.streamId,
+                streamTitle: res.streamTitle,
+                streamDesc: res.streamDesc,
+                streamCategoryId: res.streamCategories[0].categoryId,
+                streamTagIds: res.streamTags.map((tag) => tag.tagId),
+                isLive: false,
+                streamStatus: StreamStatus.FINISHED,
+              }
+              StreamRoutes.updateStream(res.streamId, data).then((res1) => {
+                info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
+                info.push(`${new Date().toLocaleString()}: ` + "Stream stopping" + "\n");
+                SignalRTest.stop();
+                setServerStatus(false);
+                setPreviewStatus(false);
+                document.getElementById('offline_label').style.display = 'block';
+              });
+            }
+            else {
+              info.push(`${new Date().toLocaleString()}: ` + "You are not streaming");
+            }
+          }
+          else {
+            info.push(`${new Date().toLocaleString()}: ` + "Wut de hell??? stop");
+          }
+         });
+      }
+      setInfoLog(info);
+    }
     
+    // console.log(localStorage.getItem("streamId"));
     return (
       <>
         <div className="modal__layout bg__color-2">
@@ -335,39 +399,36 @@ export default function CustomModal(props) {
                       Stream Status
                     </span>
                     <pre className="str__status bg__color-00 def-pad-1 citizenship">
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                      Iure eum maiores quae et nesciunt ipsam explicabo quia,
-                      odit, commodi voluptatem ea quos nostrum alias expedita
-                      velit doloremque perferendis soluta vitae!
+                      {infoLog.map((log, index) => (
+                        <span key={index}>{log}</span>
+                      ))}
                     </pre>
                     <div className="fill__container rr__flex-row rrf__col-small">
                       {serverStatus ? 
                       <>
                         <Button type="default" text={"Stop"} onClick={() => {
-                          SignalRTest.stop();
-                          setServerStatus(false);
-                          document.getElementById('offline_label').style.display = 'block';
+                          
+                            handleStream("stop");
+                          
                         }}/>
                       </> : 
                       <>
                       <Button type="default" text={"Preview Stream"} onClick={() => {
-                        
+                        setPreviewStatus(true);
                         SignalRTest.preview();
                         document.getElementById('offline_label').style.display = 'none';
                         
                       }}/>
                       <Button type="default" text={"Start"} onClick={() => {
                         
-                        SignalRTest.start(userGlobal.UserName);
-                        setServerStatus(true);
-                        console.log("Status: " + serverStatus);
+                          handleStream("start");
                         //truyền context.username vào đây
                         
                       }}/>
                       </>}
                       
                     </div>
-                  </>
+                    </>
                 ) : (
                   <>
                     <span className="fs__normal-3 league-spartan-regular citizenship fill__container ta__center">
@@ -382,51 +443,465 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type == "SMdesc__setting") {
+    //fetched data
+    const [tagDataList, setTagDataList] = useState([]);
+    const [categoryDataList, setCategoryDataList] = useState([]);
+    const [prevStreamData, setPrevStreamData] = useState({});
+    //input value
+    const [title, setTitle] = useState("");
+    const [inputCategory, setInputCategory] = useState("");
+    const [inputTagStandAlone, setInputTagStandAlone] = useState("");
+    const [inputDesc, setInputDesc] = useState("");
+    //data for stream submit
+    const [selectedCategory, setSelectedCategory] = useState({});
+    //string handling
+    //input ref
+    const cateRef = useRef(null);
+    const tagRef = useRef(null);
+    const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0 });
+    //trigger datalist
+    const [mouseDown, setMouseDown] = useState(false); //for datalist
+    const [focus, setFocus] = useState(0); // 0: none, 1: category, 2: tag
+    //information logging
+    const [error, setError] = useState([]);
+    const [info, setInfo] = useState([]);
+    //fetch data
+    useEffect(() => {
+      let tempStandAloneList = [];
+      let tempDataList = [];
+      const fetchData = async () => {
+        try {
+          await TagRoutes.getAllTags().then((res) => {
+            tempDataList.push(...res);
+            setTagDataList(res || []);
+          });
+          await CategoryRoutes.getAllCategories().then((res) => {
+            setCategoryDataList(res || []);
+          });
+          await StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
+            console.log("Prev Stream Data: ", res);
+            setPrevStreamData(res || {});
+              setTitle(res.streamTitle || "");
+              setInputDesc(res.streamDesc, "");
+              CategoryRoutes.getCategoryById(res.streamCategories[0].categoryId).then((res1) => {
+                setInputCategory(res1.categoryName || "");
+                setSelectedCategory({
+                  categoryId: res1.categoryId,
+                  categoryName: res1.categoryName
+                } || {});
+              });
+              const tempTagList = res.streamTags.map((tag) => tag.tagId) || [];
+              console.log(tempDataList);
+              tempDataList.forEach((tag) => {
+                if(tempTagList.indexOf(tag.tagId) > -1) tempStandAloneList.push(tag.tagName);
+              });
+              console.log("TempStandAloneList: ", tempStandAloneList);
+              handleTagsLoading(tempStandAloneList);
+          });
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+      console.log("Userglobal: "+ JSON.stringify(userGlobal));
+      fetchData();
+    }, [])
+    //datalist position
+    useEffect(() => {
+      if (focus === 1 && cateRef.current) {
+        const rect = cateRef.current.getBoundingClientRect();
+        setInputPosition({ top: rect.bottom - 1.5, left: rect.left - 1, height: rect.height, width: rect.width - 2 });
+      }
+      else if(focus === 2 && tagRef.current){
+        const rect = tagRef.current.getBoundingClientRect();
+        setInputPosition({ top: rect.bottom - 1.5, left: rect.left - 1, height: rect.height, width: rect.width - 2 });
+      }
+      
+    }, [focus]);
+    // debug useEffect
+    useEffect(() => {
+      console.log("TagDataList: ", tagDataList);
+    }, [tagDataList]);
     
-    const handleStreamDesc = () => {
 
+    //handle selecting value
+    const handleTagsLoading = (data) => {
+      console.log("Data: ", data);
+      console.log("Data: ", data.length);
+      const stringdata = data.join(", ");
+      console.log("StringData: ", stringdata);
+      setInputTagStandAlone(stringdata || "");
+    }
+    const handleSelectCategory = (value, id) => {
+      console.log("Selected:", value, id);
+      setInputCategory(value);
+      setSelectedCategory({
+        categoryId: id,
+        categoryName: value
+      });
+      setFocus(0);
+    }
+    const handleSelectTag = (value, id) => {
+      console.log("Selected:", value, id);
+      setInputTagStandAlone(inputTagStandAlone + value);
+      // setInputTag(value);
+      // setSelectedCategory(id);
+      setFocus(0);
+    }
+    //form validating
+    const formCheck = () => {
+      let newErrors = [];
+
+      const tagListTemp = inputTagStandAlone.split(",")
+      .map((value) => value.trim())
+      .filter((value) => value !== "")
+      .filter((name, index, self) => self.indexOf(name) === index);
+
+      if (title.trim() === "") {
+      newErrors.push("Title is required");
+      }
+      if(tagListTemp.length > 3) newErrors.push("Tag list must be less than 3 tags");
+      if(inputCategory.includes(",")) newErrors.push("Category must be a single value");
+      if(categoryDataList.filter((cate) => cate.categoryName === inputCategory).length === 0) newErrors.push("Category must be one of value in available list");
+      if (inputCategory.trim() === "") {
+      newErrors.push("Category is required");
+      }
+      setError(newErrors);
+      return newErrors.length === 0;
+    };
+    const infoLog = (logData) => {
+      let newInfo = [];
+      newInfo.push(logData);
+      setInfo([...info, newInfo].filter((value, index, self) => self.indexOf(value) === index)); //remove duplicate
+    }
+    //create or update stream
+    const handleStreamCreate = async () => {
+       
+          console.log("inputtagcheck");
+          let tagIdList = [];
+          const inputTagsList = inputTagStandAlone.split(",")
+          .map((value) => value.trim())
+          .filter((value) => value !== "")
+          .filter((name, index, self) => self.indexOf(name) === index);
+          //ex: ["tag1", "tag2", "tag3"]
+          const filterTagList = tagDataList.map((tag) => tag.tagName); //ex: ["tag1", "tag2", "tag3"]
+          const createTagPromises = inputTagsList.map((tag) => {
+            if (filterTagList.indexOf(tag) > -1) {
+              const neededtagId = tagDataList.filter((tagData) => tagData.tagName === tag)[0].tagId;
+              tagIdList.push(neededtagId); // tag existed
+              return Promise.resolve(); // Return a resolved promise for existing tags
+            } else { // tag doesn't exist
+              return TagRoutes.createTag({ tagName: tag }).then((res) => {
+                tagIdList.push(Number(res));
+              });
+            }
+          });
+        
+          // Wait for all promises to resolve
+          await Promise.all(createTagPromises);
+          
+        try{
+          const tagListTemp = tagIdList;
+          console.log(tagListTemp);
+          console.log(prevStreamData);
+          // console.log("TagListTemp: ", tagListTemp);
+          //body data
+          const data = {
+            UserId: userGlobal.UserId,
+            StreamTitle: title,
+            StreamDesc: inputDesc,
+            streamCategoryId: selectedCategory.categoryId,
+            streamTagIds: tagListTemp,
+            streamStatus: StreamStatus.UNFINISHED,
+          }
+          //create stream
+          console.log(data);
+          console.log(prevStreamData);
+          if(isEmpty(prevStreamData)) {
+            console.log("Create stream 1");
+            StreamRoutes.createStream(data).then((res) => {
+              console.log(res);
+              //reset prevStreamData
+              StreamRoutes.getStreamById(res).then((res1) => {
+                console.log(res1);
+                setPrevStreamData(res1);
+              });
+              localStorage.setItem("streamId", res);
+            });
+          }
+          else
+          if(prevStreamData.streamStatus === StreamStatus.FINISHED) {
+            console.log("Create stream 2");
+            StreamRoutes.createStream(data).then((res) => {
+              console.log(res);
+              //reset prevStreamData
+              StreamRoutes.getStreamById(res).then((res1) => {
+                console.log(res1);
+                setPrevStreamData(res1);
+              });
+              localStorage.setItem("streamId", res);
+            });
+          }
+          else if(prevStreamData.streamStatus === StreamStatus.UNFINISHED) {
+            //update stream
+            console.log("Update stream");
+            const data = {
+              streamId: prevStreamData.streamId,
+              // UserId: userGlobal.UserId,
+              streamTitle: title,
+              streamDesc: inputDesc,
+              streamCategoryId: selectedCategory.categoryId,
+              streamTagIds: tagListTemp,
+            }
+            // console.log("update data: " + JSON.stringify(data));
+            StreamRoutes.updateStream(prevStreamData.streamId, data).then((res) => {
+              StreamRoutes.getStreamById(prevStreamData.streamId).then((res) => {
+                setPrevStreamData(res);
+              });
+              infoLog(res);
+            });
+          }
+          else console.error("Stream status error");
+        }
+        catch(error){
+          console.error("Error creating stream: ", error);
+        }
     }
     return (
       <>
-        <div className="smd__size rr__flex-col def-pad-1 bg__color-2 rrf__row-normal citizenship">
+        <div className="smd__size rr__flex-col def-pad-1 bg__color-2 rrf__row-normal citizenship" style={{
+        }}>
           <span className="fs__large-1 league-spartan-semibold">
             <FontAwesomeIcon icon={faPenToSquare} /> Description
           </span>
-          <div className="rr__flex-col fill__container rrf__row-normal">
+          <div className="rr__flex-col fill__container rrf__row-normal" style={{
+              width: "40em",
+            }}>
             <div className="rr__flex-row">
               <label className="smd__label fs__normal-2 league-spartan-regular">
                 Title
               </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "0.5em",
+              }}>
               <input
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Enter title here..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onFocus={() => {
+                  setError([]);
+                  setInfo([]);
+                }}
               />
+              <span className="league-spartan-light fs__normal-1 citizenship">
+                Title must be less than 100 characters
+              </span>
+              </div>
+            </div>
+            <div className="rr__flex-row">
+              <label className="smd__label fs__normal-2 league-spartan-regular">
+                Description
+              </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "0.5em",
+              }}>
+              <textarea
+                className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
+                type="text"
+                placeholder="Enter description here..."
+                style={{
+                  height: "7em",
+                  resize: "none",
+                }}
+                onFocus={() => {
+                  setError([]);
+                  setInfo([]);
+                }}
+                value={inputDesc}
+                onChange={(e) => setInputDesc(e.target.value)}
+              />
+              <span className="league-spartan-light fs__normal-1 citizenship">
+                Description must be less than 100 characters
+              </span>
+              </div>
             </div>
             <div className="rr__flex-row">
               <label className="smd__label fs__normal-2 league-spartan-regular">
                 Category
               </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "0.5em",
+              }}>
               <input
+                style={{
+                  zIndex: 100,
+                }}
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Search category..."
+                value={inputCategory}
+                ref={cateRef}
+                onFocus={() => {
+                  setError([]);
+                  setInfo([]);
+                  setFocus(1);
+                  
+                }}
+                onBlur={() => {
+                  if(!mouseDown)
+                  {
+                    setFocus(0); 
+                    
+                  }
+                }}
+                onChange={(e) => setInputCategory(e.target.value)}
               />
+              <CustomDatalist 
+                id="categoryList" 
+                type="category"
+                data={categoryDataList}
+                inputValue={inputCategory}
+                styles={{
+                  display: focus === 1 ? "flex" : "none",
+                  position: "absolute",
+                  top: `${inputPosition.top}px`,
+                  left: `${inputPosition.left}px`,
+                  width: `${inputPosition.width}px`,
+                }}
+                onMouseDown={() => setMouseDown(true)}
+                onMouseUp={() => {
+                  setMouseDown(false)
+                  setFocus(0);
+                }}
+                onClick={handleSelectCategory}
+              />
+              <span className="league-spartan-light fs__normal-1 citizenship">
+                Select a category for your stream
+              </span>
+              </div>
             </div>
             <div className="rr__flex-row">
               <label className="smd__label fs__normal-2 league-spartan-regular">
                 Tags
               </label>
+              <div className="rr__flex-col fill__container" style={{
+                rowGap: "1em",
+              }}>
               <input
+              style={{
+                zIndex: 100,
+              }}
                 className="smd__input fs__normal-1 league-spartan-regular fill__container no__bg citizenship"
                 type="text"
                 placeholder="Seperate tags with commas..."
+                value={inputTagStandAlone}
+                ref={tagRef}
+                onFocus={() => {
+                  setError([]);
+                  setInfo([]);
+                  setFocus(2);
+                }}
+                onBlur={() => {
+                  if(!mouseDown)
+                  {
+                    setFocus(0);
+                  }
+                }}
+                onChange={(e) => {
+                  setInputTagStandAlone(e.target.value);
+                  console.log("input: " + inputTagStandAlone.split(",")
+                  .map((value) => value.trim())
+                  .slice(-1)[0])
+                  
+                }}
               />
+              <CustomDatalist 
+                id="tagList"
+                type="tag"
+                data={tagDataList}
+                inputValue={inputTagStandAlone.split(",")
+                  .map((value) => value.trim())
+                  .filter((value) => value !== "").slice(-1)[0] === undefined? 
+                  ''
+                  :
+                  inputTagStandAlone.split(",")
+                  .map((value) => value.trim())
+                  .slice(-1)[0]
+                } //get last tag
+                styles={{
+                  display: focus === 2 ? "flex" : "none",
+                  position: "absolute",
+                  top: `${inputPosition.top}px`,
+                  left: `${inputPosition.left}px`,
+                  width: `${inputPosition.width}px`,
+                }}
+                onMouseDown={() => setMouseDown(true)}
+                onMouseUp={() => {
+                  setMouseDown(false)
+                  setFocus(0);
+                }}
+                onClick={handleSelectTag}
+              />
+              <div className="rr__flex-row" style={{
+                
+              }}>
+                <label className="smd__label fs__normal-1 league-spartan-light">
+                  Selected tags: 
+                </label>
+                {inputTagStandAlone.split(",")
+                .map((value) => value.trim())
+                .filter((value) => value !== "")
+                .filter((name, index, self) => self.indexOf(name) === index) //trim value
+                .map((tag, index) => (
+                  <TagCard key={index} name={tag}/>
+                ))}
+              </div>
+              </div>
+              
+            </div>
+            <div className="rr__flex-row rrf__ai-center">
+              {error.length > 0 && <FontAwesomeIcon icon={faTriangleExclamation} style={{
+                color: "#47FFD3",
+                fontSize: "1.5em",
+                paddingRight: "0.5em",
+              }}/>
+              }
+              {
+                info.length > 0 && <FontAwesomeIcon icon={faTriangleExclamation} style={{
+                  color: "#47FFD3",
+                  fontSize: "1.5em",
+                  paddingRight: "0.5em",
+                }}/>
+              }
+
+              <div className="rr__flex-col">
+                {error.map((err, index) => (
+                  <span className="league-spartan-semibold fs__normal-1 rr__color-secondary" key={index}>
+                    {err}
+                  </span>
+                ))}
+              </div>
+              <div className="rr__flex-col">
+                {info.map((inf, index) => (
+                  <span className="league-spartan-semibold fs__normal-1 rr__color-secondary" key={index}>
+                    {inf}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className="rr__flex-row-reverse">
               <Button type="default" text="Save" onClick={() => {
-
+                //set tag data
+                const check = formCheck();
+                console.log(error);
+                if(!check) return;
+                handleStreamCreate();
               }} />
+              {/* <Button type="default" text="Test" onClick={() => {
+                console.log(prevStreamData);
+                console.log("title: " + title);
+              }}/> */}
             </div>
           </div>
         </div>
@@ -448,7 +923,7 @@ export default function CustomModal(props) {
                 style={{ display: 'none' }}
                 onChange={(e) => {
                   const file = e.target.files[0];
-                  console.log(file.toString());
+                  console.log(file);
                   if (file) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -542,6 +1017,7 @@ export default function CustomModal(props) {
                   setUpdate(res);
                 });
             }} />
+            
             <span className="league-spartan-regular fs__normal-1 citizenship">
               {update}
             </span>
@@ -549,6 +1025,34 @@ export default function CustomModal(props) {
         </div>
       </>
     );
+  } else if (props.type == "update"){
+    const [value, setValue] = useState(props.currentValue);
+    return(
+      <div className="modal__holder">
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-normal">
+            <div className="rr__flex-col rrf__jc-center rrf__ai-center rrf__row-normal">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Update {props.updateLabel}
+              </span>
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                type="text"
+                placeholder={props.updateLabel}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              />
+              <div className="btn__holder rrf__jc-center">
+              <Button type="default" text="OK" onClick={() => {
+                props.update(value, props.updateLabel);
+              }} />
+              <Button type="default" text="Cancel" onClick={props.offModal} />
+
+            </div>
+            </div>
+          </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+    )
   }
 
 }

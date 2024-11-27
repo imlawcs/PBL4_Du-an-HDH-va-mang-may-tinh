@@ -59,13 +59,11 @@ namespace StreamingApp.Controllers
             {
                 //không tạo thành công stream
                 return BadRequest(stream.Errors);
-                //thông báo không tạo thành công kèm lỗi
-
             }
 
-            var streamCategory = new StreamCategory { StreamId=streamModel.StreamId ,CategoryId = model.streamCategoryId };
+            var streamCategory = new StreamCategory { StreamId=streamModel.StreamId ,CategoryId = model.StreamCategoryId };
             
-            foreach(int i in model.streamTagIds){
+            foreach(int i in model.StreamTagIds){
                 var streamTag = new StreamTag { StreamId=streamModel.StreamId, TagId = i };
                 var newStreamTag = await _streamTagService.CreateStreamTagAsync(streamTag);
                 if(!newStreamTag.Succeeded)
@@ -84,7 +82,12 @@ namespace StreamingApp.Controllers
                 return BadRequest(newStreamCategory.Errors);
             }
         
-            return Ok("Create stream successfully");
+            if (stream.Stream == null)
+            {
+                return StatusCode(500, "Stream creation failed.");
+            }
+            return Ok(stream.Stream.StreamId);
+            
         }
 
         [HttpPut("{id}")]
@@ -103,7 +106,8 @@ namespace StreamingApp.Controllers
                 StreamDate = stream.StreamDate,
                 IsLive = model.IsLive,
                 StreamTitle = model.StreamTitle,
-                StreamDesc = model.StreamDesc
+                StreamDesc = model.StreamDesc,
+                StreamStatus = model.StreamStatus
             };
 
             var result = await _streamService.UpdateStreamAsync(modelStream);
@@ -112,7 +116,7 @@ namespace StreamingApp.Controllers
                 return BadRequest(result.Errors);
 
             var currentTagIds = stream.StreamTags.Select(x => x.TagId).ToList();
-            var newTagIds = model.streamTagIds;
+            var newTagIds = model.StreamTagIds;
 
             if (!currentTagIds.SequenceEqual(newTagIds))
             {
@@ -142,10 +146,12 @@ namespace StreamingApp.Controllers
                 }
             }}
 
-            if(model.streamCategoryId!= stream.StreamCategories.Select(x=>x.CategoryId).FirstOrDefault())
+            int categoryIdbefore = stream.StreamCategories.Select(x=>x.CategoryId).FirstOrDefault();
+            int categoryIdafter = model.StreamCategoryId;
+            if(categoryIdbefore!=categoryIdafter)
             {
-                var streamCategory = new StreamCategory { StreamId=model.StreamId ,CategoryId = model.streamCategoryId };
-                var resultCategory = await _streamCategoryService.UpdateStreamCategoryAsync(model.StreamId, model.streamCategoryId, streamCategory);
+                var streamCategory = new StreamCategory { StreamId=model.StreamId ,CategoryId = model.StreamCategoryId };
+                var resultCategory = await _streamCategoryService.UpdateStreamCategoryAsync(model.StreamId, categoryIdbefore, streamCategory);
                 if(!resultCategory.Succeeded)
                 {
                 //không tạo thành công stream category

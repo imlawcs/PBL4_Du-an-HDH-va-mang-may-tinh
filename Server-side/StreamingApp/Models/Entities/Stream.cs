@@ -15,6 +15,8 @@ namespace StreamingApp.Models.Entities {
         [MaxLength(100)]
         public string StreamDesc { get; set; }
 
+        public int StreamStatus { get; set; }
+
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
 

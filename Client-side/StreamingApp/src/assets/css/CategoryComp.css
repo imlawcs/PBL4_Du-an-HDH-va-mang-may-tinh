@@ -39,3 +39,11 @@
 .category__card.rr__flex-row.rrf__col-normal:hover{
     cursor: pointer;
 }
+.category__list-comp{
+    width: 100%;
+    /* padding: 0.5em; */
+}
+.category__list-comp:hover{
+    cursor: pointer;
+    opacity: 0.8;
+}

@@ -33,13 +33,17 @@ import UserChannelList from "./UserChannelList";
 import { UserRoutes } from "../API/User.routes";
 import defaultImage from "../assets/img/Logo__Sieufix.png";
 import { StreamRoutes } from "../API/Stream.route";
+import { useAuth } from "../hooks/AuthProvider";
+import { CategoryRoutes } from "../API/Category.routes";
+import { TagRoutes } from "../API/Tag.routes";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
-  //   const navigate = useNavigate();
+    const navigate = useNavigate();
   const [option, setOption] = useState(0);
   if (props.routing == "SM") {
     const [isOffline, setOffline] = useState(true);
+    const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     return (
       <div className="main__position">
         <div className="sidebar">
@@ -99,10 +103,10 @@ export default function Sidebar(props) {
                         </span>
                       
                     </div>
-                    <CustomModal type={"SMdesc__setting"} />
+                    <CustomModal type={"SMdesc__setting"} user={userGlobal}/>
                   </div>
                   <div className="rr__flex-col">
-                    <CustomModal type={"SM"} />
+                    <CustomModal type={"SM"} user={userGlobal}/>
                   </div>
                 </div>
               </div>
@@ -119,7 +123,7 @@ export default function Sidebar(props) {
                     Check your stream analytics here
                   </span>
                 </div>
-                <div class="rr__flex-row rrf__col-normal fill__container">
+                <div className="rr__flex-row rrf__col-normal fill__container">
                   <StatBox value={"123"} label={"Viewers"} />
                   <StatBox value={"123"} label={"Viewers"} />
                   <StatBox value={"123"} label={"Viewers"} />
@@ -137,6 +141,7 @@ export default function Sidebar(props) {
   } else if (props.routing == "Personalize") {
     const personalInfoRef = useRef(null);
     const connectionsRef = useRef(null);
+    const Auth = useAuth();
     const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     const scrollToPersonalInfo = () => {
       personalInfoRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -144,8 +149,39 @@ export default function Sidebar(props) {
     const scrollToConnections = () => {
       connectionsRef.current?.scrollIntoView({ behavior: "smooth" });
     };
-
+    const [phoneNumber, setPhoneNumber] = useState(userGlobal.PhoneNumber || "");
+    const [email, setEmail] = useState(userGlobal.Email || "");
+    const [model, setModel] = useState(0);
+    const setValue = async (value1) =>{
+      if(model === 1){
+        setPhoneNumber(value1);
+      }
+      else setEmail(value1);
+    }
+    const [update, setUpdate] = useState("");
+    const handleUpdate = async (value, updateLabel) => {
+      await setValue(value);
+        const postData = {
+          userId: userGlobal.UserId,
+          userName: userGlobal.UserName,
+          displayName: userGlobal.DisplayName,
+          email: (updateLabel === "email") ? value : userGlobal.Email,
+          phoneNumber: (updateLabel === "phonenumber") ? value : userGlobal.PhoneNumber,
+          bio: userGlobal.Bio,
+        };
+        await UserRoutes.updateUser(userGlobal.UserId, postData).then((res) => {
+          Auth.updateUserData();
+          console.log(res);
+          setUpdate(res);
+          setModel(0);
+        });
+    }
+    const handleModel = (value) => {
+      console.log(value);
+      setModel(value);
+    }
     return (
+      <>
       <div className="main__position">
         <div className="sidebar">
           <div className="border__r">
@@ -214,16 +250,21 @@ export default function Sidebar(props) {
                   <IconCard
                     iconColor={"ic__default-color"}
                     icon={faPhone}
-                    text={userGlobal.PhoneNumber}
-                    onClick={() => {}}
+                    text={phoneNumber}
+                    onClick={ 
+                      () => handleModel(1)
+                    }
                   />
                   <IconCard
                     iconColor={"ic__default-color"}
                     icon={faEnvelope}
-                    text={userGlobal.Email}
-                    onClick={() => {}}
+                    text={email}
+                    onClick={
+                      () => handleModel(2)
+                    }
                   />
                 </div>
+                
                 {/* <span className="fs__normal-2 league-spartan-semibold citizenship">
                   SNS
                 </span> 
@@ -252,15 +293,61 @@ export default function Sidebar(props) {
             </div>
           </div>
         </div>
+        
       </div>
+      {
+                model == 1?
+                <>
+                  <CustomModal 
+                  type={"update"} 
+                  updateLabel={"phonenumber"} 
+                  currentValue={phoneNumber}
+                  update={handleUpdate}
+                  offModal={() => handleModel(0)}
+                  />
+                </>
+                : 
+                model == 2 ?
+                <>
+                  <CustomModal 
+                  type={"update"} 
+                  updateLabel={"email"}
+                  currentValue={email}
+                  update={handleUpdate}
+                  offModal={() => handleModel(0)}
+                  />
+                </>
+                : 
+                <>
+                </>
+              }
+      </>
     );
   } else if (props.routing == "index") {
-    const LazyVideoContent = lazy(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve(import("./VideoContent")), 200)
-        )
-    );
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+      const fetchData = 
+        StreamRoutes.getAllStreams().then((res) => {
+          setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+          return Promise.resolve();
+        });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        setTagList(res);
+        return Promise.resolve();
+      })
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+        return Promise.resolve();
+      });
+
+        Promise.all([fetchData, fetchTags, fetchCategories]).then(() => {
+          setLoading(false);
+        });
+        
+    }, [])
     return (
       <div className="main__position">
         <div className="sidebar bg__color-2 rr__flex-row">
@@ -274,122 +361,95 @@ export default function Sidebar(props) {
           />
           <div className="stream__holder rr__flex-col">
             <div className="sh__label fs__large-3 league-spartan-semibold citizenship">
-              Livestream you may like
+              Currently live
             </div>
             <div className="sh__content-holder rr__flex-row">
+              {loading?
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                Loading...
+              </span>
+              :
+              <>
+               {
+               streamList.length > 0?
+               streamList
+               .slice(0, 5)
+               .map((content, index) => (
+                <VideoContent
+                      key={index}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      displayName={content.user.displayName}
+                      category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      userName={content.user.userName}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
+                    />
+               ))
+               :
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                No stream available
+              </span>
+               }
+              </>
+              }
               {/* map stream here */}
-              <Suspense
-                fallback={
-                  <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                    Loading...
-                  </div>
-                }
-              >
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-              </Suspense>
+              
             </div>
             <div className="btn__holder">
-              <div className="sepe__line"></div>
+              <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
               <Button
                 type={"link-type"}
                 text={"Show more"}
                 onClick={() => {}}
               />
-              <div className="sepe__line"></div>
+              <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
             </div>
           </div>
           <div className="stream__holder rr__flex-col">
             <div className="sh__label fs__large-3 league-spartan-semibold citizenship">
-              Livestream you may like
+              Categories
             </div>
             <div className="sh__content-holder rr__flex-row">
-              {/* map stream here */}
-              <Suspense
-                fallback={
-                  <div className="fs__large-2 league-spartan-semibold citizenship fill__container ta__center">
-                    Loading...
-                  </div>
-                }
-              >
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
+              {categoryList.length > 0 && 
+              categoryList.map((content, index) => (
+                <CategoryComp
+                  key={index}
+                  cateViewCount={12727}
+                  categoryName={content.categoryName}
+                  categoryId={content.categoryId}
+                  categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
                 />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-                <LazyVideoContent
-                  title="MY FIRST STREAM"
-                  thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                  profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                  userName="nauts"
-                  category="League Of Legends"
-                />
-              </Suspense>
+              ))
+              }
+              
             </div>
             <div className="btn__holder">
-              <div className="sepe__line"></div>
+            <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
               <Button
                 type={"link-type"}
                 text={"Show more"}
                 onClick={() => {}}
               />
-              <div className="sepe__line"></div>
+              <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
             </div>
           </div>
         </div>
@@ -485,6 +545,28 @@ export default function Sidebar(props) {
       </>
     );
   } else if (props.routing == "browsing") {
+    const [categoryList, setCategoryList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [tagList, setTagList] = useState([]);
+    useEffect(() => {
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+        Promise.resolve();
+      });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log(res);
+        setTagList(res);
+        Promise.resolve();
+      });
+      const fetchStream = StreamRoutes.getAllStreams().then((res) => {
+        console.log(res.filter((item) => item.streamCategories.length > 0));
+        setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+        Promise.resolve();
+      });
+      Promise.all([fetchCategories, fetchTags, fetchStream]).then(() => {
+          console.log("done fetching");
+      });
+    }, [])
     const [flBtn, setFlBtn] = useState(true);
     return (
       <>
@@ -527,41 +609,43 @@ export default function Sidebar(props) {
                   )}
                 </div>
                 <div className="sh__content-holder rr__flex-row">
-                  {flBtn ? (
-                    <>
-                      <CategoryComp
-                        cateViewCount={12727}
-                        categoryName="Bach Khoa"
-                        categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                      />
-                      <CategoryComp
-                        cateViewCount={12727}
-                        categoryName="Bach Khoa"
-                        categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                      />
-                      <CategoryComp
-                        cateViewCount={12727}
-                        categoryName="Bach Khoa"
-                        categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                    </>
+                  {flBtn ? 
+                    
+                      categoryList.length > 0 && 
+                      categoryList.map((content, index) => (
+                        <CategoryComp
+                          key={index}
+                          cateViewCount={12727}
+                          categoryName={content.categoryName}
+                          categoryId={content.categoryId}
+                          categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                        />
+                      ))
+                   : (
+                    streamList.length > 0?
+                  streamList
+                  .map((content, index) => (
+                    <VideoContent
+                      key={index}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      displayName={content.user.displayName}
+                      category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      userName={content.user.userName}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
+                    />
+                  ))
+                  :
+                  <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                    No stream available
+                  </span>
                   )}
                 </div>
               </div>
@@ -571,6 +655,19 @@ export default function Sidebar(props) {
       </>
     );
   } else if (props.routing == "category") {
+    const [currentCategory, setCurrentCategory] = useState({});
+    const [streamList, setStreamList] = useState([]);
+    useEffect(() => {
+      CategoryRoutes.getCategoryById(props.category).then((res) => {
+        setCurrentCategory(res || {});
+      });
+      if(currentCategory.length > 0){
+        StreamRoutes.getStreamsWithCategory(currentCategory.categoryId).then((res) => {
+          console.log(res);
+          setStreamList(res || []);
+        });
+      }
+    },[]);
     return (
       <>
         <div className="main__position">
@@ -582,96 +679,34 @@ export default function Sidebar(props) {
                 <CategoryComp
                   cateViewCount={12727}
                   type={"default"}
-                  categoryName="Bach Khoa"
+                  categoryName={currentCategory.categoryName}
                   categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                  categoryDesc={lorem}
+                  categoryDesc={currentCategory.categoryDesc}
                 />
                 <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
                   Live channels of this category
                 </span>
                 <div className="def-pad-1"></div>
                 <div className="sh__content-holder rr__flex-row">
-                  {[
-                    {
-                      title: "MY FIRST STREAM",
-                      thumbnail: "https://i.imgur.com/mUaz2eC.jpg",
-                      profilePic: "https://i.imgur.com/JcLIDUe.jpg",
-                      userName: "nauts",
-                      category: "League Of Legends",
-                    },
-                    {
-                      title: "ROAD TO CHALLENGER",
-                      thumbnail: "https://i.imgur.com/pQrIBFY.jpg",
-                      profilePic: "https://i.imgur.com/A3jLXXN.jpg",
-                      userName: "pro_gamer123",
-                      category: "League Of Legends",
-                    },
-                    {
-                      title: "CHILL STREAM",
-                      thumbnail: "https://i.imgur.com/ZGfCkYC.jpg",
-                      profilePic: "https://i.imgur.com/M7uPcKN.jpg",
-                      userName: "relaxed_streamer",
-                      category: "Just Chatting",
-                    },
-                    {
-                      title: "RANKED GRIND",
-                      thumbnail: "https://i.imgur.com/8TZvZJO.jpg",
-                      profilePic: "https://i.imgur.com/K2HdEji.jpg",
-                      userName: "competitive_player",
-                      category: "Valorant",
-                    },
-                    {
-                      title: "SPEEDRUN ATTEMPT",
-                      thumbnail: "https://i.imgur.com/nXYWoZS.jpg",
-                      profilePic: "https://i.imgur.com/L8zGJU2.jpg",
-                      userName: "speed_demon",
-                      category: "Minecraft",
-                    },
-                    {
-                      title: "ESPORTS TOURNAMENT",
-                      thumbnail: "https://i.imgur.com/qR3VbVY.jpg",
-                      profilePic: "https://i.imgur.com/F2XU58M.jpg",
-                      userName: "esports_pro",
-                      category: "Counter-Strike: Global Offensive",
-                    },
-                    {
-                      title: "STRATEGY GUIDE",
-                      thumbnail: "https://i.imgur.com/T8KYYmU.jpg",
-                      profilePic: "https://i.imgur.com/W9XUx7E.jpg",
-                      userName: "strategy_master",
-                      category: "Starcraft II",
-                    },
-                    {
-                      title: "CASUAL GAMEPLAY",
-                      thumbnail: "https://i.imgur.com/3XZhJLU.jpg",
-                      profilePic: "https://i.imgur.com/Q9ZXuZY.jpg",
-                      userName: "casual_gamer",
-                      category: "The Sims 4",
-                    },
-                    {
-                      title: "HORROR NIGHT",
-                      thumbnail: "https://i.imgur.com/7ZjU9L2.jpg",
-                      profilePic: "https://i.imgur.com/X6Y3VNm.jpg",
-                      userName: "scared_streamer",
-                      category: "Resident Evil Village",
-                    },
-                    {
-                      title: "RETRO GAMING",
-                      thumbnail: "https://i.imgur.com/1KZqPjq.jpg",
-                      profilePic: "https://i.imgur.com/P9ZkL7H.jpg",
-                      userName: "retro_lover",
-                      category: "Super Mario World",
-                    },
-                  ].map((content, index) => (
+                  {
+                  streamList.length > 0?
+                  streamList.map((content, index) => (
                     <VideoContent
                       key={index}
-                      title={content.title}
-                      thumbnail={content.thumbnail}
-                      profilePic={content.profilePic}
-                      userName={content.userName}
-                      category={content.category}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      userName={content.user.userName}
+                      category={currentCategory.CategoryName}
                     />
-                  ))}
+                  ))
+                :
+                <>
+                <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                  No stream available
+                </span>
+                </>
+                }
                 </div>
               </div>
             </div>
@@ -777,20 +812,32 @@ export default function Sidebar(props) {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
     const [messages, setMessages] = useState([]);
     const [userList, setUserList] = useState([]);
+    const [streamData, setStreamData] = useState({});
     const connection = SignalRTest.getConnection();
     const [user, setUser] = useState("");
+    const [currentCategory, setCurrentCategory] = useState("");
+    const [currentTags, setCurrentTags] = useState([]);
     useEffect(() => {
       try{
         UserRoutes.getUserByName(props.userRoute).then((res) => {
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
+            StreamRoutes.getMostRecentStreamByUser(res.UserId).then((res1) => {
+              console.log(res1);
+              TagRoutes.getAllTags().then((res2) => {
+                const tagIdList = res1.streamTags.map((item) => item.tagId);
+                const tagList = res2.filter((item) => tagIdList.includes(item.tagId));
+                setCurrentTags(tagList.map((item) => item.tagName) || []);
+              });
+              CategoryRoutes.getCategoryById(res1.streamCategories[0].categoryId).then((res2) => {
+                setCurrentCategory(res2.categoryName);
+              });
+              setStreamData(res1|| {});
+              console.log(JSON.stringify(streamData));
+          })
         });
-        if(user != null && user != ""){
-            StreamRoutes.getStreamById(user.UserId).then((res) => {
-
-            })
-        }
+        
       }
       catch(e){
         console.log(e);
@@ -822,7 +869,6 @@ export default function Sidebar(props) {
       }
     }, [connection]);
     
-    if(user != null && user != ""){
     return (
       <>
         <div className="main__position">
@@ -845,11 +891,14 @@ export default function Sidebar(props) {
 
               <StreamUserInfo
                 userName={user.DisplayName}
-                title="Hello guys"
-                category="osu!"
+                title={streamData.streamTitle}
+                desc={streamData.streamDesc}
+                category={currentCategory || "error"}
+                tagList={currentTags}
                 profilePic="https://i.imgur.com/neHVP5j.jpg"
                 viewCount={userList.length}
                 flCount={12342}
+                status={streamData.isLive !== undefined ? streamData.isLive : false}
               />
             </div>
             <StreamChat messages={messages} userList={userList}/>
@@ -857,41 +906,41 @@ export default function Sidebar(props) {
         </div>
       </>
     );
-    }
-    else return(
-      <>
-        <div className="main__position">
-          <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
-            <div className="main__content bg__color-00 rr__flex-col">
-              {/* <img className="bg__img" src={smBackground} alt="background"/> */}
-              <div className="fl__content-holder rr__flex-col">
+    
+    // return(
+    //   <>
+    //     <div className="main__position">
+    //       <div className="sidebar bg__color-2 rr__flex-row">
+    //       <UserChannelList />
+    //         <div className="main__content bg__color-00 rr__flex-col">
+    //           {/* <img className="bg__img" src={smBackground} alt="background"/> */}
+    //           <div className="fl__content-holder rr__flex-col">
                 
-                <div className="rr__flex-row rrf__ai-center">
-                <FontAwesomeIcon style={{
-                  padding: "0.5em",
-                  paddingLeft: "0",
-                  fontSize: "3em",
-                }} icon={faTriangleExclamation} color="#47FFD3"/>
-                <div className="rr__flex-col">
-                  <span className="fs__title-4 league-spartan-semibold citizenship ta__center fill__container">
-                    Cannot find user {props.userRoute}
-                  </span>
-                  <span className="fs__normal-3 league-spartan-regular citizenship">
-                    This user may have been banned or does not exist
-                  </span>
-                </div>
-                </div>
+    //             <div className="rr__flex-row rrf__ai-center">
+    //             <FontAwesomeIcon style={{
+    //               padding: "0.5em",
+    //               paddingLeft: "0",
+    //               fontSize: "3em",
+    //             }} icon={faTriangleExclamation} color="#47FFD3"/>
+    //             <div className="rr__flex-col">
+    //               <span className="fs__title-4 league-spartan-semibold citizenship ta__center fill__container">
+    //                 Cannot find user {props.userRoute}
+    //               </span>
+    //               <span className="fs__normal-3 league-spartan-regular citizenship">
+    //                 This user may have been banned or does not exist
+    //               </span>
+    //             </div>
+    //             </div>
                   
                 
                 
-              </div>
+    //           </div>
 
               
-            </div>
-          </div>
-        </div>
-      </>
-    )
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </>
+    // )
   }
 }

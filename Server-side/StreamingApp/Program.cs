@@ -15,13 +15,7 @@ namespace StreamingApp
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().ConfigureKestrel(serverOptions =>
-                          {
-                              serverOptions.ConfigureHttpsDefaults(httpsOptions =>
-                              {
-                                  httpsOptions.ServerCertificate = new X509Certificate2("./DevCert/_192.168.56.1_cert.pfx", "huukhoa");
-                              });
-                          });
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

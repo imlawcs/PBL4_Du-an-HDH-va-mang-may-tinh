@@ -24,35 +24,59 @@ export default function CategoryComp(props) {
                 {props.categoryDesc}
               </span>
             </div>
-            <div className="tag__holder rr__flex-row">
+            {/* <div className="tag__holder rr__flex-row">
               <TagCard name="English" />
               <TagCard name="Vietnamese" />
-            </div>
+            </div> */}
           </div>
         </div>
       </>
     );
-  } else {
+  } 
+  else if(props.type === "datalist") {
+    return (
+      <>
+        <div className="category__list-comp rr__flex-row rrf__ai-center" value={props.categoryName} onClick={props.onClick}>
+          <span className="league-spartan-light rr__color-secondary fs__normal-2 ta__left" style={{
+            padding: "0.5em",
+          }}>
+            {props.categoryName}
+          </span>
+        </div>
+      </>
+    )
+  }
+  
+  else {
     return (
       <>
         <div
           className="category__card rr__flex-col"
           onClick={() => {
-            navigate("/category");
-          }}
-        >
-          <img src={props.categoryPic} className="cate__c-bg" />
-          <div className="cate__content-holder rr__flex-col">
-            <span className="fs__large-1 citizenship fill__container league-spartan-semibold">
+            navigate(`/category/${props.categoryId}`);
+            }}
+          >
+            <img src={props.categoryPic} className="cate__c-bg" />
+            <div className="cate__content-holder rr__flex-col"
+            style={{
+            wordWrap: "break-word",
+            width: "9.375em"
+            }}
+            >
+            <span className={`fs__normal-2 citizenship league-spartan-semibold`}
+            >
               {props.categoryName}
             </span>
-            <span className="cate__vc league-spartan-light fs__small-3 citizenship">
+            
+            {/* <span className="cate__vc league-spartan-light fs__small-3 citizenship" style={{
+              alignSelf: "flex-start",
+            }}>
               {props.cateViewCount} viewers
-            </span>
-            <div className="tag__holder rr__flex-row">
+            </span> */}
+            {/* <div className="tag__holder rr__flex-row">
               <TagCard name="English" />
               <TagCard name="Vietnamese" />
-            </div>
+            </div> */}
           </div>
         </div>
       </>

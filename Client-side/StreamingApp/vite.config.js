@@ -10,8 +10,10 @@ export default defineConfig({
       key: fs.readFileSync(path.resolve(__dirname, "certs/localhost-key.pem")),
       cert: fs.readFileSync(path.resolve(__dirname, "certs/localhost.pem")),
     },
-    host: "0.0.0.0",
-    port: 5173,
-  }
+    host: true,
+  },
+  // esbuild: {
+  //   drop: ['console', 'debugger'],
+  // },
   
 })

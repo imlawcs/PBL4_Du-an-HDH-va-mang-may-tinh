@@ -2,7 +2,7 @@ import AdminNav from "../components/admin/AdminNav";
 import "../assets/css/AdminPage.css";
 import AdminSideBar from "../components/admin/AdminSideBar";
 import { useState } from "react";
-import DashBoard from "../components/admin/Dashboard";
+import AdminContent from "../components/admin/AdminContent";
 export default function AdminPage() {
     const [option, setOption] = useState("dashboard");
     const handleOption = (opt) => {
@@ -13,32 +13,25 @@ export default function AdminPage() {
             case "dashboard":
                     return (
                     <>
-                        <DashBoard />
+                        <AdminContent current="dashboard"/>
                     </>
                     )
             case "users":
                 return (
                     <>
-                        <h1 className="league-spartan-bold citizenship fill__container ta__center">
-                            Users
-                        </h1>
+                        <AdminContent current="users"/>
                     </>
                     )
             case "categories":
                 return (
                     <>
-                        <h1 className="league-spartan-bold citizenship fill__container ta__center">
-                            Categories
-                        </h1>
-
+                        <AdminContent current="categories"/>
                     </>
                     )
             case "streams":
                 return (
                     <>
-                        <h1 className="league-spartan-bold citizenship fill__container ta__center">
-                            Streams
-                        </h1>
+                        <AdminContent current="streams"/>
                     </>
                     )
             default:

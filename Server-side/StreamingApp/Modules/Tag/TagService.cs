@@ -17,7 +17,7 @@ namespace StreamingApp.Services
             TagManager = tagManager ?? throw new ArgumentNullException(nameof(tagManager));
         }
 
-        public Task<Tag> CreateTagAsync(Tag model)
+        public Task<(bool Succeeded, string[] Errors, Tag? tag)> CreateTagAsync(Tag model)
         {
             var tag = TagManager.CreateTag(model);
             return tag;
@@ -36,6 +36,11 @@ namespace StreamingApp.Services
         public Task<Tag?> GetTagByIdAsync(int id)
         {
             return TagManager.GetTagWithId(id);
+        }
+
+        public Task<Tag?> GetTagWithName(string name)
+        {
+            return TagManager.GetTagWithName(name);
         }
 
         public Task<(bool Succeeded, string[] Errors)> UpdateTagAsync(int id, Tag model)

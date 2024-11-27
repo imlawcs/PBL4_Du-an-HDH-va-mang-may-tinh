@@ -24,7 +24,7 @@ export default function StreamChat(props) {
   const chatHolderRef = useRef(null);
   const handleSendMessage = () => {
     if(user)
-    SignalRTest.sendMessage(chatContents, user.userName);
+    SignalRTest.sendMessage(chatContents, user.UserName);
     setChatContents("");
   }
   const handleToggleUserList = () => {
