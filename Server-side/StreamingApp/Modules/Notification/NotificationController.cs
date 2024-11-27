@@ -43,11 +43,11 @@ namespace StreamingApp.Controllers
             await _notificationService.MarkAsReadAsync(notificationId);
         }
 
-        // [HttpPost]
-        // public async Task<IActionResult> SendNotification(string message)
-        // {
-        //     await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
-        //     return Ok();
-        // }
+        [HttpPost]
+        public async Task<IActionResult> SendNotification(string message)
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
+            return Ok();
+        }
     }
 }

@@ -1,14 +1,17 @@
 using StreamingApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
 
 namespace StreamingApp.Managers
 {
     public class NotificationManager {
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
-        public NotificationManager(AppDbContext context, IEmailService emailService) {
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public NotificationManager(AppDbContext context, IEmailService emailService, IHubContext<NotificationHub> hubContext) {
             _context = context;
             _emailService = emailService;
+            _hubContext = hubContext;
         }
 
         public async Task CreateNotificationAsync(int userId, string message, string type)
@@ -31,7 +34,7 @@ namespace StreamingApp.Managers
             await _emailService.SendEmailAsync(userId, "Thông báo mới", message);
 
             // 4. Gửi thông báo realtime qua SignalR
-            // await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceiveNotification", notification);
         }
 
         public async Task<List<Notification>> GetUserNotificationsAsync(string userId)
