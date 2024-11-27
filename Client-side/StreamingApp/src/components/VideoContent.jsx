@@ -46,12 +46,13 @@ export default function VideoContent(props) {
   } else {
   }
   return (
-    <div className="vc__holder" onClick={props.onClick}>
+    <div className="vc__holder">
       <div
         className="thumbnail"
         style={{
           backgroundImage: `url(${props.thumbnail})`,
         }}
+        onClick={props.onClick}
       >
         <div className="live__tag league-spartan-regular fs__normal-1">
           LIVE

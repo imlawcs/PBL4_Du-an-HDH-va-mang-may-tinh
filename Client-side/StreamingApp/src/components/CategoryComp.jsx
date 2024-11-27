@@ -53,17 +53,26 @@ export default function CategoryComp(props) {
         <div
           className="category__card rr__flex-col"
           onClick={() => {
-            navigate("/category");
-          }}
-        >
-          <img src={props.categoryPic} className="cate__c-bg" />
-          <div className="cate__content-holder rr__flex-col">
-            <span className="fs__large-1 citizenship fill__container league-spartan-semibold">
+            navigate(`/category/${props.categoryId}`);
+            }}
+          >
+            <img src={props.categoryPic} className="cate__c-bg" />
+            <div className="cate__content-holder rr__flex-col"
+            style={{
+            wordWrap: "break-word",
+            width: "9.375em"
+            }}
+            >
+            <span className={`fs__normal-2 citizenship league-spartan-semibold`}
+            >
               {props.categoryName}
             </span>
-            <span className="cate__vc league-spartan-light fs__small-3 citizenship">
+            
+            {/* <span className="cate__vc league-spartan-light fs__small-3 citizenship" style={{
+              alignSelf: "flex-start",
+            }}>
               {props.cateViewCount} viewers
-            </span>
+            </span> */}
             {/* <div className="tag__holder rr__flex-row">
               <TagCard name="English" />
               <TagCard name="Vietnamese" />

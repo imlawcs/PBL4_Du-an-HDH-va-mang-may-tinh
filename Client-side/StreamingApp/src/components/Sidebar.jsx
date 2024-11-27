@@ -328,17 +328,17 @@ export default function Sidebar(props) {
     const [categoryList, setCategoryList] = useState([]);
     const [streamList, setStreamList] = useState([]);
     const [loading, setLoading] = useState(true);
-    useEffect(async () => {
+    useEffect(() => {
       const fetchData = 
-        await StreamRoutes.getAllStreams().then((res) => {
-          setStreamList(res.filter((item) => item.isLive === true));
+        StreamRoutes.getAllStreams().then((res) => {
+          setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
           return Promise.resolve();
         });
-      const fetchTags = await TagRoutes.getAllTags().then((res) => {
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
         setTagList(res);
         return Promise.resolve();
       })
-      const fetchCategories = await CategoryRoutes.getAllCategories().then((res) => {
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
         setCategoryList(res);
         return Promise.resolve();
       });
@@ -361,25 +361,7 @@ export default function Sidebar(props) {
           />
           <div className="stream__holder rr__flex-col">
             <div className="sh__label fs__large-3 league-spartan-semibold citizenship">
-              Livestream you may like
-            </div>
-            <div className="sh__content-holder rr__flex-row">
-              {/* map stream here */}
-              
-            </div>
-            <div className="btn__holder">
-              <div className="sepe__line"></div>
-              <Button
-                type={"link-type"}
-                text={"Show more"}
-                onClick={() => {}}
-              />
-              <div className="sepe__line"></div>
-            </div>
-          </div>
-          <div className="stream__holder rr__flex-col">
-            <div className="sh__label fs__large-3 league-spartan-semibold citizenship">
-              Livestream you may like
+              Currently live
             </div>
             <div className="sh__content-holder rr__flex-row">
               {loading?
@@ -388,37 +370,86 @@ export default function Sidebar(props) {
               </span>
               :
               <>
-               {streamList.map((content, index) => (
+               {
+               streamList.length > 0?
+               streamList
+               .slice(0, 5)
+               .map((content, index) => (
                 <VideoContent
-                  key={index}
-                  title={content.streamTitle}
-                  thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
-                  profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
-                  displayName={content.user.DisplayName}
-                  category={categoryList.filter((item) => item.CategoryId === content.streamCategories[0].categoryId)[0].categoryName}
-                  tag={tagList.filter((item) => content.streamTags.includes(item.tagId))}
-                  userName={content.user.UserName}
-                  onClick={() => {
-                    navigate(`/user/${content.user.UserName}`);
-                  }}
-                  navigateCategory={() => {
-                    navigate(`/category/${content.streamCategories[0].categoryId}`);
-                  }}
-                />
-               ))}
+                      key={index}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      displayName={content.user.displayName}
+                      category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      userName={content.user.userName}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
+                    />
+               ))
+               :
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                No stream available
+              </span>
+               }
               </>
               }
               {/* map stream here */}
               
             </div>
             <div className="btn__holder">
-              <div className="sepe__line"></div>
+              <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
               <Button
                 type={"link-type"}
                 text={"Show more"}
                 onClick={() => {}}
               />
-              <div className="sepe__line"></div>
+              <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
+            </div>
+          </div>
+          <div className="stream__holder rr__flex-col">
+            <div className="sh__label fs__large-3 league-spartan-semibold citizenship">
+              Categories
+            </div>
+            <div className="sh__content-holder rr__flex-row">
+              {categoryList.length > 0 && 
+              categoryList.map((content, index) => (
+                <CategoryComp
+                  key={index}
+                  cateViewCount={12727}
+                  categoryName={content.categoryName}
+                  categoryId={content.categoryId}
+                  categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                />
+              ))
+              }
+              
+            </div>
+            <div className="btn__holder">
+            <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
+              <Button
+                type={"link-type"}
+                text={"Show more"}
+                onClick={() => {}}
+              />
+              <hr style={{
+                color: "#555555",
+                width: "100%",
+              }}></hr>
             </div>
           </div>
         </div>
@@ -516,12 +547,24 @@ export default function Sidebar(props) {
   } else if (props.routing == "browsing") {
     const [categoryList, setCategoryList] = useState([]);
     const [streamList, setStreamList] = useState([]);
+    const [tagList, setTagList] = useState([]);
     useEffect(() => {
-      CategoryRoutes.getAllCategories().then((res) => {
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
         setCategoryList(res);
+        Promise.resolve();
       });
-      StreamRoutes.getAllStreams().then((res) => {
-        setStreamList(res);
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log(res);
+        setTagList(res);
+        Promise.resolve();
+      });
+      const fetchStream = StreamRoutes.getAllStreams().then((res) => {
+        console.log(res.filter((item) => item.streamCategories.length > 0));
+        setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+        Promise.resolve();
+      });
+      Promise.all([fetchCategories, fetchTags, fetchStream]).then(() => {
+          console.log("done fetching");
       });
     }, [])
     const [flBtn, setFlBtn] = useState(true);
@@ -566,41 +609,43 @@ export default function Sidebar(props) {
                   )}
                 </div>
                 <div className="sh__content-holder rr__flex-row">
-                  {flBtn ? (
-                    <>
-                      <CategoryComp
-                        cateViewCount={12727}
-                        categoryName="Bach Khoa"
-                        categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                      />
-                      <CategoryComp
-                        cateViewCount={12727}
-                        categoryName="Bach Khoa"
-                        categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                      />
-                      <CategoryComp
-                        cateViewCount={12727}
-                        categoryName="Bach Khoa"
-                        categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                    </>
+                  {flBtn ? 
+                    
+                      categoryList.length > 0 && 
+                      categoryList.map((content, index) => (
+                        <CategoryComp
+                          key={index}
+                          cateViewCount={12727}
+                          categoryName={content.categoryName}
+                          categoryId={content.categoryId}
+                          categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                        />
+                      ))
+                   : (
+                    streamList.length > 0?
+                  streamList
+                  .map((content, index) => (
+                    <VideoContent
+                      key={index}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      displayName={content.user.displayName}
+                      category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      userName={content.user.userName}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
+                    />
+                  ))
+                  :
+                  <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                    No stream available
+                  </span>
                   )}
                 </div>
               </div>
@@ -613,11 +658,11 @@ export default function Sidebar(props) {
     const [currentCategory, setCurrentCategory] = useState({});
     const [streamList, setStreamList] = useState([]);
     useEffect(() => {
-      StreamRoutes.getCategoryById(props.category).then((res) => {
+      CategoryRoutes.getCategoryById(props.category).then((res) => {
         setCurrentCategory(res || {});
       });
       if(currentCategory.length > 0){
-        StreamRoutes.getStreamsWithCategory(currentCategory.CategoryId).then((res) => {
+        StreamRoutes.getStreamsWithCategory(currentCategory.categoryId).then((res) => {
           console.log(res);
           setStreamList(res || []);
         });
@@ -634,16 +679,18 @@ export default function Sidebar(props) {
                 <CategoryComp
                   cateViewCount={12727}
                   type={"default"}
-                  categoryName={currentCategory.CategoryName}
+                  categoryName={currentCategory.categoryName}
                   categoryPic="https://i.imgur.com/tbmr3e8.jpg"
-                  categoryDesc={currentCategory.CategoryDesc}
+                  categoryDesc={currentCategory.categoryDesc}
                 />
                 <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
                   Live channels of this category
                 </span>
                 <div className="def-pad-1"></div>
                 <div className="sh__content-holder rr__flex-row">
-                  {streamList.map((content, index) => (
+                  {
+                  streamList.length > 0?
+                  streamList.map((content, index) => (
                     <VideoContent
                       key={index}
                       title={content.streamTitle}
@@ -652,7 +699,14 @@ export default function Sidebar(props) {
                       userName={content.user.userName}
                       category={currentCategory.CategoryName}
                     />
-                  ))}
+                  ))
+                :
+                <>
+                <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                  No stream available
+                </span>
+                </>
+                }
                 </div>
               </div>
             </div>

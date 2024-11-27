@@ -133,12 +133,10 @@ connection.on("roomCreated", async (hostName) => {
 connection.on("roomLeft", async (clientId) => {
     console.log("Client left: " + clientId);
     hostPeerConnection[clientId].close();
-    hostPeerConnection[clientId] = null;
 })
 //[HOST] room remove
 connection.on("roomRemoved", async (hostName) => {
     localStream.getTracks().forEach(track => track.stop());
-    localStream = null;
     console.log("Room removed by: " + hostName);
 });
 //[HOST]roomJoined by client
@@ -171,9 +169,9 @@ connection.on("disposeClient", async (host) => {
     console.log("left room:  " + host);
     hostConnectionId = null;
     peerConnection.close();
-    peerConnection = null;
+    // peerConnection = null;
     remoteStream.getTracks().forEach(track => track.stop());
-    remoteStream = null;
+    // remoteStream = null;
     
 });
 /*
@@ -207,18 +205,14 @@ connection.on("receiveIceCandidate", async (candidate, sender, type) => {
         if(type === "fromHost"){
             await PeerHandler.handleIceCandidate(candidate);
             peerConnection.onconnectionstatechange = (event) => {
-                if(peerConnection.connectionState === 'connected'){
-                    console.log("Connected");
-                }
+                console.log("Client: " + peerConnection.connectionState);
             }
             
         }
         else {
             await hostPeerConnection[sender].addIceCandidate(new RTCIceCandidate(candidate));
             hostPeerConnection[sender].onconnectionstatechange = (event) => {
-                if(hostPeerConnection[sender].connectionState === 'connected'){
-                    console.log("Connected");
-                }
+                console.log("Host: " + hostPeerConnection[sender].connectionState);
             }
         }
     }
@@ -236,7 +230,6 @@ connection.on("error", async (message) => {
 
 
 let peerConnection = new RTCPeerConnection(servers);
-peerConnection.addTransceiver('video', { direction: 'sendrecv' });
 
 peerConnection.ontrack = (event) => {
     const remoteVideo = document.getElementById('remote__stream');
@@ -262,10 +255,14 @@ export const SignalRTest = {
     //[BOTH] start signalR
         async serverOn() {
             try {
-                await connection.start();
-                console.log("SignalR Connected");
-                connection.invoke("ready");
-                isServerOn = true;
+                if(connection.state === signalR.HubConnectionState.Disconnected){
+                    await connection.start();
+                    console.log("SignalR Connecting");
+                    connection.invoke("ready");
+                }
+                else if(connection.state === signalR.HubConnectionState.Connected){
+                    console.log("SignalR already connected");
+                }
                 //room created announce to make call
             } catch (err) {
                 console.error(err);
@@ -273,17 +270,16 @@ export const SignalRTest = {
         },
         async serverOff(){
             try {
-                if(connection.connectionStarted){
+                if(connection.state === signalR.HubConnectionState.Connected){
                     await connection.stop();
                     console.log("SignalR Disconnected");
-                    isServerOn = false;
                 }
             } catch (err) {
                 console.error(err);
             }
         },
         async start(hostName) {
-            if(isServerOn){
+            if(connection.state === signalR.HubConnectionState.Connected){
                  //Turn server on
                 if(localStream != null){
                     connection.invoke("createRoom", hostName); //Create room and wait for offer from client
@@ -330,11 +326,13 @@ export const SignalRTest = {
         },
         //[CLIENT]join room
         async joinRoom(username, hostName) {
-            await this.serverOn(); //Turn server on
-            if(isServerOn){
+            await this.serverOn().then(() => {
                 connection.invoke("joinRoom", username ,hostName); //Join room and send offer
-            }
-            else console.log("Server is off");
+            });
+            
+            if(connection.state === signalR.HubConnectionState.Disconnected)
+            console.log("Server is off");
+             //Turn server on
         },
         async leaveRoom() {
             peerConnection.close();
@@ -353,8 +351,6 @@ export const SignalRTest = {
             connection.invoke("removeRoom");
             localStream.getTracks().forEach(track => track.stop());
             document.getElementById('localVideo').style.display = 'none';
-
-            
         },
         modifySDP(sdp){
             sdp = sdp.replace(/a=fmtp:.*\r\n/g, '');
