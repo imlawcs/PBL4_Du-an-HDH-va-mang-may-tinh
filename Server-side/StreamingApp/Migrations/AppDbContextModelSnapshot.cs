@@ -87,19 +87,24 @@ namespace StreamingApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("NotiDate")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("NotiDesc")
-                        .IsRequired()
+                    b.Property<string>("Message")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("StreamId")
+                    b.Property<DateTime>("NotiDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StreamId")
                         .HasColumnType("int");
 
                     b.Property<int?>("StreamerUserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -314,7 +319,9 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
+
                             Password = "$2a$11$YJeQn4Eph1InJRvRCU.J1.frv8rOokdZOdBYhjCJ8D2MvYvKmfGni",
+
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin1"
