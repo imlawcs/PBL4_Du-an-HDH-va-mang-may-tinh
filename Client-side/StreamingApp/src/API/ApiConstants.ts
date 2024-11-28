@@ -23,5 +23,11 @@ export const ApiConstants = {
     TAG: {
         GET_TAGS: '/api/Tag',
         GET_TAG_BY_ID: '/api/Tag/',
+    },
+    FOLLOW: {
+        GET_ALL_FOLLOWING: '/api/Following',
+        GET_FOLLOWERS_BY_ID: '/api/Following/',
+        FOLLOW: '/api/Following/follow',
+        UNFOLLOW: '/api/Following/unfollow',
     }
 }

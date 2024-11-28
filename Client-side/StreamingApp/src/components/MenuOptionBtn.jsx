@@ -8,7 +8,9 @@ import {
 import "../assets/css/MenuOptionBtn.css";
 export default function MenuOptionBtn(props) {
   return (
-    <div className="option__btn" onClick={props.onClick}>
+    <div className="option__btn" onClick={props.onClick} style={{
+      ...props.styles
+    }}>
       <div className="option__icon">
         <FontAwesomeIcon icon={props.icon} />
       </div>

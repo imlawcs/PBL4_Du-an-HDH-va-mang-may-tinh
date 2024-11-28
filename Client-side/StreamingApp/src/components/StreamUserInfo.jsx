@@ -11,11 +11,12 @@ import Toast from "./Toast";
 import { UserRoutes } from "../API/User.routes";
 import { TagRoutes } from "../API/Tag.routes";
 import { CategoryRoutes } from "../API/Category.routes";
+import { FollowRoutes } from "../API/Follow.routes";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
     }
-
+    const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     function shortenNumber(number) {
         if(number >= 1000000000){
             return (number / 1000000000).toFixed(1) + "B";
@@ -34,11 +35,38 @@ export default function StreamUserInfo(props) {
     const [isFollowed, setIsFollowed] = useState(false); 
       //show toast
     const [showToast, setShowToast] = useState(false);
-   
+    const [toastMessage, setToastMessage] = useState("");
+    const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const menuRef = useRef(null);
+    useEffect(() => {
+        FollowRoutes.FollowCheck(props.channelId, userGlobal.UserId).then((res) => {
+            console.log("isfollowed: ", res);
+            setIsFollowed(res);
+        });
+    }, [])
     
     const handleFollow = () => {
-        setIsFollowed(!isFollowed);
-        setShowToast(true);
+        if(userGlobal.UserId === undefined){
+            setToastMessage("Please login to follow this channel");
+            setShowToast(true);
+            return;
+        }
+        if(isFollowed){
+            FollowRoutes.Unfollow(props.channelId, userGlobal.UserId).then((res) => {
+                console.log(res);
+                setToastMessage("Unfollowed " + props.userName);
+                setIsFollowed(false);
+                setShowToast(true);
+            });
+        }
+        else{
+            FollowRoutes.Follow(props.channelId, userGlobal.UserId).then((res) => {
+                console.log(res);
+                setToastMessage("Followed " + props.userName);
+                setIsFollowed(true);
+                setShowToast(true);
+            })
+        }
     }
 
     return(
@@ -74,13 +102,14 @@ export default function StreamUserInfo(props) {
                     <div className="uih__right-holder rr__flex-col">
                         <div className="uihr__btn-holder rr__flex-row">
                             <BtnIcon icons={faShareFromSquare}/>
-                            <BtnIcon icons={faHeart} color={isFollowed ? Colors.secondary : "#fff"} onClick={handleFollow}/>
+                            { (userGlobal.UserId !== props.channelId) && <BtnIcon icons={faHeart} color={isFollowed ? Colors.secondary : "#fff"} onClick={handleFollow}/>}
                         </div>
                         <div className="uihr__view-holder rr__flex-row">
                             <span className="uihr__view-count citizenship league-spartan-semibold fs__large-1">
                                 <FontAwesomeIcon icon={faEye} /> {props.viewCount}
                             </span>
-                            <BtnIcon icons={faEllipsis}/>
+                            <BtnIcon ref={menuRef} icons={faEllipsis} onClick={() => setShowMoreMenu(!showMoreMenu)}/>
+                            
                         </div>
                     </div>
                 </div>
@@ -101,7 +130,7 @@ export default function StreamUserInfo(props) {
         </div>
         {showToast && (
             <Toast
-                message={isFollowed ? "Followed" : "Unfollowed"}
+                message={toastMessage}
                 onDispose={() => setShowToast(false)}
             />
         )}

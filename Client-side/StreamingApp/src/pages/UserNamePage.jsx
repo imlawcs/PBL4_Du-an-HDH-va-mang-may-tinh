@@ -7,10 +7,12 @@ import { SignalRTest } from "../scripts/webrtcTemp";
 export default function UserNamePage(props) {
     const params = useParams();
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || "");
-    console.log(params.username);
+    const [username, setUsername] = useState(params.username);
+    console.log(username);
     //need validate code for username
     useEffect(() => {
         console.log("Start loading stream...");
+        setUsername(params.username);
         // SignalRTest.serverOff().then(() => {
             SignalRTest.joinRoom(user.UserName, params.username);
         // });
@@ -22,7 +24,7 @@ export default function UserNamePage(props) {
     return(
         <>
             <NavBar routing="index"/>
-            <Sidebar routing="Username" userRoute={params.username}/>
+            <Sidebar key={params.username} routing="Username" userRoute={params.username}/>
         </>
         
     )

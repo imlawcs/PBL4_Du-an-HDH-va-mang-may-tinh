@@ -10,6 +10,9 @@ import { CategoryRoutes } from "../API/Category.routes";
 import { useEffect, useRef, useState } from "react";
 import CustomDatalist from "../components/CustomDatalist";
 import { TagRoutes } from "../API/Tag.routes";
+import MenuHolder from "../components/MenuHolder.main";
+import MenuOptionBtn from "../components/MenuOptionBtn";
+import { faBan, faEllipsis, faUsersBetweenLines } from "@fortawesome/free-solid-svg-icons";
 export default function ComponentTest() {
   const navigate = useNavigate();
   const [categoryDataList, setCategoryDataList] = useState([]);
@@ -152,6 +155,17 @@ export default function ComponentTest() {
             onClick={handleSelectTag}
           />
         </div>
+          <MenuHolder>
+            <MenuOptionBtn icon={faBan} optionName={"Block"} styles={{
+              width: "100%"
+            }}/>
+            <MenuOptionBtn icon={faEllipsis} optionName={"About"} styles={{
+              width: "100%"
+            }}/>
+            <MenuOptionBtn icon={faUsersBetweenLines} optionName={"Block"} styles={{
+              width: "100%"
+            }}/>
+          </MenuHolder>
       </div>
     </>
   )

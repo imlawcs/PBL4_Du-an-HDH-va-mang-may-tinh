@@ -41,6 +41,7 @@ export default function Sidebar(props) {
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
     const navigate = useNavigate();
   const [option, setOption] = useState(0);
+  const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
   if (props.routing == "SM") {
     const [isOffline, setOffline] = useState(true);
     const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
@@ -142,7 +143,7 @@ export default function Sidebar(props) {
     const personalInfoRef = useRef(null);
     const connectionsRef = useRef(null);
     const Auth = useAuth();
-    const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
+    // const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     const scrollToPersonalInfo = () => {
       personalInfoRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -423,7 +424,13 @@ export default function Sidebar(props) {
               Categories
             </div>
             <div className="sh__content-holder rr__flex-row">
-              {categoryList.length > 0 ?
+              {loading?
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+              Loading...
+              </span>
+              :
+              
+              categoryList.length > 0 ?
               categoryList.map((content, index) => (
                 <CategoryComp
                   key={index}
@@ -909,12 +916,13 @@ export default function Sidebar(props) {
     const [userList, setUserList] = useState([]);
     const [streamData, setStreamData] = useState({});
     const connection = SignalRTest.getConnection();
+    const [userRoute, setUserRoute] = useState(props.userRoute);
     const [user, setUser] = useState("");
     const [currentCategory, setCurrentCategory] = useState("");
     const [currentTags, setCurrentTags] = useState([]);
     useEffect(() => {
       try{
-        UserRoutes.getUserByName(props.userRoute).then((res) => {
+        UserRoutes.getUserByName(userRoute).then((res) => {
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
@@ -938,7 +946,7 @@ export default function Sidebar(props) {
         console.log(e);
       }
         
-    }, []);
+    }, [userRoute]);
     
     useEffect(() => {
       if(connection == null) return;
@@ -985,6 +993,8 @@ export default function Sidebar(props) {
               </div>
 
               <StreamUserInfo
+                key={user.UserId}
+                channelId={user.UserId}
                 userName={user.DisplayName}
                 title={streamData.streamTitle}
                 desc={streamData.streamDesc}
