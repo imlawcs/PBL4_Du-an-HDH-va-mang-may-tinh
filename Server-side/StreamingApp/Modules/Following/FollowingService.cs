@@ -25,8 +25,8 @@ namespace StreamingApp.Services {
             return followingManager.UnfollowUser(followerId, channelId);
         }
 
-        public Task<bool> IsFollowing(int followerId, int channelId) {
-            return followingManager.IsFollowing(followerId, channelId);
+        public Task<bool> IsFollowing(int channelId, int followerId) {
+            return followingManager.IsFollowing(channelId, followerId);
         }
     }
 }
