@@ -656,17 +656,18 @@ export default function Sidebar(props) {
     );
   } else if (props.routing == "category") {
     const [currentCategory, setCurrentCategory] = useState({});
+    const [tagList, setTagList] = useState([]);
     const [streamList, setStreamList] = useState([]);
     useEffect(() => {
-      CategoryRoutes.getCategoryById(props.category).then((res) => {
+      const category = CategoryRoutes.getCategoryById(props.category).then((res) => {
         setCurrentCategory(res || {});
+        return Promise.resolve(res);
       });
-      if(currentCategory.length > 0){
-        StreamRoutes.getStreamsWithCategory(currentCategory.categoryId).then((res) => {
-          console.log(res);
-          setStreamList(res || []);
+      Promise.all([category]).then((res) => {
+        StreamRoutes.getStreamsWithCategory(res[0].categoryId).then((res) => {
+          setStreamList(res.filter((item) => item.isLive === true));
         });
-      }
+      });
     },[]);
     return (
       <>

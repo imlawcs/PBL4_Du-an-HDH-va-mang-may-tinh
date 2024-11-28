@@ -42,7 +42,7 @@ export const StreamRoutes = {
                 throw new Error("Failed to get streams");
             }
             const data = await response.json();
-            return data;
+            return data || [];
         }
         catch (error) {
             console.error(error);

@@ -43,28 +43,18 @@ export default function CustomModal(props) {
     const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
-      let newErrors = {};
-
-      if (!Username.trim()) {
-        newErrors.Username = "Username is required";
-      } else if (Username.length < 3) {
-        newErrors.Username = "Username must be at least 3 characters";
-      }
-
-      if (!Password) {
-        newErrors.Password = "Password is required";
-      } else if (Password.length < 6) {
-        newErrors.Password = "Password must be at least 6 characters";
-      }
-
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
+      
     };
 
     const handleLogin = async () => {
-      if (validateForm()) {
-        await Auth.logIn({Username, Password});
-      }
+      let newErrors = {};
+      const signup = await Auth.logIn({Username, Password}).then((res) => {
+        if(res.error){
+          newErrors.form = "invalid username or password";
+        }
+        return Promise.resolve(res);
+      });
+      setErrors(newErrors);
     };
     return (
       <>
@@ -128,6 +118,11 @@ export default function CustomModal(props) {
                   </span>
                 </span>
               </div>
+              {errors.form && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.form}
+                </span>
+              )}
               <div className="btn__holder rrf__jc-center">
                 <Button type="default" text="Login" onClick={handleLogin} />
               </div>
@@ -147,43 +142,32 @@ export default function CustomModal(props) {
     const [Password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
     const validateSignup = () => {
-      let newErrors = {};
-
-      if (!Username.trim()) {
-        newErrors.Username = "Username is required";
-      } else if (Username.length < 5) {
-        newErrors.Username = "Username must be at least 5 characters long";
-      }
-
-      if (!Email.trim()) {
-        newErrors.email = "Email is required";
-      } else if (!/\S+@\S+\.\S+/.test(Email)) {
-        newErrors.email = "Email is invalid";
-      }
-
-      if (!Password) {
-        newErrors.Password = "Password is required";
-      } else if (Password.length < 8) {
-        newErrors.Password = "Password must be at least 8 characters long";
-      }
-
-      if (Password !== ConfirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
-      }
-
       
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
     };
 
 
     const handleSignup = () => {
-      if (validateSignup()) {
         // Proceed with signup
+        let newErrors = {};
         const data = { Username, Password, ConfirmPassword, Email, PhoneNumber, DisplayName };
-        Auth.signUp(data);
+        const signup = Auth.signUp(data).then((res) => {;
+          if(res.status === 400){
+            newErrors.email = res.errors.Email[0];
+            newErrors.Password = res.errors.Password[0];
+          }
+          else if(res.message){
+            newErrors.ok = res.message;
+            console.log("Signup success");
+          }
+          else {
+            console.log("Status: ", res.status);
+          }
+          return Promise.resolve(res);
+        });
+        Promise.all([signup]).then((res) => {
+          setErrors(newErrors);
+        })
         // props.signup();
-      }
     };
     return (
       <>
@@ -203,11 +187,11 @@ export default function CustomModal(props) {
                 value={Username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              {errors.Username && (
+              {/* {errors.Username && (
                 <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
                   {errors.Username}
                 </span>
-              )}
+              )} */}
               <input
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                 type="email"
@@ -271,6 +255,11 @@ export default function CustomModal(props) {
                 </span>
               </span>
             </div>
+            {errors.ok && (
+              <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                {errors.ok}
+              </span>
+            )}
             <div className="btn__holder rrf__jc-center">
               <Button type="default" text="Sign Up" onClick={handleSignup} />
             </div>
