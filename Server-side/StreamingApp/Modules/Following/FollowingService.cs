@@ -17,12 +17,12 @@ namespace StreamingApp.Services {
             return followingManager.GetAllFollowings();
         }
 
-        public Task<(bool Succeeded, string[] Errors)> FollowUser(int followerId, int channelId) {
-            return followingManager.FollowUser(followerId, channelId);
+        public Task<(bool Succeeded, string[] Errors)> FollowUser(int channelId, int followerId) {
+            return followingManager.FollowUser(channelId, followerId);
         }
 
-        public Task<(bool Succeeded, string[] Errors)> UnfollowUser(int followerId, int channelId) {
-            return followingManager.UnfollowUser(followerId, channelId);
+        public Task<(bool Succeeded, string[] Errors)> UnfollowUser(int channelId, int followerId) {
+            return followingManager.UnfollowUser(channelId, followerId);
         }
 
         public Task<bool> IsFollowing(int channelId, int followerId) {

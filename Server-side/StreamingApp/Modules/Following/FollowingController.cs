@@ -48,7 +48,7 @@ namespace StreamingApp.Controllers
                 return BadRequest("User is already following");
             }
 
-            var result = await _followingService.FollowUser(followDTO.FollowerId, followDTO.ChannelId);
+            var result = await _followingService.FollowUser(followDTO.ChannelId, followDTO.FollowerId);
             if (result.Succeeded) {
                 return Ok("Follow successfully");
             }
@@ -67,7 +67,7 @@ namespace StreamingApp.Controllers
             if(!isFollowing) {
                 return BadRequest("User is not following");
             }
-            var result = await _followingService.UnfollowUser(followDTO.FollowerId, followDTO.ChannelId);
+            var result = await _followingService.UnfollowUser(followDTO.ChannelId, followDTO.FollowerId);
             if (result.Succeeded) {
                 return Ok("Unfollow successfully");
             }
