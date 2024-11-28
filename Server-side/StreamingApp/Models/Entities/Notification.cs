@@ -7,11 +7,13 @@ namespace StreamingApp.Models.Entities
     {
         [Key] [Required]
         public int Id {get; set;}
-        public int StreamId { get; set; } 
+        public int? StreamId { get; set; } 
         public int UserId { get; set; }
+        public string? Type { get; set; }
+        public bool IsRead { get; set; }
 
         [MaxLength(100)]
-        public string NotiDesc { get; set; }
+        public string? Message { get; set; }
 
         public DateTime NotiDate { get; set; }
 

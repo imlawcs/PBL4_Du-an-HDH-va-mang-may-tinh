@@ -131,9 +131,11 @@ namespace StreamingApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StreamId = table.Column<int>(type: "int", nullable: false),
+                    StreamId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    NotiDesc = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     NotiDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StreamerUserId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -267,10 +269,10 @@ namespace StreamingApp.Migrations
                 columns: new[] { "UserId", "Bio", "DisplayName", "Email", "IsEmailNoti", "Password", "PhoneNumber", "ProfilePic", "RegisterDate", "UserName", "UserStatus" },
                 values: new object[,]
                 {
-                    { 1, null, "admin", "admin@gmail.com", null, "$2a$11$F6ZL5Gntu7xtRBPWRqEZ9.JLITRsXUfLUUffy6WsY3LxQd7uCAs8.", "1111111111", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin Placeholder", null },
-                    { 2, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$WMOBU6r4LZVAcyb5i4pOEe8.mIqtxM/ppp1k1Q0fkreIM0tAPNLuO", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
-                    { 3, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$dya.wZkI9L0RYpD0mOeT9ukpcj3lshVN0cUW09GktKU5P21Jtyzcq", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
-                    { 4, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$eGR4gqrOX.8HMOD3YZVFSuj1.7xqplLMca6KRJ8MXiHA8tuhQchWm", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
+                    { 1, null, "admin", "admin@gmail.com", null, "$2a$11$qBZP4ep4RTs5Yl7/A3kfUuHp1yTRpG8FK9dNlbq/tXLi0X48HmcCW", "1111111111", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin Placeholder", null },
+                    { 2, null, "Dao Le Hanh Nguyen", "daolehanhnguyen@gmail.com", null, "$2a$11$KmKcL0WMlc9W6HZqrVwCnusvrrq6cGb9rAbBLISVG.LvEm2esZ3yO", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin1", null },
+                    { 3, null, "Huynh Thuy Minh Nguyet", "minhnguyetdn2004@gmail.com", null, "$2a$11$9Uu.jUj4rL/zXal1jxcbS.wg/oEAQDh4YGc3rMMz/FEBre904TpMG", "0775500744", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2", null },
+                    { 4, null, "Nguyen Huu Khoa", "huukhoa04@gmail.com", null, "$2a$11$f5yMpUAsB6LVEeqtAWzSc.VvdhJQQC19SauBqn0TysqU7e2PX/OCe", "0333414094", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin3", null }
                 });
 
             migrationBuilder.InsertData(
