@@ -43,7 +43,7 @@ export default function BtnIcon(props) {
   } else {
     return (
       <>
-        <div className="rr__icon-btn citizenship" onClick={props.onClick}>
+        <div className="rr__icon-btn citizenship" onClick={() => props.onClick()}>
           <FontAwesomeIcon icon={props.icons} color={props.color}/>
         </div>
       </>

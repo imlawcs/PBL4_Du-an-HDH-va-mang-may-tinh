@@ -62,6 +62,7 @@ namespace StreamingApp.Managers
             streamToUpdate.StreamTitle = stream.StreamTitle;
             streamToUpdate.StreamDesc= stream.StreamDesc;
             streamToUpdate.IsLive = stream.IsLive;
+            streamToUpdate.StreamStatus = stream.StreamStatus;
 
             await _context.SaveChangesAsync();
             return (true, new [] {"Update stream successfully"});

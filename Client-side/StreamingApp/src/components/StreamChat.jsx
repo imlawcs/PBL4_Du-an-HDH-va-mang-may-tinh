@@ -12,6 +12,7 @@ import BtnIcon from "./BtnIcon";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/AuthProvider";
 import { SignalRTest } from "../scripts/webrtcTemp";
+import { useRef } from "react";
 export default function StreamChat(props) {
   const context =
     "Consequat ex amet quis aliqua duis. Aute sunt cupidatat irure ex anim cillum Lorem culpa. Aute elit commodo occaecat sunt elit culpa qui mollit. Commodo id officia adipisicing pariatur consectetur tempor occaecat.";
@@ -19,16 +20,22 @@ export default function StreamChat(props) {
   const [chatContents, setChatContents] = useState("");
   const [isOnline, setIsOnline] = useState(SignalRTest.getHostConnectionId());
   const [toggleUserList, setToggleUserList] = useState(false);
-  
-
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || "");
+  const chatHolderRef = useRef(null);
   const handleSendMessage = () => {
-    SignalRTest.sendMessage(chatContents, "random");
+    if(user)
+    SignalRTest.sendMessage(chatContents, user.UserName);
     setChatContents("");
   }
   const handleToggleUserList = () => {
     setToggleUserList(!toggleUserList);
   };
   const auth = useAuth();
+  useEffect(() => {
+    if (chatHolderRef.current) {
+      chatHolderRef.current.scrollTop = chatHolderRef.current.scrollHeight;
+    }
+  }, [props.messages]);
   if (isVisible)
     return (
       <>
@@ -45,7 +52,7 @@ export default function StreamChat(props) {
               <BtnIcon icons={faEye} onClick={handleToggleUserList}/>
             </div>
           </div>
-          <div className="sc__body">
+          <div className="sc__body" ref={chatHolderRef}>
             <div id="chat__holder" className="sc__body-holder">
 
             {

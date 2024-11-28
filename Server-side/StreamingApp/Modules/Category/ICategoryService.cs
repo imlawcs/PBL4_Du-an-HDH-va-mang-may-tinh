@@ -9,6 +9,6 @@ public interface ICategoryService
     Task<IEnumerable<Category>> GetAllCategoryAsync();
     Task<(bool Succeeded, string[] Errors)> UpdateCategoryAsync(int id,Category model);
     Task<bool> DeleteCategoryAsync(int id);
-    Task<Category> CreateCategoryAsync(Category model);
+    Task<(bool Succeeded, string[] Errors, Category? category)> CreateCategoryAsync(Category model);
 }
 }

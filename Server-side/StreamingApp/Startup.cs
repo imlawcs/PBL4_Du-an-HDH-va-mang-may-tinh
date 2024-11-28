@@ -39,15 +39,11 @@ namespace StreamingApp
             {
                 options.AddPolicy("ClientPermission", policy =>
                 {
-                    var clientSideUrl = Configuration["ClientSide:Url"];
-                    if (!string.IsNullOrEmpty(clientSideUrl))
-                    {
-                        policy.WithOrigins(clientSideUrl);
-                    }
-                        // .SetIsOriginAllowedToAllowWildcardSubdomains()
-                        // .AllowAnyHeader()
-                        // .AllowAnyMethod()
-                        // .AllowCredentials();
+                    policy.WithOrigins(Configuration["ClientSide:Url"], "https://localhost:5173")
+                        .SetIsOriginAllowedToAllowWildcardSubdomains()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
 

@@ -36,7 +36,7 @@
     
 }
 .smd__size{
-    width: 40em;
+    width: 42em;
     padding: 2em;
     border-radius: var(--radius-scale);
 }
@@ -105,4 +105,7 @@
 }
 .str__status::-webkit-scrollbar{
     display: none;
+}
+.datalist__styling{
+    background-color: transparent;
 }

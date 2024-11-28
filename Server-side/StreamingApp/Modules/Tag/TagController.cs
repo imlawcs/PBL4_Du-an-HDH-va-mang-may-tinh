@@ -31,6 +31,15 @@ namespace StreamingApp.Controllers
             }
         }
 
+        
+        [HttpGet("name={name}")]
+        public async Task<IActionResult> GetTagWithName(string name)
+        {
+            var tag = await _tagService.GetTagWithName(name);
+            if (tag==null) return NotFound("Tag not found");
+            else return Ok(tag);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTagWithIdAsync(int id)
         {
@@ -39,15 +48,16 @@ namespace StreamingApp.Controllers
             else return Ok(tag);
         }
 
+
         [HttpPost]
         public async Task<IActionResult> CreateTagAsync([FromBody] Tag model)
         {
             var tag = await _tagService.CreateTagAsync(model);
-            if(tag == null)
+            if(!tag.Succeeded)
             {
-                return BadRequest("Create tag failed");
+                return BadRequest(tag.Errors);
             }
-            return Ok("Create tag successfully");
+            return Ok(tag.tag.TagId);
         }
 
         [HttpPut("{id}")]
