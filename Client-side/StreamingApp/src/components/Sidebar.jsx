@@ -423,7 +423,7 @@ export default function Sidebar(props) {
               Categories
             </div>
             <div className="sh__content-holder rr__flex-row">
-              {categoryList.length > 0 && 
+              {categoryList.length > 0 ?
               categoryList.map((content, index) => (
                 <CategoryComp
                   key={index}
@@ -433,6 +433,10 @@ export default function Sidebar(props) {
                   categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
                 />
               ))
+              :
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                No category available
+              </span>
               }
               
             </div>
@@ -568,6 +572,7 @@ export default function Sidebar(props) {
       });
     }, [])
     const [flBtn, setFlBtn] = useState(true);
+    const [search, setSearch] = useState("");
     return (
       <>
         <div className="main__position">
@@ -579,6 +584,7 @@ export default function Sidebar(props) {
                 <span className="fl__title fs__title-5 league-spartan-regular citizenship fill__container">
                   Browsing
                 </span>
+                  
                 <div className="btn__holder">
                   {flBtn ? (
                     <>
@@ -608,11 +614,24 @@ export default function Sidebar(props) {
                     </>
                   )}
                 </div>
+                <input type="text"
+                    className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search for streamers or categories"
+                    style={{
+                      marginTop: "0.5em",
+                      marginBottom: "0.5em",
+                      width: "32em",
+                    }}
+                  />
                 <div className="sh__content-holder rr__flex-row">
                   {flBtn ? 
                     
-                      categoryList.length > 0 && 
-                      categoryList.map((content, index) => (
+                      categoryList.length > 0 ? 
+                      categoryList
+                      .filter((item) => item.categoryName.toLowerCase().includes(search.toLowerCase()))
+                      .map((content, index) => (
                         <CategoryComp
                           key={index}
                           cateViewCount={12727}
@@ -621,9 +640,17 @@ export default function Sidebar(props) {
                           categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
                         />
                       ))
-                   : (
+                   : 
+                   (
+                    <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                      No category available
+                    </span>
+                   )
+                   :
+                   (
                     streamList.length > 0?
                   streamList
+                  .filter((item) => item.streamTitle.toLowerCase().includes(search.toLowerCase()))
                   .map((content, index) => (
                     <VideoContent
                       key={index}
@@ -663,7 +690,11 @@ export default function Sidebar(props) {
         setCurrentCategory(res || {});
         return Promise.resolve(res);
       });
-      Promise.all([category]).then((res) => {
+      const tag = TagRoutes.getAllTags().then((res) => {
+        setTagList(res);
+        return Promise.resolve();
+      })
+      Promise.all([category, tag]).then((res) => {
         StreamRoutes.getStreamsWithCategory(res[0].categoryId).then((res) => {
           setStreamList(res.filter((item) => item.isLive === true));
         });
@@ -699,6 +730,13 @@ export default function Sidebar(props) {
                       profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
                       userName={content.user.userName}
                       category={currentCategory.CategoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
                     />
                   ))
                 :
@@ -717,10 +755,16 @@ export default function Sidebar(props) {
     );
   } else if (props.routing == "SearchResult") {
     const [searchParams] = useSearchParams();
-    const search = searchParams.get("query");
+    const search = searchParams.get("query").toLowerCase();
     const [userList, setUserList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    
+
+
     const renderLoading = () => {
       return (
         <>
@@ -729,8 +773,26 @@ export default function Sidebar(props) {
       )
     }
     useEffect(() => {
-      UserRoutes.getUsers().then((res) => {
+      const fetchUser = UserRoutes.getUsers().then((res) => {
         setUserList(res);
+        Promise.resolve();
+      });
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+        Promise.resolve();
+      });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log(res);
+        setTagList(res);
+        Promise.resolve();
+      });
+      const fetchStream = StreamRoutes.getAllStreams().then((res) => {
+        console.log(res.filter((item) => item.streamCategories.length > 0));
+        setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+        Promise.resolve();
+      });
+      Promise.all([fetchUser, fetchCategories, fetchTags, fetchStream]).then(() => {
+          console.log("done fetching");
       });
       setLoading(false);
     }, []);
@@ -755,9 +817,11 @@ export default function Sidebar(props) {
                   renderLoading() 
                   : 
                   userList
-                  .filter(user => user.UserName.includes(search) || user.DisplayName.includes(search))
+                  .filter(user => user.UserName.toLowerCase().includes(search) || user.DisplayName.toLowerCase().includes(search)).length > 0?
+                  userList
+                  .filter(user => user.UserName.toLowerCase().includes(search) || user.DisplayName.toLowerCase().includes(search))
                   .map((user, index) => (
-                      <>
+                
                       <ChannelComp type="search"
                         key={index}
                         profilePic={user.ProfilePic? user.ProfilePic : defaultImage}
@@ -767,42 +831,72 @@ export default function Sidebar(props) {
                           navigate(`/user/${user.UserName}`);
                         }}
                       />
-                      </>
-                  ))}
+                      
+                  ))
+                :
+                <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                  No user found
+                </span>
+                }
                 </div>
                 <span className="fs__large-2 league-spartan-regular citizenship fill__container def-pad-2 no__padding-lr">
-                  Channels with search term "{search}"
+                  Stream with search term "{search}"
                 </span>
                 <div className="sh__content-holder rr__flex-row">
-                  {[
-                    {
-                      title: "MY FIRST STREAM",
-                      thumbnail: "https://i.imgur.com/mUaz2eC.jpg",
-                      profilePic: "https://i.imgur.com/JcLIDUe.jpg",
-                      userName: "nauts",
-                      category: "League Of Legends",
-                    },
-                    {
-                      title: "MY FIRST STREAM",
-                      thumbnail: "https://i.imgur.com/mUaz2eC.jpg",
-                      profilePic: "https://i.imgur.com/JcLIDUe.jpg",
-                      userName: "nauts",
-                      category: "League Of Legends",
-                    },
-                  ].map((content, index) => (
+                  {loading? renderLoading() : 
+                  streamList
+                  .filter((item) => 
+                    item.streamTitle.toLowerCase().includes(search) || 
+                  item.streamDesc.toLowerCase().includes(search)).length > 0
+                  ?
+                  streamList
+                  .filter((item) => 
+                    item.streamTitle.toLowerCase().includes(search) || 
+                  item.streamDesc.toLowerCase().includes(search))
+                  .map((content, index) => (
                     <VideoContent
                       key={index}
-                      title={content.title}
-                      thumbnail={content.thumbnail}
-                      profilePic={content.profilePic}
-                      userName={content.userName}
-                      category={content.category}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      userName={content.user.userName}
+                      category={currentCategory.CategoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
                     />
-                  ))}
+                  ))
+                :
+                <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                  No stream found
+                </span>
+                }
                 </div>
                 <span className="fs__large-2 league-spartan-regular citizenship fill__container def-pad-2 no__padding-lr">
                   Categories with search terms "{search}"
                 </span>
+                <div className="sh__content-holder rr__flex-row">
+                  {loading? renderLoading() : 
+                  categoryList.filter((item) => item.categoryName.toLowerCase().includes(search)).length > 0?
+                  categoryList.filter((item) => item.categoryName.toLowerCase().includes(search)).map((content, index) => (
+                    <CategoryComp
+                        key={index}
+                        cateViewCount={12727}
+                        categoryName={content.categoryName}
+                        categoryId={content.categoryId}
+                        categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                    />
+                      )):
+                      <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                        No category found
+                      </span>
+                  }
+
+                </div>
               </div>
             </div>
           </div>
