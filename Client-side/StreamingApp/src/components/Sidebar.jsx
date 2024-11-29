@@ -37,6 +37,7 @@ import { useAuth } from "../hooks/AuthProvider";
 import { CategoryRoutes } from "../API/Category.routes";
 import { TagRoutes } from "../API/Tag.routes";
 import { FollowRoutes } from "../API/Follow.routes";
+import { BlockRoutes } from "../API/Block.routes";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -995,6 +996,10 @@ export default function Sidebar(props) {
     useEffect(() => {
       try{
         UserRoutes.getUserByName(userRoute).then((res) => {
+            if(res == null || res == undefined){ 
+              navigate("/error"); 
+              return; 
+            }
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
@@ -1010,7 +1015,16 @@ export default function Sidebar(props) {
               });
               setStreamData(res1|| {});
               console.log(JSON.stringify(streamData));
-          })
+            })
+            BlockRoutes.getAllBlockedUsers().then((res2) => {
+              console.log(res2);
+              if(res2.filter((item) => item.channelId == res.UserId).map((item) => item.blockedId).includes(userGlobal.UserId)){
+                navigate("/error");
+              }
+              else if(res2.filter((item) => item.channelId == userGlobal.UserId).map((item) => item.blockedId).includes(res.UserId)){
+                navigate(`/blocked?self=${encodeURIComponent(userGlobal.UserId)}&blocked=${encodeURIComponent(res.UserId)}&name=${encodeURIComponent(userRoute)}`);
+              }
+            })
         });
         
       }
@@ -1068,6 +1082,7 @@ export default function Sidebar(props) {
                 key={user.UserId}
                 channelId={user.UserId}
                 userName={user.DisplayName}
+                qname={userRoute}
                 title={streamData.streamTitle}
                 desc={streamData.streamDesc}
                 category={currentCategory || "error"}

@@ -29,5 +29,11 @@ export const ApiConstants = {
         GET_FOLLOWERS_BY_ID: '/api/Following/',
         FOLLOW: '/api/Following/follow',
         UNFOLLOW: '/api/Following/unfollow',
+    },
+    BLOCK: {
+        GET_ALL_BLOCKED: '/api/Blocked',
+        GET_BLOCKED_BY_ID: '/api/Blocked/',
+        BLOCK: '/api/Blocked/block',
+        UNBLOCK: '/api/Blocked/unblock',
     }
 }

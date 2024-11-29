@@ -1131,6 +1131,40 @@ export default function CustomModal(props) {
         </div>
         </>
         );
+  } else if(props.type === "block-confirm"){
+    return (
+      <>
+        <div className="modal__holder">
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-small">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Confirm Block
+              </span>
+            <div className="rr__flex-col rrf__jc-center rrf__row-small fill__container">
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                Are you sure you want to block {props.user || "user"}?
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                You will not: 
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                - See their content
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                - Be able to chat with them
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                - Be able to follow them
+              </span>
+              <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Block" onClick={props.block} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+              </div>
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
+      </>
+    );
   }
 
 }

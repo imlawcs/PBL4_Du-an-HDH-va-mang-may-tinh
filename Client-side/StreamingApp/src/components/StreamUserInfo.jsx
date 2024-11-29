@@ -14,6 +14,9 @@ import { CategoryRoutes } from "../API/Category.routes";
 import { FollowRoutes } from "../API/Follow.routes";
 import MenuOptionBtn from "./MenuOptionBtn";
 import MenuHolder from "./MenuHolder.main";
+import CustomModal from "./CustomModal";
+import { BlockRoutes } from "../API/Block.routes";
+import { useNavigate } from "react-router-dom";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
@@ -35,10 +38,13 @@ export default function StreamUserInfo(props) {
         }
       }
     const [isFollowed, setIsFollowed] = useState(false); 
+    const [isBlocked, setIsBlocked] = useState(false);
+    const navigate = useNavigate();
       //show toast
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [moreMenuOption, setMoreMenuOption] = useState(0);
     const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0, width: 0 });
     const menuRef = useRef(null);
     useEffect(() => {
@@ -78,7 +84,26 @@ export default function StreamUserInfo(props) {
             })
         }
     }
-    
+    const HandleBlock = () => {
+        console.log("Block user");
+        if(userGlobal.UserId === undefined){
+            setToastMessage("Please login");
+            setShowToast(true);
+            return;
+        }
+            BlockRoutes.blockUser({
+                ChannelId: userGlobal.UserId,
+                UserId: props.channelId
+            }).then((res) => {
+                console.log(res);
+                setToastMessage("Blocked " + props.userName);
+                setIsBlocked(true);
+                setShowToast(true);
+                navigate(`/blocked?self=${encodeURIComponent(userGlobal.UserId)}&blocked=${encodeURIComponent(props.channelId)}&name=${encodeURIComponent(props.qname)}`);
+            });
+        
+
+    }
     return(
         <>
         <div className="sui__layout fill__container">
@@ -119,9 +144,9 @@ export default function StreamUserInfo(props) {
                                 <FontAwesomeIcon icon={faEye} /> {props.viewCount}
                             </span>
                             <div ref={menuRef}>
-                            <BtnIcon icons={faEllipsis} onClick={() => {
+                            {(userGlobal.UserId !== props.channelId) && <BtnIcon icons={faEllipsis} onClick={() => {
                                 setShowMoreMenu(!showMoreMenu);
-                                }}/>
+                                }}/>}
                             </div>
                             <MenuHolder styles={{
                                 top: `${inputPosition.top}px`,
@@ -129,13 +154,32 @@ export default function StreamUserInfo(props) {
                                 display: showMoreMenu ? "flex" : "none",
                             }}>
                                 <MenuOptionBtn icon={faBan} optionName={"Block"} styles={{
-                                width: "100%"
-                                }}/>
+                                    width: "100%"
+                                }}
+                                onClick={() => {
+                                    setMoreMenuOption(1);
+                                    setShowMoreMenu(false);
+                                }}
+                                />
                                 <MenuOptionBtn icon={faInfoCircle} optionName={"About"} styles={{
                                 width: "100%"
-                                }}/>
+                                }}
+                                onClick={() => {
+                                    setMoreMenuOption(2);
+                                    setShowMoreMenu(false);
+                                }}
+                                />
                             </MenuHolder>
-                            
+                            {moreMenuOption === 1 && (
+                                <CustomModal 
+                                    type={"block-confirm"}
+                                    offModal={() => setMoreMenuOption(0)}
+                                    user={props.userName}
+                                    block={() => {
+                                        HandleBlock();
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

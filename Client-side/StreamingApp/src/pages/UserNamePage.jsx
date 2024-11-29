@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 import { useEffect, useState } from "react";
 import { SignalRTest } from "../scripts/webrtcTemp";
 
-export default function UserNamePage(props) {
+export default function UserNamePage() {
     const params = useParams();
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || "");
     const [username, setUsername] = useState(params.username);
