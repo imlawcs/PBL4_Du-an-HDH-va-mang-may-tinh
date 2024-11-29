@@ -3,9 +3,13 @@ import { UserRoutes } from "../API/User.routes";
 import ChannelComp from "./ChannelComp";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
+import { FollowRoutes } from "../API/Follow.routes";
+import { StreamRoutes } from "../API/Stream.route";
 
-export default function UserChannelList() {
+export default function UserChannelList(props) {
     const [channels, setChannels] = useState([]);
+    const [userFollowList, setUserFollowList] = useState([]);
+    const [userGlobal, setUserGlobal] = useState(props.user);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem("site"));
     const navigate = useNavigate();
@@ -16,20 +20,18 @@ export default function UserChannelList() {
         return false;
     }
     useEffect(() =>  {
-        async function fetchData()
-        {
-            try
-            {
-                const res = await UserRoutes.getUsers();
-                setChannels(res || []);
-                setLoading(false);
-            }
-            catch(err){
-                console.error("Error fetching user channels:", err);
-                setLoading(false);
-            }
-        }
-        fetchData();
+      const fetchUserList = UserRoutes.getUsers().then((res) => {
+        setChannels(res);
+        return Promise.resolve();
+      });
+      const fetchUserFollow = userGlobal && FollowRoutes.GetAllChannelsByFollowerId(userGlobal.UserId).then((res) => {
+        console.log("User follow list:", res);
+        setUserFollowList(res);
+        return Promise.resolve();
+      });
+        Promise.all([fetchUserList, fetchUserFollow]).then(() => {
+          setLoading(false);
+        });
     }, []);
     
     return (
@@ -49,7 +51,11 @@ export default function UserChannelList() {
                   FOLLOWED CHANNELS
                 </div>
                 <div className="cn__holder-comps">
-                  {channels.length > 0 && channels
+                  {channels
+                  .filter((channel) => userFollowList.filter((follow) => follow.channelId === channel.UserId).length>0).length > 0
+                  ? 
+                  channels
+                  .filter((user) => userFollowList.filter((follow) => follow.channelId === user.UserId).length > 0)
                   .filter((user) => adminCheck(user) === false)
                   .slice(0, 5)
                   .map((user) => (
@@ -64,14 +70,21 @@ export default function UserChannelList() {
                       category={user.Category? user.Category : "null"}
                       viewCount={user.ViewCount? user.ViewCount : 0}
                     />
-                  ))}
+                  )):
+                    <span className="cn__holder-label league-spartan-bold fs__normal-1">
+                        You are not following any channels
+                    </span>
+                  }
+
+                  {channels
+                  .filter((channel) => userFollowList.filter((follow) => follow.channelId === channel.UserId).length>0).length > 5 && 
                   <Button
                     type={"link-type"}
                     text={"Show more"}
                     onClick={() => {
                         
                     }}
-                  />
+                  />}
                 </div>
                 </>}
                 <div className="cn__holder-label league-spartan-semibold fs__normal-2">
@@ -79,7 +92,9 @@ export default function UserChannelList() {
                 </div>
                 <div className="cn__holder-comps">
                   {/* map user here */}
-                  {channels.length > 0 && channels
+                  {channels.length > 0 && 
+                  channels
+                  .filter((channel) => userFollowList.filter((follow) => follow.channelId === channel.UserId).length === 0) //get nhung ai chua follow
                   .filter((user) => adminCheck(user) === false)
                   .slice(0, 5)
                   .map((user) => (
@@ -95,13 +110,14 @@ export default function UserChannelList() {
                       viewCount={user.ViewCount? user.ViewCount : 0}
                     />
                   ))}
+                  {channels.filter((user) => adminCheck(user) === false).length > 5 && 
                   <Button
                     type={"link-type"}
                     text={"Show more"}
                     onClick={() => {
                         
                     }}
-                  />
+                  />}
                 </div>
                 </>}
                 

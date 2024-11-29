@@ -1,6 +1,33 @@
 import { ApiConstants } from "./ApiConstants";
 
 export const FollowRoutes = {
+    GetAllFollowing: async() => {
+        try{
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.FOLLOW.GET_ALL_FOLLOWING);
+            if(!response.ok) {
+                throw new Error("Failed to get all following");
+            }
+            const data = await response.json();
+            return data;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    },
+    GetAllChannelsByFollowerId: async (followerId: string) => {
+        if(followerId === "" || followerId === undefined) {
+            return false;
+        }
+        try{
+            const data = await FollowRoutes.GetAllFollowing().then((res) => {
+                return res.filter((follow: any) => follow.followerId === followerId);
+            });
+            return data;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    },
     GetFollowersByChannelId: async (channelId: string) => {
         try{
             const response = await fetch(ApiConstants.BASE_URL + ApiConstants.FOLLOW.GET_FOLLOWERS_BY_ID + channelId);

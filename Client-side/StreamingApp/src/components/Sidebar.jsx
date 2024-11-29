@@ -36,6 +36,7 @@ import { StreamRoutes } from "../API/Stream.route";
 import { useAuth } from "../hooks/AuthProvider";
 import { CategoryRoutes } from "../API/Category.routes";
 import { TagRoutes } from "../API/Tag.routes";
+import { FollowRoutes } from "../API/Follow.routes";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -352,7 +353,7 @@ export default function Sidebar(props) {
     return (
       <div className="main__position">
         <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
+          <UserChannelList key={userGlobal} user={userGlobal} />
         </div>
         <div className="main__content bg__color-00">
           <img
@@ -468,11 +469,48 @@ export default function Sidebar(props) {
     );
   } else if (props.routing == "following") {
     const [flBtn, setFlBtn] = useState(true);
+    const [userFollowList, setUserFollowList] = useState([]);
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [userList, setUserList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+      const fetchUserList = UserRoutes.getUsers().then((res) => {
+        setUserList(res);
+        return Promise.resolve();
+      });
+      const fetchData = 
+        StreamRoutes.getAllStreams().then((res) => {
+          console.log(res.filter((item) => item.streamCategories.length > 0));
+          setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+          return Promise.resolve();
+        });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log("Tag list:", res);
+        setTagList(res);
+        return Promise.resolve();
+      })
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        console.log("Category list:", res);
+        setCategoryList(res);
+        return Promise.resolve();
+      });
+      const fetchUserFollow = FollowRoutes.GetAllChannelsByFollowerId(userGlobal.UserId).then((res) => {
+        console.log("User follow list:", res);
+        setUserFollowList(res);
+        return Promise.resolve();
+      });
+      Promise.all([fetchUserList, fetchData, fetchTags, fetchCategories, fetchUserFollow]).then(() => {
+        console.log("done fetching");
+        setLoading(false);
+      });
+    }, [])
     return (
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-            <UserChannelList />
+            <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00 rr__flex-col">
               {/* main content here */}
               <div className="fl__content-holder rr__flex-col">
@@ -511,43 +549,58 @@ export default function Sidebar(props) {
                 </div>
                 <div className="def-pad-3"></div>
                 <div className="sh__content-holder rr__flex-row">
-                  {flBtn ? (
-                    <>
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <ChannelComp
-                        type={"default"}
-                        profilePic="https://i.imgur.com/neHVP5j.jpg"
-                        userBg={"https://i.imgur.com/rbuyoEE.jpg"}
-                        userName="Resolved"
-                        category="League Of Legends"
-                        viewCount={144226}
-                      />
-                      <ChannelComp
-                        type={"default"}
-                        profilePic="https://i.imgur.com/neHVP5j.jpg"
-                        userBg={"https://i.imgur.com/rbuyoEE.jpg"}
-                        userName="Resolved"
-                        category="League Of Legends"
-                        viewCount={144226}
-                      />
-                    </>
-                  )}
+                  {loading?
+                  <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                   Loading...
+                  </span>
+                 : 
+                 flBtn ? 
+                  streamList.filter((user) => userFollowList.map((item) => item.channelId).includes(user.UserId)).length > 0?
+                  streamList
+                  .filter((item) => userFollowList.map((item) => item.channelId).includes(item.UserId)) //check if channel is follow
+                  .slice(0, 5)
+                  .map((content, index) => (
+                   <VideoContent
+                         key={index}
+                         title={content.streamTitle}
+                         thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                         profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                         displayName={content.user.displayName}
+                         category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                         tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                         userName={content.user.userName}
+                         onClick={() => {
+                           navigate(`/user/${content.user.userName}`);
+                         }}
+                         navigateCategory={() => {
+                           navigate(`/category/${content.streamCategories[0].categoryId}`);
+                         }}
+                       />
+                  ))
+                  :
+                 <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                   No stream available
+                 </span>
+                   : userList.filter((user) => userFollowList.map((item) => item.channelId).includes(user.UserId)).length > 0?
+                  userList
+                  .filter((user) => userFollowList.map((item) => item.channelId).includes(user.UserId)) //check if channel is followed
+                  .map((user, index) => (
+                    <ChannelComp
+                      onClick={() => {
+                        navigate(`/user/${user.UserName}`);
+                      }}
+                      type={"default"}
+                      key={index}
+                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      userName={user.DisplayName}
+                      userBg={user.UserBg? user.UserBg : "https://i.imgur.com/rbuyoEE.jpg"}
+                    />
+                  ))
+                  :
+                  <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                   No followed channels
+                  </span>
+                  }
                 </div>
               </div>
             </div>
@@ -584,7 +637,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-              <UserChannelList />
+              <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00 rr__flex-col">
               {/* main content here */}
               <div className="fl__content-holder rr__flex-col">
@@ -711,7 +764,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-              <UserChannelList />
+              <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00">
               {/* Main content will be inserted here */}
               <div className="fl__content-holder rr__flex-col">
@@ -807,7 +860,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
+          <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00">
               {/* Main content will be inserted here */}
               <div className="fl__content-holder rr__flex-col">
@@ -976,7 +1029,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
+          <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-vid">
               {/* <img className="bg__img" src={smBackground} alt="background"/> */}
               <div className="video__holder rr__flex-col rrf__jc-center rrf__ai-center bg__color-00">
@@ -1016,7 +1069,7 @@ export default function Sidebar(props) {
     //   <>
     //     <div className="main__position">
     //       <div className="sidebar bg__color-2 rr__flex-row">
-    //       <UserChannelList />
+    //       <UserChannelList key={userGlobal} user={userGlobal} />
     //         <div className="main__content bg__color-00 rr__flex-col">
     //           {/* <img className="bg__img" src={smBackground} alt="background"/> */}
     //           <div className="fl__content-holder rr__flex-col">
