@@ -132,8 +132,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } 
-  else if (props.type === "signup") {
+  } else if (props.type === "signup") {
     const [Username, setUsername] = useState("");
     const [Email, setEmail] = useState("");
     const [DisplayName, setDisplayName] = useState("");
@@ -302,7 +301,6 @@ export default function CustomModal(props) {
                   streamTagIds: res.streamTags.map((tag) => tag.tagId),
                   isLive: true,
                 }
-                
                 StreamRoutes.updateStream(res.streamId, data).then((res1) => {
                   info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
                   info.push(`${new Date().toLocaleString()}: ` + "Stream starting" + "\n");
@@ -1042,7 +1040,7 @@ export default function CustomModal(props) {
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
     )
-  } else if(props.type === "update-password"){
+  } else if (props.type === "update-password"){
     const [currentUser, setCurrentUser] = useState(props.user || "");
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");

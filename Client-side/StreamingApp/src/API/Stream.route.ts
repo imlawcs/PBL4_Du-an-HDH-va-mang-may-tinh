@@ -42,7 +42,7 @@ export const StreamRoutes = {
                 throw new Error("Failed to get streams");
             }
             const data = await response.json();
-            return data || [];
+            return data;
         }
         catch (error) {
             console.error(error);
@@ -109,7 +109,7 @@ export const StreamRoutes = {
         try {
             const data = await StreamRoutes.getAllStreams().then((streams) => {
                 if(streams.length > 0) {
-                    const userStreams = streams.filter((stream: any) => stream.userId === userid);
+                    const userStreams = streams.filter((stream: any) => stream.userId == userid);
                     // console.log(userStreams);
                     if(userStreams.length > 0)
                     {
@@ -128,12 +128,16 @@ export const StreamRoutes = {
     },
     getStreamsWithCategory: async (categoryId: string) => {
         try {
-            await StreamRoutes.getAllStreams().then((streams) => {
+            const data = await StreamRoutes.getAllStreams().then((streams) => {
                 if(streams.length > 0) {
-                    const categoryStreams = streams.filter((stream: any) => stream.streamCategories[0].categoryId === categoryId);
-                    return categoryStreams;
+                    console.log(streams);
+                    const categoryStreams = streams.filter((stream: any) => stream.streamCategories[0].categoryId == categoryId);
+                    console.log(streams.filter((stream: any) => stream.streamCategories.some((item: any) => item.categoryId == categoryId)));
+                    return categoryStreams
                 }
+                else [];
             });
+            return data;
         } catch (error) {
             console.error(error);
         }

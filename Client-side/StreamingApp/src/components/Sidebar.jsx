@@ -572,9 +572,9 @@ export default function Sidebar(props) {
                   </span>
                  : 
                  flBtn ? 
-                  streamList.filter((user) => userFollowList.map((item) => item.channelId).includes(user.UserId)).length > 0?
+                  streamList.filter((user) => userFollowList.map((item) => item.channelId).includes(user.userId)).length > 0?
                   streamList
-                  .filter((item) => userFollowList.map((item) => item.channelId).includes(item.UserId)) //check if channel is follow
+                  .filter((user) => userFollowList.map((item) => item.channelId).includes(user.userId)) //check if channel is follow
                   .slice(0, 5)
                   .map((content, index) => (
                    <VideoContent
@@ -583,7 +583,7 @@ export default function Sidebar(props) {
                          thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
                          profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
                          displayName={content.user.displayName}
-                         category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                         category={categoryList.filter((item) => item.categoryId == content.streamCategories[0].categoryId)[0].categoryName}
                          tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
                          userName={content.user.userName}
                          onClick={() => {
@@ -769,11 +769,13 @@ export default function Sidebar(props) {
       });
       const tag = TagRoutes.getAllTags().then((res) => {
         setTagList(res);
-        return Promise.resolve();
+        return Promise.resolve(res);
       })
       Promise.all([category, tag]).then((res) => {
-        StreamRoutes.getStreamsWithCategory(res[0].categoryId).then((res) => {
-          setStreamList(res.filter((item) => item.isLive === true));
+        console.log(res);
+        StreamRoutes.getStreamsWithCategory(String(res[0].categoryId)).then((res2) => {
+          console.log(res2);
+          setStreamList(res2.filter((item) => item.isLive === true) || []);
         });
       });
     },[]);
@@ -806,7 +808,7 @@ export default function Sidebar(props) {
                       thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
                       profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
                       userName={content.user.userName}
-                      category={currentCategory.CategoryName}
+                      category={currentCategory.categoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
                       onClick={() => {
                         navigate(`/user/${content.user.userName}`);
@@ -1046,7 +1048,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList key={userGlobal} user={userGlobal} />
+          <UserChannelList user={userGlobal} />
             <div className="main__content bg__color-vid">
               {/* <img className="bg__img" src={smBackground} alt="background"/> */}
               <div className="video__holder rr__flex-col rrf__jc-center rrf__ai-center bg__color-00">
