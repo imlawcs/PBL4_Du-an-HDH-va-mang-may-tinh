@@ -65,6 +65,31 @@ export const UserRoutes = {
             console.error(error);
         }
     },
+    updatePassword: async (id: string, data: any) => {
+        try {
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.USER.GET_USER_BY_ID + id + "/update-password", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Connection": "keep-alive"
+                },
+                body: JSON.stringify(data)
+            });
+            const responseText = await response.text();
+            console.log(responseText);
+            if(!response.ok) {
+                throw new Error(responseText.split('\"')[1]);
+            }
+            return responseText;
+
+
+        } catch (error) {
+            console.error(error.message);
+            return error.message;
+        }
+    },
     fetchUser: async (token: string) => {
         try 
         {

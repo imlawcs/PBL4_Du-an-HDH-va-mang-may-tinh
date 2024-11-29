@@ -269,7 +269,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "SM") {
+  } else if (props.type === "SM") {
     const [option, setOption] = useState(0);
     const [isClose, setIsClose] = useState(false);
     const [serverStatus, setServerStatus] = useState(false);
@@ -431,7 +431,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "SMdesc__setting") {
+  } else if (props.type === "SMdesc__setting") {
     //fetched data
     const [tagDataList, setTagDataList] = useState([]);
     const [categoryDataList, setCategoryDataList] = useState([]);
@@ -896,7 +896,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "account__setting profile-pic") {
+  } else if (props.type === "account__setting profile-pic") {
     return (
       <>
         <div className="modal__layout rr__flex-row rrf__col-normal bg__color-2 citizenship def-pad-1">
@@ -941,7 +941,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "account__setting profile-settings") {
+  } else if (props.type === "account__setting profile-settings") {
     const [displayName, setDisplayName] = useState(userGlobal.DisplayName);
     const [bio, setBio] = useState(userGlobal.Bio || "");
     const [update, setUpdate] = useState("");
@@ -1014,7 +1014,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "update"){
+  } else if (props.type === "update"){
     const [value, setValue] = useState(props.currentValue);
     return(
       <div className="modal__holder">
@@ -1042,6 +1042,97 @@ export default function CustomModal(props) {
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
     )
+  } else if(props.type === "update-password"){
+    const [currentUser, setCurrentUser] = useState(props.user || "");
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [errors, setErrors] = useState({});
+    const validatePassword = () => {
+      let newErrors = {};
+      if(oldPassword.trim() === "") newErrors.oldPassword = "Old password is required";
+      if(newPassword.trim() === "") newErrors.newPassword = "New password is required";
+      if(confirmPassword.trim() === "") newErrors.confirmPassword = "Confirm password is required";
+      if(newPassword !== confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    }
+    const handleUpdatePassword = () => {
+      const check = validatePassword();
+      if(!check) return;
+      UserRoutes.updatePassword(currentUser, {
+        userId: currentUser,
+        oldPassword,
+        newPassword,
+        confirmPassword
+      }).then((res) => {
+        console.log(res);
+        setErrors({ok: res});
+      });
+    }
+    return (
+      <>
+        <div className="modal__holder">
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-normal">
+            <div className="rr__flex-col rrf__jc-center rrf__ai-center rrf__row-normal">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Update Password
+              </span>
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                type="password"
+                placeholder="Old Password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+              {errors.oldPassword && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.oldPassword}
+                </span>
+              )}
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                type="password"
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              {errors.newPassword && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.newPassword}
+                </span>
+              )}
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {errors.confirmPassword && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.confirmPassword}
+                </span>
+              )}
+              <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Update" onClick={handleUpdatePassword} />
+              </div>
+              {errors.ok && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.ok}
+                </span>
+              )}
+              {errors.form && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.form}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
+        </>
+        );
   }
 
 }

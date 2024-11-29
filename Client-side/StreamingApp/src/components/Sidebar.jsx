@@ -234,6 +234,14 @@ export default function Sidebar(props) {
                   Profile Settings
                 </span>
                 <CustomModal type={"account__setting profile-settings"} user={userGlobal} />
+                <span className="fs__normal-2 league-spartan-semibold citizenship">
+                  Change password
+                </span>
+                <Button 
+                  type={"default"}
+                  text={"Change password"}
+                  onClick={() => handleModel(3)}
+                />
               </div>
             </div>
             <br />
@@ -320,7 +328,16 @@ export default function Sidebar(props) {
                   />
                 </>
                 : 
+                model == 3?
                 <>
+                <CustomModal 
+                  type={"update-password"} 
+                  user={userGlobal.UserId}
+                  offModal={() => handleModel(0)}
+                  />
+                </>
+                :
+                <> 
                 </>
               }
       </>
