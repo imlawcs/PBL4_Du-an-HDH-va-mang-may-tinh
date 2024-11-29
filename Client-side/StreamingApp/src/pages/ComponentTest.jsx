@@ -12,7 +12,7 @@ import CustomDatalist from "../components/CustomDatalist";
 import { TagRoutes } from "../API/Tag.routes";
 import MenuHolder from "../components/MenuHolder.main";
 import MenuOptionBtn from "../components/MenuOptionBtn";
-import { faBan, faEllipsis, faUsersBetweenLines } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faEllipsis, faInfoCircle, faUsersBetweenLines } from "@fortawesome/free-solid-svg-icons";
 export default function ComponentTest() {
   const navigate = useNavigate();
   const [categoryDataList, setCategoryDataList] = useState([]);
@@ -159,10 +159,7 @@ export default function ComponentTest() {
             <MenuOptionBtn icon={faBan} optionName={"Block"} styles={{
               width: "100%"
             }}/>
-            <MenuOptionBtn icon={faEllipsis} optionName={"About"} styles={{
-              width: "100%"
-            }}/>
-            <MenuOptionBtn icon={faUsersBetweenLines} optionName={"Block"} styles={{
+            <MenuOptionBtn icon={faInfoCircle} optionName={"About"} styles={{
               width: "100%"
             }}/>
           </MenuHolder>

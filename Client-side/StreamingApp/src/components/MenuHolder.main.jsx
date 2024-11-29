@@ -7,7 +7,7 @@ export default function MenuHolder(props){
             width: "10em",
             padding: "1em",
             backgroundColor: Colors.primary,
-            position: "absolute",
+            position: "fixed",
             border: "0.16em var(--border-color) solid",
             borderRadius: "0.5em",
             display: "flex",
