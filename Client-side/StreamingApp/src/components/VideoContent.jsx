@@ -77,7 +77,7 @@ export default function VideoContent(props) {
           </div>
         </div>
         <div className="tag__holder rr__flex-row">
-          {props.tags.map((tag, index) => (
+          {props.tags && props.tags.map((tag, index) => (
             <TagCard key={index} name={tag.tagName} id={tag.tagId}/>
           ))}
         </div>

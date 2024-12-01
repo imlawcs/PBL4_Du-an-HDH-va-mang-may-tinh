@@ -10,6 +10,10 @@ import { CategoryRoutes } from "../API/Category.routes";
 import { useEffect, useRef, useState } from "react";
 import CustomDatalist from "../components/CustomDatalist";
 import { TagRoutes } from "../API/Tag.routes";
+import MenuHolder from "../components/MenuHolder.main";
+import MenuOptionBtn from "../components/MenuOptionBtn";
+import { faBan, faEllipsis, faInfoCircle, faUsersBetweenLines } from "@fortawesome/free-solid-svg-icons";
+import TagCard from "../components/TagCard";
 export default function ComponentTest() {
   const navigate = useNavigate();
   const [categoryDataList, setCategoryDataList] = useState([]);
@@ -67,7 +71,7 @@ export default function ComponentTest() {
         <Button type="default" text="Back to Home" onClick={() => {
           navigate("/");
         }}/>
-        <div className="test-comp__holder rr__flex-col rrf__row-tiny">
+        {/* <div className="test-comp__holder rr__flex-col rrf__row-tiny">
 
           <input
           style={{
@@ -151,7 +155,8 @@ export default function ComponentTest() {
             }}
             onClick={handleSelectTag}
           />
-        </div>
+        </div> */}
+        <TagCard name="Test" type="tagPage"/>
       </div>
     </>
   )

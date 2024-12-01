@@ -12,6 +12,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import ComponentTest from "./pages/ComponentTest";
 import AdminPage from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Blocked from "./pages/Blocked";
+import TagPage from "./pages/TagPage";
 
 function App() {
   return (
@@ -20,12 +22,14 @@ function App() {
         <Routes>
           <Route index element={<Home />} />
           <Route path="category/:categoryid" element={<Category />} />
+          <Route path="tag/:tagid" element={<TagPage />} />
           <Route path="/user/:username" element={<UserNamePage />} />
           <Route element={<PrivateRoute />}>
             <Route path="test" element={<ComponentTest />} />
             <Route path="streamManager" element={<StreamManager />} />
             <Route path="following" element={<Following />} />
             <Route path="accountSetting" element={<AccountSetting />} />
+            <Route path="blocked" element={<Blocked />} />
           </Route>
           <Route path="searchResult" element={<SearchResult />} />
           <Route path="browsing" element={<Browsing />} />

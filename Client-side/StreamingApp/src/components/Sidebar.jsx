@@ -27,7 +27,7 @@ import StatBox from "./StatBox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import IconCard from "./IconCard";
 import { faFacebook, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { SignalRTest } from "../scripts/webrtcTemp";
 import UserChannelList from "./UserChannelList";
 import { UserRoutes } from "../API/User.routes";
@@ -36,11 +36,15 @@ import { StreamRoutes } from "../API/Stream.route";
 import { useAuth } from "../hooks/AuthProvider";
 import { CategoryRoutes } from "../API/Category.routes";
 import { TagRoutes } from "../API/Tag.routes";
+import { FollowRoutes } from "../API/Follow.routes";
+import { BlockRoutes } from "../API/Block.routes";
+import TagCard from "./TagCard";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
     const navigate = useNavigate();
   const [option, setOption] = useState(0);
+  const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
   if (props.routing == "SM") {
     const [isOffline, setOffline] = useState(true);
     const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
@@ -142,7 +146,7 @@ export default function Sidebar(props) {
     const personalInfoRef = useRef(null);
     const connectionsRef = useRef(null);
     const Auth = useAuth();
-    const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
+    // const [userGlobal, setUserGlobal] = useState(JSON.parse(localStorage.getItem("user")) || "");
     const scrollToPersonalInfo = () => {
       personalInfoRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -232,6 +236,14 @@ export default function Sidebar(props) {
                   Profile Settings
                 </span>
                 <CustomModal type={"account__setting profile-settings"} user={userGlobal} />
+                <span className="fs__normal-2 league-spartan-semibold citizenship">
+                  Change password
+                </span>
+                <Button 
+                  type={"default"}
+                  text={"Change password"}
+                  onClick={() => handleModel(3)}
+                />
               </div>
             </div>
             <br />
@@ -318,7 +330,16 @@ export default function Sidebar(props) {
                   />
                 </>
                 : 
+                model == 3?
                 <>
+                <CustomModal 
+                  type={"update-password"} 
+                  user={userGlobal.UserId}
+                  offModal={() => handleModel(0)}
+                  />
+                </>
+                :
+                <> 
                 </>
               }
       </>
@@ -351,7 +372,7 @@ export default function Sidebar(props) {
     return (
       <div className="main__position">
         <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
+          <UserChannelList key={userGlobal} user={userGlobal} />
         </div>
         <div className="main__content bg__color-00">
           <img
@@ -423,7 +444,13 @@ export default function Sidebar(props) {
               Categories
             </div>
             <div className="sh__content-holder rr__flex-row">
-              {categoryList.length > 0 && 
+              {loading?
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+              Loading...
+              </span>
+              :
+              
+              categoryList.length > 0 ?
               categoryList.map((content, index) => (
                 <CategoryComp
                   key={index}
@@ -433,6 +460,10 @@ export default function Sidebar(props) {
                   categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
                 />
               ))
+              :
+              <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                No category available
+              </span>
               }
               
             </div>
@@ -457,11 +488,48 @@ export default function Sidebar(props) {
     );
   } else if (props.routing == "following") {
     const [flBtn, setFlBtn] = useState(true);
+    const [userFollowList, setUserFollowList] = useState([]);
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [userList, setUserList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+      const fetchUserList = UserRoutes.getUsers().then((res) => {
+        setUserList(res);
+        return Promise.resolve();
+      });
+      const fetchData = 
+        StreamRoutes.getAllStreams().then((res) => {
+          console.log(res.filter((item) => item.streamCategories.length > 0));
+          setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+          return Promise.resolve();
+        });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log("Tag list:", res);
+        setTagList(res);
+        return Promise.resolve();
+      })
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        console.log("Category list:", res);
+        setCategoryList(res);
+        return Promise.resolve();
+      });
+      const fetchUserFollow = FollowRoutes.GetAllChannelsByFollowerId(userGlobal.UserId).then((res) => {
+        console.log("User follow list:", res);
+        setUserFollowList(res);
+        return Promise.resolve();
+      });
+      Promise.all([fetchUserList, fetchData, fetchTags, fetchCategories, fetchUserFollow]).then(() => {
+        console.log("done fetching");
+        setLoading(false);
+      });
+    }, [])
     return (
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-            <UserChannelList />
+            <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00 rr__flex-col">
               {/* main content here */}
               <div className="fl__content-holder rr__flex-col">
@@ -500,43 +568,58 @@ export default function Sidebar(props) {
                 </div>
                 <div className="def-pad-3"></div>
                 <div className="sh__content-holder rr__flex-row">
-                  {flBtn ? (
-                    <>
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                      <VideoContent
-                        title="MY FIRST STREAM"
-                        thumbnail="https://i.imgur.com/mUaz2eC.jpg"
-                        profilePic="https://i.imgur.com/JcLIDUe.jpg"
-                        userName="nauts"
-                        category="League Of Legends"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <ChannelComp
-                        type={"default"}
-                        profilePic="https://i.imgur.com/neHVP5j.jpg"
-                        userBg={"https://i.imgur.com/rbuyoEE.jpg"}
-                        userName="Resolved"
-                        category="League Of Legends"
-                        viewCount={144226}
-                      />
-                      <ChannelComp
-                        type={"default"}
-                        profilePic="https://i.imgur.com/neHVP5j.jpg"
-                        userBg={"https://i.imgur.com/rbuyoEE.jpg"}
-                        userName="Resolved"
-                        category="League Of Legends"
-                        viewCount={144226}
-                      />
-                    </>
-                  )}
+                  {loading?
+                  <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                   Loading...
+                  </span>
+                 : 
+                 flBtn ? 
+                  streamList.filter((user) => userFollowList.map((item) => item.channelId).includes(user.userId)).length > 0?
+                  streamList
+                  .filter((user) => userFollowList.map((item) => item.channelId).includes(user.userId)) //check if channel is follow
+                  .slice(0, 5)
+                  .map((content, index) => (
+                   <VideoContent
+                         key={index}
+                         title={content.streamTitle}
+                         thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                         profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                         displayName={content.user.displayName}
+                         category={categoryList.filter((item) => item.categoryId == content.streamCategories[0].categoryId)[0].categoryName}
+                         tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                         userName={content.user.userName}
+                         onClick={() => {
+                           navigate(`/user/${content.user.userName}`);
+                         }}
+                         navigateCategory={() => {
+                           navigate(`/category/${content.streamCategories[0].categoryId}`);
+                         }}
+                       />
+                  ))
+                  :
+                 <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                   No stream available
+                 </span>
+                   : userList.filter((user) => userFollowList.map((item) => item.channelId).includes(user.UserId)).length > 0?
+                  userList
+                  .filter((user) => userFollowList.map((item) => item.channelId).includes(user.UserId)) //check if channel is followed
+                  .map((user, index) => (
+                    <ChannelComp
+                      onClick={() => {
+                        navigate(`/user/${user.UserName}`);
+                      }}
+                      type={"default"}
+                      key={index}
+                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      userName={user.DisplayName}
+                      userBg={user.UserBg? user.UserBg : "https://i.imgur.com/rbuyoEE.jpg"}
+                    />
+                  ))
+                  :
+                  <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                   No followed channels
+                  </span>
+                  }
                 </div>
               </div>
             </div>
@@ -568,17 +651,19 @@ export default function Sidebar(props) {
       });
     }, [])
     const [flBtn, setFlBtn] = useState(true);
+    const [search, setSearch] = useState("");
     return (
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-              <UserChannelList />
+              <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00 rr__flex-col">
               {/* main content here */}
               <div className="fl__content-holder rr__flex-col">
                 <span className="fl__title fs__title-5 league-spartan-regular citizenship fill__container">
                   Browsing
                 </span>
+                  
                 <div className="btn__holder">
                   {flBtn ? (
                     <>
@@ -608,11 +693,24 @@ export default function Sidebar(props) {
                     </>
                   )}
                 </div>
+                <input type="text"
+                    className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search for streamers or categories"
+                    style={{
+                      marginTop: "0.5em",
+                      marginBottom: "0.5em",
+                      width: "32em",
+                    }}
+                  />
                 <div className="sh__content-holder rr__flex-row">
                   {flBtn ? 
                     
-                      categoryList.length > 0 && 
-                      categoryList.map((content, index) => (
+                      categoryList.length > 0 ? 
+                      categoryList
+                      .filter((item) => item.categoryName.toLowerCase().includes(search.toLowerCase()))
+                      .map((content, index) => (
                         <CategoryComp
                           key={index}
                           cateViewCount={12727}
@@ -621,9 +719,17 @@ export default function Sidebar(props) {
                           categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
                         />
                       ))
-                   : (
+                   : 
+                   (
+                    <span className="fs__normal-2 league-spartan-semibold citizenship ta__center fill__container">
+                      No category available
+                    </span>
+                   )
+                   :
+                   (
                     streamList.length > 0?
                   streamList
+                  .filter((item) => item.streamTitle.toLowerCase().includes(search.toLowerCase()))
                   .map((content, index) => (
                     <VideoContent
                       key={index}
@@ -656,23 +762,30 @@ export default function Sidebar(props) {
     );
   } else if (props.routing == "category") {
     const [currentCategory, setCurrentCategory] = useState({});
+    const [tagList, setTagList] = useState([]);
     const [streamList, setStreamList] = useState([]);
     useEffect(() => {
-      CategoryRoutes.getCategoryById(props.category).then((res) => {
+      const category = CategoryRoutes.getCategoryById(props.category).then((res) => {
         setCurrentCategory(res || {});
+        return Promise.resolve(res);
       });
-      if(currentCategory.length > 0){
-        StreamRoutes.getStreamsWithCategory(currentCategory.categoryId).then((res) => {
-          console.log(res);
-          setStreamList(res || []);
+      const tag = TagRoutes.getAllTags().then((res) => {
+        setTagList(res);
+        return Promise.resolve(res);
+      })
+      Promise.all([category, tag]).then((res) => {
+        console.log(res);
+        StreamRoutes.getStreamsWithCategory(String(res[0].categoryId)).then((res2) => {
+          console.log(res2);
+          setStreamList(res2.filter((item) => item.isLive === true) || []);
         });
-      }
+      });
     },[]);
     return (
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-              <UserChannelList />
+              <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00">
               {/* Main content will be inserted here */}
               <div className="fl__content-holder rr__flex-col">
@@ -697,7 +810,14 @@ export default function Sidebar(props) {
                       thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
                       profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
                       userName={content.user.userName}
-                      category={currentCategory.CategoryName}
+                      category={currentCategory.categoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
                     />
                   ))
                 :
@@ -716,10 +836,16 @@ export default function Sidebar(props) {
     );
   } else if (props.routing == "SearchResult") {
     const [searchParams] = useSearchParams();
-    const search = searchParams.get("query");
+    const search = searchParams.get("query").toLowerCase();
     const [userList, setUserList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    
+
+
     const renderLoading = () => {
       return (
         <>
@@ -728,8 +854,26 @@ export default function Sidebar(props) {
       )
     }
     useEffect(() => {
-      UserRoutes.getUsers().then((res) => {
+      const fetchUser = UserRoutes.getUsers().then((res) => {
         setUserList(res);
+        Promise.resolve();
+      });
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+        Promise.resolve();
+      });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log(res);
+        setTagList(res);
+        Promise.resolve();
+      });
+      const fetchStream = StreamRoutes.getAllStreams().then((res) => {
+        console.log(res.filter((item) => item.streamCategories.length > 0));
+        setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+        Promise.resolve();
+      });
+      Promise.all([fetchUser, fetchCategories, fetchTags, fetchStream]).then(() => {
+          console.log("done fetching");
       });
       setLoading(false);
     }, []);
@@ -737,7 +881,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
+          <UserChannelList key={userGlobal} user={userGlobal} />
             <div className="main__content bg__color-00">
               {/* Main content will be inserted here */}
               <div className="fl__content-holder rr__flex-col">
@@ -754,9 +898,11 @@ export default function Sidebar(props) {
                   renderLoading() 
                   : 
                   userList
-                  .filter(user => user.UserName.includes(search) || user.DisplayName.includes(search))
+                  .filter(user => user.UserName.toLowerCase().includes(search) || user.DisplayName.toLowerCase().includes(search)).length > 0?
+                  userList
+                  .filter(user => user.UserName.toLowerCase().includes(search) || user.DisplayName.toLowerCase().includes(search))
                   .map((user, index) => (
-                      <>
+                
                       <ChannelComp type="search"
                         key={index}
                         profilePic={user.ProfilePic? user.ProfilePic : defaultImage}
@@ -766,60 +912,188 @@ export default function Sidebar(props) {
                           navigate(`/user/${user.UserName}`);
                         }}
                       />
-                      </>
-                  ))}
+                      
+                  ))
+                :
+                <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                  No user found
+                </span>
+                }
                 </div>
                 <span className="fs__large-2 league-spartan-regular citizenship fill__container def-pad-2 no__padding-lr">
-                  Channels with search term "{search}"
+                  Stream with search term "{search}"
                 </span>
                 <div className="sh__content-holder rr__flex-row">
-                  {[
-                    {
-                      title: "MY FIRST STREAM",
-                      thumbnail: "https://i.imgur.com/mUaz2eC.jpg",
-                      profilePic: "https://i.imgur.com/JcLIDUe.jpg",
-                      userName: "nauts",
-                      category: "League Of Legends",
-                    },
-                    {
-                      title: "MY FIRST STREAM",
-                      thumbnail: "https://i.imgur.com/mUaz2eC.jpg",
-                      profilePic: "https://i.imgur.com/JcLIDUe.jpg",
-                      userName: "nauts",
-                      category: "League Of Legends",
-                    },
-                  ].map((content, index) => (
+                  {loading? renderLoading() : 
+                  streamList
+                  .filter((item) => 
+                    item.streamTitle.toLowerCase().includes(search) || 
+                  item.streamDesc.toLowerCase().includes(search)).length > 0
+                  ?
+                  streamList
+                  .filter((item) => 
+                    item.streamTitle.toLowerCase().includes(search) || 
+                  item.streamDesc.toLowerCase().includes(search))
+                  .map((content, index) => (
                     <VideoContent
                       key={index}
-                      title={content.title}
-                      thumbnail={content.thumbnail}
-                      profilePic={content.profilePic}
-                      userName={content.userName}
-                      category={content.category}
+                      title={content.streamTitle}
+                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      userName={content.user.userName}
+                      category={currentCategory.CategoryName}
+                      tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                      onClick={() => {
+                        navigate(`/user/${content.user.userName}`);
+                      }}
+                      navigateCategory={() => {
+                        navigate(`/category/${content.streamCategories[0].categoryId}`);
+                      }}
                     />
-                  ))}
+                  ))
+                :
+                <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                  No stream found
+                </span>
+                }
                 </div>
                 <span className="fs__large-2 league-spartan-regular citizenship fill__container def-pad-2 no__padding-lr">
                   Categories with search terms "{search}"
                 </span>
+                <div className="sh__content-holder rr__flex-row">
+                  {loading? renderLoading() : 
+                  categoryList.filter((item) => item.categoryName.toLowerCase().includes(search)).length > 0?
+                  categoryList.filter((item) => item.categoryName.toLowerCase().includes(search)).map((content, index) => (
+                    <CategoryComp
+                        key={index}
+                        cateViewCount={12727}
+                        categoryName={content.categoryName}
+                        categoryId={content.categoryId}
+                        categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                    />
+                      )):
+                      <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                        No category found
+                      </span>
+                  }
+
+                </div>
               </div>
             </div>
           </div>
         </div>
       </>
     );
-  } else {
+  } else if (props.routing == "tagPage"){
+    const [userList, setUserList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [currentTag, setCurrentTag] = useState({});
+    const [loading, setLoading] = useState(true);
+    const tagid = props.tagid;
+    const renderLoading = () => {
+      return (
+        <>
+          <span className="fs__title-3">Loading</span>
+        </>
+      )
+    }
+    useEffect(() => {
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+        return Promise.resolve(res);
+      });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log(res);
+        setTagList(res);
+        return Promise.resolve(res);
+      });
+      const fetchStream = StreamRoutes.getAllStreams().then((res) => {
+        console.log(res.filter((item) => item.streamCategories.length > 0));
+        setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+        return Promise.resolve(res);
+      });
+      Promise.all([fetchCategories, fetchTags, fetchStream]).then((res) => {
+          console.log(res);
+          if(res[1].filter((item) => item.tagId == tagid).length > 0){
+            setCurrentTag(res[1].filter((item) => item.tagId == tagid)[0] || {});
+          }
+          else {
+            navigate("/error");
+          }
+      });
+      setLoading(false);
+    }, [])
+    return(
+      <>
+        <div className="main__position">
+          <div className="sidebar bg__color-2 rr__flex-row">
+          <UserChannelList key={userGlobal} user={userGlobal} />
+            <div className="main__content bg__color-00">
+              <div className="fl__content-holder rr__flex-col">
+                {/* Main content will be inserted here */}
+                {loading?
+                renderLoading():
+                <>
+                  <TagCard type="tagPage" name={currentTag.tagName} />
+                  <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
+                    Live channels with tag "{currentTag.tagName}"
+                  </span>
+                  <div className="sh__content-holder rr__flex-row">
+                    {
+                    streamList.filter((item) => item.streamTags.some((tag) => tag.tagId == tagid)).length > 0?
+                    streamList
+                    .filter((item) => item.streamTags.some((tag) => tag.tagId == tagid))
+                    .map((content, index) => (
+                      <VideoContent
+                        key={index}
+                        title={content.streamTitle}
+                        thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                        profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                        userName={content.user.userName}
+                        category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                        tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                        onClick={() => {
+                          navigate(`/user/${content.user.userName}`);
+                        }}
+                        navigateCategory={() => {
+                          navigate(`/category/${content.streamCategories[0].categoryId}`);
+                        }}
+                      />
+                    ))
+                  :
+                  <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                    No stream available
+                  </span>
+                  }
+                  </div>
+                </>  
+                }
+              </div>
+            </div>
+            </div>
+          </div>
+      </>
+    )
+  }
+  else {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
     const [messages, setMessages] = useState([]);
     const [userList, setUserList] = useState([]);
     const [streamData, setStreamData] = useState({});
     const connection = SignalRTest.getConnection();
+    const [userRoute, setUserRoute] = useState(props.userRoute);
     const [user, setUser] = useState("");
     const [currentCategory, setCurrentCategory] = useState("");
     const [currentTags, setCurrentTags] = useState([]);
     useEffect(() => {
       try{
-        UserRoutes.getUserByName(props.userRoute).then((res) => {
+        UserRoutes.getUserByName(userRoute).then((res) => {
+            if(res == null || res == undefined){ 
+              navigate("/error"); 
+              return; 
+            }
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
@@ -828,14 +1102,23 @@ export default function Sidebar(props) {
               TagRoutes.getAllTags().then((res2) => {
                 const tagIdList = res1.streamTags.map((item) => item.tagId);
                 const tagList = res2.filter((item) => tagIdList.includes(item.tagId));
-                setCurrentTags(tagList.map((item) => item.tagName) || []);
+                setCurrentTags(tagList || []);
               });
               CategoryRoutes.getCategoryById(res1.streamCategories[0].categoryId).then((res2) => {
-                setCurrentCategory(res2.categoryName);
+                setCurrentCategory(res2);
               });
               setStreamData(res1|| {});
               console.log(JSON.stringify(streamData));
-          })
+            })
+            BlockRoutes.getAllBlockedUsers().then((res2) => {
+              console.log(res2);
+              if(res2.filter((item) => item.channelId == res.UserId).map((item) => item.blockedId).includes(userGlobal.UserId)){
+                navigate("/error");
+              }
+              else if(res2.filter((item) => item.channelId == userGlobal.UserId).map((item) => item.blockedId).includes(res.UserId)){
+                navigate(`/blocked?self=${encodeURIComponent(userGlobal.UserId)}&blocked=${encodeURIComponent(res.UserId)}&name=${encodeURIComponent(userRoute)}`);
+              }
+            })
         });
         
       }
@@ -843,7 +1126,7 @@ export default function Sidebar(props) {
         console.log(e);
       }
         
-    }, []);
+    }, [userRoute]);
     
     useEffect(() => {
       if(connection == null) return;
@@ -873,7 +1156,7 @@ export default function Sidebar(props) {
       <>
         <div className="main__position">
           <div className="sidebar bg__color-2 rr__flex-row">
-          <UserChannelList />
+          <UserChannelList user={userGlobal} />
             <div className="main__content bg__color-vid">
               {/* <img className="bg__img" src={smBackground} alt="background"/> */}
               <div className="video__holder rr__flex-col rrf__jc-center rrf__ai-center bg__color-00">
@@ -890,7 +1173,10 @@ export default function Sidebar(props) {
               </div>
 
               <StreamUserInfo
+                key={user.UserId}
+                channelId={user.UserId}
                 userName={user.DisplayName}
+                qname={userRoute}
                 title={streamData.streamTitle}
                 desc={streamData.streamDesc}
                 category={currentCategory || "error"}
@@ -911,7 +1197,7 @@ export default function Sidebar(props) {
     //   <>
     //     <div className="main__position">
     //       <div className="sidebar bg__color-2 rr__flex-row">
-    //       <UserChannelList />
+    //       <UserChannelList key={userGlobal} user={userGlobal} />
     //         <div className="main__content bg__color-00 rr__flex-col">
     //           {/* <img className="bg__img" src={smBackground} alt="background"/> */}
     //           <div className="fl__content-holder rr__flex-col">

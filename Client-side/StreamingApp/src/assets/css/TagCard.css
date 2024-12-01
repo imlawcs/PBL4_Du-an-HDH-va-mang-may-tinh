@@ -14,3 +14,16 @@
     background-color: #555555;
     cursor: pointer;
 }
+.tag__card-2x{
+    background-color: transparent;
+    color: #AAAAAA;
+    border-radius: 0.7em;
+    border-top-left-radius: 0;
+    /* border-bottom-left-radius: 0; */
+    width: fit-content;
+    /* padding: 0.375em 0.415em; */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    font-size: 6rem;
+}

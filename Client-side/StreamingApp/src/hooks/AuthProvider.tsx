@@ -41,8 +41,8 @@ const AuthProvider = ({ children }) => {
                // Call the login function passed via props
             } else {
               const errorData = await response.json();
-              alert({ form: errorData.error });
-              return;
+              console.log(errorData);
+              return(errorData);
             }
           } catch (error) {
             console.log({ form: error.message });
@@ -65,17 +65,20 @@ const AuthProvider = ({ children }) => {
             });
   
             if (response.ok) {
-              alert("Signed up successfully, please login"); // Store the JWT token// Redirect to the home page
-              return true;
+               // Store the JWT token// Redirect to the home page
+              console.log("ok");
+              const data = await response.json();
+              console.log(data);
+              return data;
                // Call the login function passed via props
             } else {
               const errorData = await response.json();
-              alert(JSON.stringify({ form: errorData.error }));
-              return { form: errorData.error };
+              console.log(errorData);
+              return errorData;
             }
           } catch (error) {
-            console.log({ form: error.message });
-            return { form: error.message };
+            console.log(error);
+            return error;
           } finally {
             console.log("Sign up request completed.");
           }

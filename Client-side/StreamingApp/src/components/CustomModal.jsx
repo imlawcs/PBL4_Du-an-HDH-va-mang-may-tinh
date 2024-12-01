@@ -43,28 +43,18 @@ export default function CustomModal(props) {
     const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
-      let newErrors = {};
-
-      if (!Username.trim()) {
-        newErrors.Username = "Username is required";
-      } else if (Username.length < 3) {
-        newErrors.Username = "Username must be at least 3 characters";
-      }
-
-      if (!Password) {
-        newErrors.Password = "Password is required";
-      } else if (Password.length < 6) {
-        newErrors.Password = "Password must be at least 6 characters";
-      }
-
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
+      
     };
 
     const handleLogin = async () => {
-      if (validateForm()) {
-        await Auth.logIn({Username, Password});
-      }
+      let newErrors = {};
+      const signup = await Auth.logIn({Username, Password}).then((res) => {
+        if(res.error){
+          newErrors.form = "invalid username or password";
+        }
+        return Promise.resolve(res);
+      });
+      setErrors(newErrors);
     };
     return (
       <>
@@ -84,6 +74,7 @@ export default function CustomModal(props) {
                   placeholder="Username"
                   value={Username}
                   onChange={(e) => setUsername(e.target.value)}
+                  onSubmit={handleLogin}
                 />
                 {errors.Username && (
                   <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
@@ -96,6 +87,7 @@ export default function CustomModal(props) {
                   placeholder="Password"
                   value={Password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onSubmit={handleLogin}
                 />
                 {errors.Password && (
                   <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
@@ -128,6 +120,11 @@ export default function CustomModal(props) {
                   </span>
                 </span>
               </div>
+              {errors.form && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.form}
+                </span>
+              )}
               <div className="btn__holder rrf__jc-center">
                 <Button type="default" text="Login" onClick={handleLogin} />
               </div>
@@ -137,8 +134,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } 
-  else if (props.type === "signup") {
+  } else if (props.type === "signup") {
     const [Username, setUsername] = useState("");
     const [Email, setEmail] = useState("");
     const [DisplayName, setDisplayName] = useState("");
@@ -147,43 +143,32 @@ export default function CustomModal(props) {
     const [Password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
     const validateSignup = () => {
-      let newErrors = {};
-
-      if (!Username.trim()) {
-        newErrors.Username = "Username is required";
-      } else if (Username.length < 5) {
-        newErrors.Username = "Username must be at least 5 characters long";
-      }
-
-      if (!Email.trim()) {
-        newErrors.email = "Email is required";
-      } else if (!/\S+@\S+\.\S+/.test(Email)) {
-        newErrors.email = "Email is invalid";
-      }
-
-      if (!Password) {
-        newErrors.Password = "Password is required";
-      } else if (Password.length < 8) {
-        newErrors.Password = "Password must be at least 8 characters long";
-      }
-
-      if (Password !== ConfirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
-      }
-
       
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
     };
 
 
     const handleSignup = () => {
-      if (validateSignup()) {
         // Proceed with signup
+        let newErrors = {};
         const data = { Username, Password, ConfirmPassword, Email, PhoneNumber, DisplayName };
-        Auth.signUp(data);
+        const signup = Auth.signUp(data).then((res) => {;
+          if(res.status === 400){
+            newErrors.email = res.errors.Email[0];
+            newErrors.Password = res.errors.Password[0];
+          }
+          else if(res.message){
+            newErrors.ok = res.message;
+            console.log("Signup success");
+          }
+          else {
+            console.log("Status: ", res.status);
+          }
+          return Promise.resolve(res);
+        });
+        Promise.all([signup]).then((res) => {
+          setErrors(newErrors);
+        })
         // props.signup();
-      }
     };
     return (
       <>
@@ -203,11 +188,11 @@ export default function CustomModal(props) {
                 value={Username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              {errors.Username && (
+              {/* {errors.Username && (
                 <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
                   {errors.Username}
                 </span>
-              )}
+              )} */}
               <input
                 className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                 type="email"
@@ -271,6 +256,11 @@ export default function CustomModal(props) {
                 </span>
               </span>
             </div>
+            {errors.ok && (
+              <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                {errors.ok}
+              </span>
+            )}
             <div className="btn__holder rrf__jc-center">
               <Button type="default" text="Sign Up" onClick={handleSignup} />
             </div>
@@ -280,7 +270,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "SM") {
+  } else if (props.type === "SM") {
     const [option, setOption] = useState(0);
     const [isClose, setIsClose] = useState(false);
     const [serverStatus, setServerStatus] = useState(false);
@@ -313,7 +303,6 @@ export default function CustomModal(props) {
                   streamTagIds: res.streamTags.map((tag) => tag.tagId),
                   isLive: true,
                 }
-                
                 StreamRoutes.updateStream(res.streamId, data).then((res1) => {
                   info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
                   info.push(`${new Date().toLocaleString()}: ` + "Stream starting" + "\n");
@@ -442,7 +431,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "SMdesc__setting") {
+  } else if (props.type === "SMdesc__setting") {
     //fetched data
     const [tagDataList, setTagDataList] = useState([]);
     const [categoryDataList, setCategoryDataList] = useState([]);
@@ -907,7 +896,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "account__setting profile-pic") {
+  } else if (props.type === "account__setting profile-pic") {
     return (
       <>
         <div className="modal__layout rr__flex-row rrf__col-normal bg__color-2 citizenship def-pad-1">
@@ -952,7 +941,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "account__setting profile-settings") {
+  } else if (props.type === "account__setting profile-settings") {
     const [displayName, setDisplayName] = useState(userGlobal.DisplayName);
     const [bio, setBio] = useState(userGlobal.Bio || "");
     const [update, setUpdate] = useState("");
@@ -1025,7 +1014,7 @@ export default function CustomModal(props) {
         </div>
       </>
     );
-  } else if (props.type == "update"){
+  } else if (props.type === "update"){
     const [value, setValue] = useState(props.currentValue);
     return(
       <div className="modal__holder">
@@ -1053,6 +1042,131 @@ export default function CustomModal(props) {
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
     )
+  } else if (props.type === "update-password"){
+    const [currentUser, setCurrentUser] = useState(props.user || "");
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [errors, setErrors] = useState({});
+    const validatePassword = () => {
+      let newErrors = {};
+      if(oldPassword.trim() === "") newErrors.oldPassword = "Old password is required";
+      if(newPassword.trim() === "") newErrors.newPassword = "New password is required";
+      if(confirmPassword.trim() === "") newErrors.confirmPassword = "Confirm password is required";
+      if(newPassword !== confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    }
+    const handleUpdatePassword = () => {
+      const check = validatePassword();
+      if(!check) return;
+      UserRoutes.updatePassword(currentUser, {
+        userId: currentUser,
+        oldPassword,
+        newPassword,
+        confirmPassword
+      }).then((res) => {
+        console.log(res);
+        setErrors({ok: res});
+      });
+    }
+    return (
+      <>
+        <div className="modal__holder">
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-normal">
+            <div className="rr__flex-col rrf__jc-center rrf__ai-center rrf__row-normal">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Update Password
+              </span>
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                type="password"
+                placeholder="Old Password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+              {errors.oldPassword && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.oldPassword}
+                </span>
+              )}
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                type="password"
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              {errors.newPassword && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.newPassword}
+                </span>
+              )}
+              <input
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2 fill__container"
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {errors.confirmPassword && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.confirmPassword}
+                </span>
+              )}
+              <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Update" onClick={handleUpdatePassword} />
+              </div>
+              {errors.ok && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.ok}
+                </span>
+              )}
+              {errors.form && (
+                <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                  {errors.form}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
+        </>
+        );
+  } else if(props.type === "block-confirm"){
+    return (
+      <>
+        <div className="modal__holder">
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-small">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Confirm Block
+              </span>
+            <div className="rr__flex-col rrf__jc-center rrf__row-small fill__container">
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                Are you sure you want to block {props.user || "user"}?
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                You will not: 
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                - See their content
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                - Be able to chat with them
+              </span>
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                - Be able to follow them
+              </span>
+              <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Block" onClick={props.block} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+              </div>
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
+      </>
+    );
   }
 
 }
