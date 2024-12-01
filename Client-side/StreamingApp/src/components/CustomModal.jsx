@@ -74,6 +74,7 @@ export default function CustomModal(props) {
                   placeholder="Username"
                   value={Username}
                   onChange={(e) => setUsername(e.target.value)}
+                  onSubmit={handleLogin}
                 />
                 {errors.Username && (
                   <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
@@ -86,6 +87,7 @@ export default function CustomModal(props) {
                   placeholder="Password"
                   value={Password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onSubmit={handleLogin}
                 />
                 {errors.Password && (
                   <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">

@@ -13,6 +13,7 @@ import { TagRoutes } from "../API/Tag.routes";
 import MenuHolder from "../components/MenuHolder.main";
 import MenuOptionBtn from "../components/MenuOptionBtn";
 import { faBan, faEllipsis, faInfoCircle, faUsersBetweenLines } from "@fortawesome/free-solid-svg-icons";
+import TagCard from "../components/TagCard";
 export default function ComponentTest() {
   const navigate = useNavigate();
   const [categoryDataList, setCategoryDataList] = useState([]);
@@ -70,7 +71,7 @@ export default function ComponentTest() {
         <Button type="default" text="Back to Home" onClick={() => {
           navigate("/");
         }}/>
-        <div className="test-comp__holder rr__flex-col rrf__row-tiny">
+        {/* <div className="test-comp__holder rr__flex-col rrf__row-tiny">
 
           <input
           style={{
@@ -154,15 +155,8 @@ export default function ComponentTest() {
             }}
             onClick={handleSelectTag}
           />
-        </div>
-          <MenuHolder>
-            <MenuOptionBtn icon={faBan} optionName={"Block"} styles={{
-              width: "100%"
-            }}/>
-            <MenuOptionBtn icon={faInfoCircle} optionName={"About"} styles={{
-              width: "100%"
-            }}/>
-          </MenuHolder>
+        </div> */}
+        <TagCard name="Test" type="tagPage"/>
       </div>
     </>
   )

@@ -27,7 +27,7 @@ import StatBox from "./StatBox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import IconCard from "./IconCard";
 import { faFacebook, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { SignalRTest } from "../scripts/webrtcTemp";
 import UserChannelList from "./UserChannelList";
 import { UserRoutes } from "../API/User.routes";
@@ -38,6 +38,7 @@ import { CategoryRoutes } from "../API/Category.routes";
 import { TagRoutes } from "../API/Tag.routes";
 import { FollowRoutes } from "../API/Follow.routes";
 import { BlockRoutes } from "../API/Block.routes";
+import TagCard from "./TagCard";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -983,7 +984,100 @@ export default function Sidebar(props) {
         </div>
       </>
     );
-  } else {
+  } else if (props.routing == "tagPage"){
+    const [userList, setUserList] = useState([]);
+    const [streamList, setStreamList] = useState([]);
+    const [tagList, setTagList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [currentTag, setCurrentTag] = useState({});
+    const [loading, setLoading] = useState(true);
+    const tagid = props.tagid;
+    const renderLoading = () => {
+      return (
+        <>
+          <span className="fs__title-3">Loading</span>
+        </>
+      )
+    }
+    useEffect(() => {
+      const fetchCategories = CategoryRoutes.getAllCategories().then((res) => {
+        setCategoryList(res);
+        return Promise.resolve(res);
+      });
+      const fetchTags = TagRoutes.getAllTags().then((res) => {
+        console.log(res);
+        setTagList(res);
+        return Promise.resolve(res);
+      });
+      const fetchStream = StreamRoutes.getAllStreams().then((res) => {
+        console.log(res.filter((item) => item.streamCategories.length > 0));
+        setStreamList(res.filter((item) => item.isLive === true && item.streamCategories.length > 0));
+        return Promise.resolve(res);
+      });
+      Promise.all([fetchCategories, fetchTags, fetchStream]).then((res) => {
+          console.log(res);
+          if(res[1].filter((item) => item.tagId == tagid).length > 0){
+            setCurrentTag(res[1].filter((item) => item.tagId == tagid)[0] || {});
+          }
+          else {
+            navigate("/error");
+          }
+      });
+      setLoading(false);
+    }, [])
+    return(
+      <>
+        <div className="main__position">
+          <div className="sidebar bg__color-2 rr__flex-row">
+          <UserChannelList key={userGlobal} user={userGlobal} />
+            <div className="main__content bg__color-00">
+              <div className="fl__content-holder rr__flex-col">
+                {/* Main content will be inserted here */}
+                {loading?
+                renderLoading():
+                <>
+                  <TagCard type="tagPage" name={currentTag.tagName} />
+                  <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
+                    Live channels with tag "{currentTag.tagName}"
+                  </span>
+                  <div className="sh__content-holder rr__flex-row">
+                    {
+                    streamList.filter((item) => item.streamTags.some((tag) => tag.tagId == tagid)).length > 0?
+                    streamList
+                    .filter((item) => item.streamTags.some((tag) => tag.tagId == tagid))
+                    .map((content, index) => (
+                      <VideoContent
+                        key={index}
+                        title={content.streamTitle}
+                        thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
+                        profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                        userName={content.user.userName}
+                        category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
+                        tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
+                        onClick={() => {
+                          navigate(`/user/${content.user.userName}`);
+                        }}
+                        navigateCategory={() => {
+                          navigate(`/category/${content.streamCategories[0].categoryId}`);
+                        }}
+                      />
+                    ))
+                  :
+                  <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
+                    No stream available
+                  </span>
+                  }
+                  </div>
+                </>  
+                }
+              </div>
+            </div>
+            </div>
+          </div>
+      </>
+    )
+  }
+  else {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
     const [messages, setMessages] = useState([]);
     const [userList, setUserList] = useState([]);
@@ -1008,10 +1102,10 @@ export default function Sidebar(props) {
               TagRoutes.getAllTags().then((res2) => {
                 const tagIdList = res1.streamTags.map((item) => item.tagId);
                 const tagList = res2.filter((item) => tagIdList.includes(item.tagId));
-                setCurrentTags(tagList.map((item) => item.tagName) || []);
+                setCurrentTags(tagList || []);
               });
               CategoryRoutes.getCategoryById(res1.streamCategories[0].categoryId).then((res2) => {
-                setCurrentCategory(res2.categoryName);
+                setCurrentCategory(res2);
               });
               setStreamData(res1|| {});
               console.log(JSON.stringify(streamData));

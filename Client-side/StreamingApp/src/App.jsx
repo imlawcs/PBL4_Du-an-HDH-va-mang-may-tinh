@@ -13,6 +13,7 @@ import ComponentTest from "./pages/ComponentTest";
 import AdminPage from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import Blocked from "./pages/Blocked";
+import TagPage from "./pages/TagPage";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route index element={<Home />} />
           <Route path="category/:categoryid" element={<Category />} />
+          <Route path="tag/:tagid" element={<TagPage />} />
           <Route path="/user/:username" element={<UserNamePage />} />
           <Route element={<PrivateRoute />}>
             <Route path="test" element={<ComponentTest />} />

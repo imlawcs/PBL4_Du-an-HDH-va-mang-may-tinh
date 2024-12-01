@@ -122,12 +122,14 @@ export default function StreamUserInfo(props) {
                                 {props.title}
                             </div>
                             <div className="uihc__h-tag rr__flex-row">
-                                <div className="uihc__h-category league-spartan-light fs__normal-2">
-                                    {props.category}
+                                <div className="uihc__h-category league-spartan-light fs__normal-2" onClick={() => {
+                                    navigate(`/category/${props.category.categoryId}`);
+                                }}>
+                                    {props.category.categoryName}
                                 </div>
                                 <div className="uihc__h-tag__holder rr__flex-row">
                                     {props.tagList.length > 0 && props.tagList.map((tag, index) => (
-                                        <TagCard key={index} name={tag}/>
+                                        <TagCard key={index} name={tag.tagName} id={tag.tagId}/>
                                     ))}
                                     
                                 </div>
