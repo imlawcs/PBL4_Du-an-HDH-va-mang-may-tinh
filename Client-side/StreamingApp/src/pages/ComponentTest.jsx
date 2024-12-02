@@ -7,64 +7,39 @@ import CustomModal from "../components/CustomModal";
 import CategoryComp from "../components/CategoryComp";
 import "../assets/css/CustomModal.css";
 import { CategoryRoutes } from "../API/Category.routes";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import CustomDatalist from "../components/CustomDatalist";
 import { TagRoutes } from "../API/Tag.routes";
 import MenuHolder from "../components/MenuHolder.main";
 import MenuOptionBtn from "../components/MenuOptionBtn";
-import { faBan, faEllipsis, faInfoCircle, faUsersBetweenLines } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faBell, faBellConcierge, faEllipsis, faInfoCircle, faUsersBetweenLines } from "@fortawesome/free-solid-svg-icons";
 import TagCard from "../components/TagCard";
+import { NotiContext } from "../hooks/NotiProvider";
+import BtnIcon from "../components/BtnIcon";
+import NotificationComp from "../components/NotificationComp";
 export default function ComponentTest() {
   const navigate = useNavigate();
-  const [categoryDataList, setCategoryDataList] = useState([]);
-  const [tagList, setTagList] = useState([]);
-  const [focus, setFocus] = useState(0);
-  const [inputValue, setInputValue] = useState("");
-  const [tagValue, setTagValue] = useState("");
-  const cateRef = useRef(null);
-  const tagRef = useRef(null);
-  const [mouseDown, setMouseDown] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedTag, setSelectedTag] = useState([]);
-  const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0 });
+  const notiBtnRef = useRef(null);
+  const [notiOpen, setNotiOpen] = useState(false);
+  const [ready, socket] = useContext(NotiContext);
+  const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0, width: 0 });
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await CategoryRoutes.getAllCategories().then((res) => {
-          setCategoryDataList(res || []);
-        });
-        await TagRoutes.getAllTags().then((res) => {
-          setTagList(res || []);
-        });
-      } catch (error) {
-        console.error("Error fetching tags and categories:", error);
-      }
-    };
-    fetchData();
-  }, [])
+    if(ready && socket)
+    {
+      socket.on("ReceiveNotification", (user, message) => {
+        console.log(`${user}: ${message}`);
+      });
+    }
+  }, [ready, socket]);
   useEffect(() => {
-    if (focus === 1 && cateRef.current) {
-      const rect = cateRef.current.getBoundingClientRect();
+    if(notiOpen && notiBtnRef.current)
+    {
+      const rect = notiBtnRef.current.getBoundingClientRect();
+      console.log(rect);
       setInputPosition({ top: rect.bottom - 1.5, left: rect.left - 1, height: rect.height, width: rect.width - 2 });
     }
-    else if(focus === 2 && tagRef.current){
-      const rect = tagRef.current.getBoundingClientRect();
-      setInputPosition({ top: rect.bottom - 1.5, left: rect.left - 1, height: rect.height, width: rect.width - 2 });
-    }
-    
-  }, [focus]);
-  const handleSelectCategory = (value, id) => {
-    console.log("Selected:", value, id);
-    setInputValue(value);
-    setSelectedCategory(id);
-    setFocus(0);
-  }
-  const handleSelectTag = (value, id) => {
-    console.log("Selected:", value, id);
-    setTagValue(value);
-    setSelectedCategory(id);
-    setFocus(0);
-  }
+  },[notiOpen]);
+
   return (
     <>
       <div className="test__container">
@@ -156,7 +131,49 @@ export default function ComponentTest() {
             onClick={handleSelectTag}
           />
         </div> */}
-        <TagCard name="Test" type="tagPage"/>
+        <Button type="default" text="Test Websocket" onClick={() => {
+          socket.invoke("SendNotification", "usertest" , "Test Notification");
+        }}/>
+        <div ref={notiBtnRef}>
+          <BtnIcon 
+            icons={faBell}
+            color="white"
+            onClick={() => {
+              setNotiOpen(!notiOpen);
+            }}
+          />
+        </div>
+        <MenuHolder styles={{
+          width: "22em",
+          paddingLeft: 0,
+          paddingRight: 0,
+          rowGap: 0,
+          top: `${inputPosition.top}px`,
+          right: `${inputPosition.left - inputPosition.height + 43}px`,
+          display: notiOpen ? "flex" : "none",
+        }}>
+          <NotificationComp
+            user="UserTest"
+            message=" just turned on his stream"
+            onClick={() => {
+              console.log("Clicked");
+            }}
+          />
+          <NotificationComp
+            user="UserTest"
+            message=" just turned on his stream"
+            onClick={() => {
+              console.log("Clicked");
+            }}
+          />
+          <NotificationComp
+            user="UserTest"
+            message=" just turned on his stream"
+            onClick={() => {
+              console.log("Clicked");
+            }}
+          />
+        </MenuHolder>
       </div>
     </>
   )

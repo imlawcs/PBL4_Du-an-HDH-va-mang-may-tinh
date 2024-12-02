@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import Sidebar from "../components/Sidebar";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ export default function UserNamePage() {
     const params = useParams();
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || "");
     const [username, setUsername] = useState(params.username);
+    const navigate = useNavigate();
     console.log(username);
     //need validate code for username
     useEffect(() => {
