@@ -7,9 +7,10 @@ import { SignalRTest } from "../scripts/webrtcTemp.jsx";
 export default function StreamManager() {
     const name = "SM"
     useEffect(() => {
-        SignalRTest.serverOff().then(() => {
-            SignalRTest.serverOn();
-        });
+        SignalRTest.serverOn();
+        return () => {
+            SignalRTest.serverOff();
+        };
       }, []);
 
     return(

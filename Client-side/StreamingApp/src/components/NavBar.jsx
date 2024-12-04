@@ -3,17 +3,22 @@ import ProfileMenu from "./ProfileMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../assets/css/Navbar.css";
 import logo from "../assets/img/Logo__sieufix.png";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import CustomModal from "./CustomModal";
 import Toast from "./Toast";
 import { useAuth } from "../hooks/AuthProvider";
+import BtnIcon from "./BtnIcon";
+import NotificationComp from "./NotificationComp";
+import MenuHolder from "./MenuHolder.main";
+import { NotiContext } from "../hooks/NotiProvider";
 export default function NavBar(props) {
   const route = props.routing;
   const auth = useAuth();
   const navigate = useNavigate();
+  const notiBtnRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(0);
   const [showToast, setShowToast] = useState(false);
@@ -40,7 +45,6 @@ export default function NavBar(props) {
       setIsLoggedIn(true);
       // console.log(user);
     }
-    
   }, []);
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -60,6 +64,60 @@ export default function NavBar(props) {
       />
     );
   }
+  const [notiOpen, setNotiOpen] = useState(false);
+  const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0, width: 0 });
+  const [ready, socket] = useContext(NotiContext);
+  useEffect(() => {
+    if(ready && socket)
+    {
+      socket.on("ReceiveNotification", (user, message) => {
+        console.log(`${user}: ${message}`);
+      });
+    }
+  }, [ready, socket]);
+  useEffect(() => {
+    if(notiOpen && notiBtnRef.current)
+    {
+      const rect = notiBtnRef.current.getBoundingClientRect();
+      console.log(rect);
+      setInputPosition({ top: rect.bottom - 1.5, left: rect.left - 1, height: rect.height, width: rect.width - 2 });
+    }
+  },[notiOpen]);
+  const renderNoti = () => {
+    return (
+      <>
+        <div ref={notiBtnRef}>
+              <BtnIcon 
+                icons={faBell}
+                color="white"
+                onClick={() => {
+                  setNotiOpen(!notiOpen);
+                }}
+              />
+            </div>
+            <MenuHolder styles={{
+              width: "22em",
+              paddingLeft: 0,
+              paddingRight: 0,
+              rowGap: 0,
+              top: `${inputPosition.top}px`,
+              left: `${inputPosition.left - inputPosition.height - 273}px`,
+              display: notiOpen ? "flex" : "none",
+            }}>
+                    {/* map */}
+              <NotificationComp
+                user="UserTest"
+                message=" just turned on his stream"
+                onClick={() => {
+                  console.log("Clicked");
+                }}
+              />
+            </MenuHolder>
+      </>
+    )
+  }
+
+
   if (route == "AS") {
     return (
       <>
@@ -77,7 +135,8 @@ export default function NavBar(props) {
             </div>
           </div>
           <div className="middle__ch"></div>
-          <div className="right__ch rrf__jc-center rrf__ai-center">
+          <div className="right__ch rrf__jc-center rrf__ai-center rrf__col-small">
+            {renderNoti()}
             {renderProfileMenu()}
           </div>
         </div>
@@ -101,7 +160,8 @@ export default function NavBar(props) {
             </div>
           </div>
           <div className="middle__ch"></div>
-          <div className="right__ch rrf__jc-center rrf__ai-center">
+          <div className="right__ch rrf__jc-center rrf__ai-center rrf__col-small">
+            {renderNoti()}
             {renderProfileMenu()}
           </div>
         </div>
@@ -155,10 +215,16 @@ export default function NavBar(props) {
           className={`right__ch ${
             !isLoggedIn
               ? "rrf__jc-center rrf__ai-center def-pad-2em no__padding-tb"
-              : ""
+              : "rrf__jc-center rrf__ai-center rrf__col-small"
           }`}
         >
-          {isLoggedIn ? renderProfileMenu() : (
+            {isLoggedIn ? (
+              <>
+                {renderNoti()}
+                {renderProfileMenu()}
+              </>
+            
+            ) : (
             <>
               <Button
                 type={"default"}
