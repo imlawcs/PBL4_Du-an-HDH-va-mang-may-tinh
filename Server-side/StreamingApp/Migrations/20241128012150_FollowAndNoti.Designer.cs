@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace StreamingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241119100318_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241128012150_FollowAndNoti")]
+    partial class FollowAndNoti
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,19 +90,24 @@ namespace StreamingApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("NotiDate")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("NotiDesc")
-                        .IsRequired()
+                    b.Property<string>("Message")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("StreamId")
+                    b.Property<DateTime>("NotiDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StreamId")
                         .HasColumnType("int");
 
                     b.Property<int?>("StreamerUserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -177,6 +182,9 @@ namespace StreamingApp.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("StreamStatus")
+                        .HasColumnType("int");
 
                     b.Property<string>("StreamTitle")
                         .IsRequired()
@@ -304,7 +312,7 @@ namespace StreamingApp.Migrations
                             UserId = 1,
                             DisplayName = "admin",
                             Email = "admin@gmail.com",
-                            Password = "$2a$11$F6ZL5Gntu7xtRBPWRqEZ9.JLITRsXUfLUUffy6WsY3LxQd7uCAs8.",
+                            Password = "$2a$11$g9pN87CcGIp/HAdre73c4uGi.HtuL4lwxehKLD5SJ1gqetwoOjncm",
                             PhoneNumber = "1111111111",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "Admin Placeholder"
@@ -314,7 +322,7 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$WMOBU6r4LZVAcyb5i4pOEe8.mIqtxM/ppp1k1Q0fkreIM0tAPNLuO",
+                            Password = "$2a$11$wLRfB6CnaPMeBAcRSjlikutWdTj0MBOMrqvdbPB5qXRB3y8ZpzYA.",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin1"
@@ -324,7 +332,7 @@ namespace StreamingApp.Migrations
                             UserId = 3,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$dya.wZkI9L0RYpD0mOeT9ukpcj3lshVN0cUW09GktKU5P21Jtyzcq",
+                            Password = "$2a$11$ZklyDXi2x8lBbhHLJkFGRuN4gOz4jqcp31ZJvdiUW84m6qcnJsiIC",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin2"
@@ -334,7 +342,7 @@ namespace StreamingApp.Migrations
                             UserId = 4,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$eGR4gqrOX.8HMOD3YZVFSuj1.7xqplLMca6KRJ8MXiHA8tuhQchWm",
+                            Password = "$2a$11$A/1DMADK9TmFtQBfCakHU.JFNSiRsC.YUlj8nYW.vQgy8W7DtFHre",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin3"
@@ -472,7 +480,7 @@ namespace StreamingApp.Migrations
             modelBuilder.Entity("StreamingApp.Models.Entities.StreamTag", b =>
                 {
                     b.HasOne("StreamingApp.Models.Entities.Stream", "Stream")
-                        .WithMany()
+                        .WithMany("StreamTags")
                         .HasForeignKey("StreamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -528,6 +536,8 @@ namespace StreamingApp.Migrations
             modelBuilder.Entity("StreamingApp.Models.Entities.Stream", b =>
                 {
                     b.Navigation("StreamCategories");
+
+                    b.Navigation("StreamTags");
                 });
 
             modelBuilder.Entity("StreamingApp.Models.Entities.User", b =>

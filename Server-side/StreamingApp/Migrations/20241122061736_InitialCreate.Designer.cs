@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace StreamingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241122061736_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,9 +183,6 @@ namespace StreamingApp.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("StreamStatus")
-                        .HasColumnType("int");
-
                     b.Property<string>("StreamTitle")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -309,7 +309,7 @@ namespace StreamingApp.Migrations
                             UserId = 1,
                             DisplayName = "admin",
                             Email = "admin@gmail.com",
-                            Password = "$2a$11$g9pN87CcGIp/HAdre73c4uGi.HtuL4lwxehKLD5SJ1gqetwoOjncm",
+                            Password = "$2a$11$qBZP4ep4RTs5Yl7/A3kfUuHp1yTRpG8FK9dNlbq/tXLi0X48HmcCW",
                             PhoneNumber = "1111111111",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "Admin Placeholder"
@@ -319,7 +319,7 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$wLRfB6CnaPMeBAcRSjlikutWdTj0MBOMrqvdbPB5qXRB3y8ZpzYA.",
+                            Password = "$2a$11$KmKcL0WMlc9W6HZqrVwCnusvrrq6cGb9rAbBLISVG.LvEm2esZ3yO",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin1"
@@ -329,7 +329,7 @@ namespace StreamingApp.Migrations
                             UserId = 3,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$ZklyDXi2x8lBbhHLJkFGRuN4gOz4jqcp31ZJvdiUW84m6qcnJsiIC",
+                            Password = "$2a$11$9Uu.jUj4rL/zXal1jxcbS.wg/oEAQDh4YGc3rMMz/FEBre904TpMG",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin2"
@@ -339,7 +339,7 @@ namespace StreamingApp.Migrations
                             UserId = 4,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$A/1DMADK9TmFtQBfCakHU.JFNSiRsC.YUlj8nYW.vQgy8W7DtFHre",
+                            Password = "$2a$11$f5yMpUAsB6LVEeqtAWzSc.VvdhJQQC19SauBqn0TysqU7e2PX/OCe",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin3"

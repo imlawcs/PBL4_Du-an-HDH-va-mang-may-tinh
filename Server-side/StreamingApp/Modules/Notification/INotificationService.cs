@@ -5,6 +5,8 @@ namespace StreamingApp.Services
 {
     public interface INotificationService
     {
-        void SendNotification(Notification notification);
+        Task SendNotificationAsync(int userId, string message, string type);
+        Task<List<Notification>> GetUserNotificationsAsync(string userId);
+        Task MarkAsReadAsync(int notificationId);
     }
 }

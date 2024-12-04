@@ -10,7 +10,17 @@ namespace StreamingApp.Managers
             this.dbContext = dbContext;
         }
 
-        public async Task<(bool Succeeded, string[] Errors)> FollowUser(int followerId, int channelId) {
+        public async Task<Following[]> GetFollowingsByChannelIdAsync(int channelId) {
+            return await dbContext.Followings
+                .Where(f => f.ChannelId == channelId)
+                .ToArrayAsync();
+        }
+
+        public async Task<Following[]> GetAllFollowings() {
+            return await dbContext.Followings.ToArrayAsync();
+        }
+
+        public async Task<(bool Succeeded, string[] Errors)> FollowUser(int channelId, int followerId) {
             var following = new Following {
                 FollowerId = followerId,
                 ChannelId = channelId
@@ -22,23 +32,7 @@ namespace StreamingApp.Managers
             return (true, Array.Empty<string>());
         }
 
-        public async Task<Following[]> GetFollowingsByFollowerIdAsync(int followerId) {
-            return await dbContext.Followings
-                .Where(f => f.FollowerId == followerId)
-                .ToArrayAsync();
-        }
-
-        public async Task<Following[]> GetFollowingsByChannelIdAsync(int channelId) {
-            return await dbContext.Followings
-                .Where(f => f.ChannelId == channelId)
-                .ToArrayAsync();
-        }
-
-        public async Task<Following[]> GetAllFollowings() {
-            return await dbContext.Followings.ToArrayAsync();
-        }
-
-        public async Task<(bool Succeeded, string[] Errors)> UnfollowUser(int followerId, int channelId) {
+        public async Task<(bool Succeeded, string[] Errors)> UnfollowUser(int channelId, int followerId) {
             var following = await dbContext.Followings
                 .Where(f => f.FollowerId == followerId && f.ChannelId == channelId)
                 .FirstOrDefaultAsync();
@@ -51,6 +45,11 @@ namespace StreamingApp.Managers
             await dbContext.SaveChangesAsync();
 
             return (true, Array.Empty<string>());
+        }
+
+        public async Task<bool> IsFollowing(int channelId, int followerId) {
+            return await dbContext.Followings
+                .AnyAsync(f => f.FollowerId == followerId && f.ChannelId == channelId);
         }
     }
 }

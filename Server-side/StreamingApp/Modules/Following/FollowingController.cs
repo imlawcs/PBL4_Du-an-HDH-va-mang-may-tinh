@@ -1,50 +1,75 @@
 using StreamingApp.Services;
 using StreamingApp.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using StreamingApp.Models.DTOs;
 
 namespace StreamingApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class FollowingController : ControllerBase {
-        private readonly FollowingService followingService;
+        private readonly IFollowingService _followingService;
+        private readonly IUserService userService;
 
-        public FollowingController(FollowingService followingService) {
-            this.followingService = followingService;
+        public FollowingController(IFollowingService followingService, IUserService userService)
+        {
+            _followingService = followingService;
+            this.userService = userService;
         }
 
-        [HttpPost("follow")]
-        public async Task<IActionResult> FollowUser(int followerId, int channelId) {
-            var result = await followingService.FollowUser(followerId, channelId);
-            if (result.Succeeded) {
-                return Ok();
-            }
-            return BadRequest(result.Errors);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetFollowingsByFollowerIdAsync(int followerId) {
-            var followings = await followingService.GetFollowingsByFollowerIdAsync(followerId);
-            return Ok(followings);
-        }
-
-        [HttpGet]
+        [HttpGet("{channelId}")]
         public async Task<IActionResult> GetFollowingsByChannelIdAsync(int channelId) {
-            var followings = await followingService.GetFollowingsByChannelIdAsync(channelId);
+            var followings = await _followingService.GetFollowingByChannelIdAsync(channelId);
+            if(followings.Length == 0) {
+                return NotFound("Channel has no following");
+            }
             return Ok(followings);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllFollowings() {
-            var followings = await followingService.GetAllFollowings();
+            var followings = await _followingService.GetAllFollowings();
+            if(followings.Length == 0) {
+                return NotFound("Followings not found");
+            }
             return Ok(followings);
         }
 
-        [HttpPost("unfollow")]
-        public async Task<IActionResult> UnfollowUser(int followerId, int channelId) {
-            var result = await followingService.UnfollowUser(followerId, channelId);
+        [HttpPost("follow")]
+        public async Task<IActionResult> FollowUser([FromBody] FollowDTO followDTO) {
+            var followerExist = await userService.GetUserByIdAsync(followDTO.FollowerId);
+            var channelExist = await userService.GetUserByIdAsync(followDTO.ChannelId);
+            if(followerExist == null || channelExist == null ) {
+                return NotFound("User not found");
+            }
+
+            bool isFollowing = await _followingService.IsFollowing(followDTO.ChannelId, followDTO.FollowerId);
+            if(isFollowing) {
+                return BadRequest("User is already following");
+            }
+
+            var result = await _followingService.FollowUser(followDTO.ChannelId, followDTO.FollowerId);
             if (result.Succeeded) {
-                return Ok();
+                return Ok("Follow successfully");
+            }
+            return BadRequest(result.Errors);
+        }
+
+        [HttpPost("unfollow")]
+        public async Task<IActionResult> UnfollowUser([FromBody] FollowDTO followDTO) {
+            var followerExist = await userService.GetUserByIdAsync(followDTO.FollowerId);
+            var channelExist = await userService.GetUserByIdAsync(followDTO.ChannelId);
+            if(followerExist == null || channelExist == null ) {
+                return NotFound("User not found");
+            }
+
+            bool isFollowing = await _followingService.IsFollowing(followDTO.ChannelId, followDTO.FollowerId);
+            if(!isFollowing) {
+                return BadRequest("User is not following");
+            }
+            var result = await _followingService.UnfollowUser(followDTO.ChannelId, followDTO.FollowerId);
+            if (result.Succeeded) {
+                return Ok("Unfollow successfully");
             }
             return BadRequest(result.Errors);
         }

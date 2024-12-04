@@ -55,16 +55,10 @@ namespace StreamingApp
             services.AddScoped<CategoryManager>();
             services.AddScoped<ICategoryService, CategoryService>();
 
-            services.AddScoped<StreamCategoryManager>();
-            services.AddScoped<IStreamCategoryService, StreamCategoryService>();
-
-            services.AddScoped<StreamTagManager>();
-            services.AddScoped<IStreamTagService, StreamTagService>();
-
             services.AddScoped<RoleManager>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<User_RoleManager>();
-            services.AddScoped<IUser_RoleService, User_RoleService>();  
+            services.AddScoped<IUser_RoleService, User_RoleService>();
 
 
             // services.AddScoped<ModManager>();
@@ -73,13 +67,32 @@ namespace StreamingApp
             services.AddScoped<TagManager>();
             services.AddScoped<ITagService, TagService>();
 
+            services.AddScoped<FollowingManager>();
+            services.AddScoped<IFollowingService, FollowingService>();
+
+            services.AddScoped<NotificationManager>();
+            services.AddScoped<INotificationService, NotificationService>();
+
+            services.AddScoped<EmailService>();
+            services.AddScoped<IEmailService, EmailService>();
+
+            services.AddScoped<BlockedManager>();
+            services.AddScoped<IBlockedService, BlockedService>();
+
             services.AddScoped<StreamManager>();
             services.AddScoped<IStreamService, StreamService>();
 
+            services.AddScoped<StreamTagManager>();
+            services.AddScoped<IStreamTagService, StreamTagService>();
 
+            services.AddScoped<StreamCategoryManager>();
+            services.AddScoped<IStreamCategoryService, StreamCategoryService>();
 
             services.AddSingleton<MainHub>();
+            services.AddSingleton<NotificationHub>();
+
             services.AddScoped<UserManager>();
+            services.AddScoped<IUserService, UserService>();
 
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>
@@ -157,7 +170,7 @@ namespace StreamingApp
 
             app.UseRouting();
             app.UseCors("ClientPermission");
-           
+
             // app.UseAuthentication();
             // app.UseMiddleware<JwtMiddleware>();
             // app.UseMiddleware<ValidateMiddleware>();
@@ -167,6 +180,7 @@ namespace StreamingApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notification");
                 endpoints.MapHub<MainHub>("/webrtc");
 
             });

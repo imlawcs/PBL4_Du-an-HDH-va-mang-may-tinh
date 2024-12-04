@@ -2,22 +2,14 @@ using StreamingApp.Models.Entities;
 using StreamingApp.Managers;
 
 namespace StreamingApp.Services {
-    public class FollowingService {
+    public class FollowingService : IFollowingService {
         private readonly FollowingManager followingManager;
 
         public FollowingService(FollowingManager followingManager) {
             this.followingManager = followingManager ?? throw new ArgumentNullException(nameof(followingManager));
         }
 
-        public Task<(bool Succeeded, string[] Errors)> FollowUser(int followerId, int channelId) {
-            return followingManager.FollowUser(followerId, channelId);
-        }
-
-        public Task<Following[]> GetFollowingsByFollowerIdAsync(int followerId) {
-            return followingManager.GetFollowingsByFollowerIdAsync(followerId);
-        }
-
-        public Task<Following[]> GetFollowingsByChannelIdAsync(int channelId) {
+        public Task<Following[]> GetFollowingByChannelIdAsync(int channelId) {
             return followingManager.GetFollowingsByChannelIdAsync(channelId);
         }
 
@@ -25,8 +17,16 @@ namespace StreamingApp.Services {
             return followingManager.GetAllFollowings();
         }
 
-        public Task<(bool Succeeded, string[] Errors)> UnfollowUser(int followerId, int channelId) {
-            return followingManager.UnfollowUser(followerId, channelId);
+        public Task<(bool Succeeded, string[] Errors)> FollowUser(int channelId, int followerId) {
+            return followingManager.FollowUser(channelId, followerId);
+        }
+
+        public Task<(bool Succeeded, string[] Errors)> UnfollowUser(int channelId, int followerId) {
+            return followingManager.UnfollowUser(channelId, followerId);
+        }
+
+        public Task<bool> IsFollowing(int channelId, int followerId) {
+            return followingManager.IsFollowing(channelId, followerId);
         }
     }
 }
