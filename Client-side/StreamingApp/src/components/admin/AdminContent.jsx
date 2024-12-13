@@ -54,6 +54,7 @@ export default function AdminContent(props){
                 <h1 className="league-spartan-bold citizenship fill__container ta__center">
                     Users Management
                 </h1>
+                
                 {renderSampleDiv()}
                 {renderSampleDiv()}
             </>

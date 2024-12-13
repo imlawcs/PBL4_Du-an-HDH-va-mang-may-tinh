@@ -12,13 +12,16 @@ export default function MenuHolder(props){
             borderRadius: "0.5em",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             alignItems: "center",
             rowGap: "0.5em",
             zIndex: 9999,
             ...props.styles,
         }}
         >
+            <span className="league-spartan-semibold fs__normal-3 citizenship">
+                {props.title}
+            </span>
             {props.children}
         </div>
     )
