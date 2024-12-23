@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "../Button";
+import UserCompAdmin from "./_comp/UserComp";
 
 export default function AdminContent(props){
     const defaultHeight = "10em";
@@ -20,6 +21,9 @@ export default function AdminContent(props){
                 backgroundColor: getRandomColorHex(),
             }}></div>
         )
+    }
+    const renderUsers = () => {
+
     }
     if(props.current === "dashboard"){
         return (
@@ -53,6 +57,7 @@ export default function AdminContent(props){
     }
     else if(props.current === "users"){
         const [search, setSearch] = useState("");
+        const [data, setData] = useState(props.dataList);
         return (
             <>
                 <h1 className="league-spartan-bold citizenship fill__container ta__center">
@@ -91,15 +96,37 @@ export default function AdminContent(props){
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search for user..."
                             style={{
-                                paddingLeft: "0.5em !important",
+                                paddingLeft: "1em !important",
                                 paddingTop: "0.5em",
                                 paddingBottom: "0.5em",
-                                width: "99.5%"
+                                width: "99%"
                             }}
                         />
-                        {renderSampleDiv("5em")}
-                        {renderSampleDiv("5em")}
-                        {renderSampleDiv("5em")}
+                        <div style={{
+                                maxHeight: "36em",
+                                overflowY: "scroll",
+                                scrollbarColor: "#000000 #ffffff",
+                            }}>
+                            <div className="rr__flex-col rrf__row-small">
+                                {data
+                                .filter((item) => item.UserName.toLowerCase().includes(search.toLowerCase()))
+                                .map((item, index) => 
+                                    <UserCompAdmin user={item} key={index}/>
+                                )}
+                                {data
+                                .filter((item) => item.UserName.toLowerCase().includes(search.toLowerCase()))
+                                .map((item, index) => 
+                                    <UserCompAdmin user={item} key={index}/>
+                                )}
+                            </div>
+                        </div>
+                        <div className="rr__flex-row rrf__col-small">
+                            <Button type={"default"} text={"Refresh"} onClick={() => props.setRefetch(1)}/>
+                            <Button type={"default"} text={"Try wiping data"} onClick={() => props.setRefetch(-1)} styles={{
+                                backgroundColor: "#f44336",
+                            }}/>
+                        </div>
+                        
                     </div>
                 </div>
                 
