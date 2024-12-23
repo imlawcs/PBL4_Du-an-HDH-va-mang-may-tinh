@@ -81,12 +81,12 @@ export default function AdminPage() {
     //data refetching
     useEffect(() => {
         console.log("current: " + refetch);
-        if(refetch === -1){
+        if(refetch < 0){
             console.log("Wiping data");
-            setUsers([]);
-            setCategories([]);
-            setStreams([]);
-            setTags([]);
+            (refetch === -1) && setUsers([]);
+            (refetch === -2) && setCategories([]);
+            (refetch === -3) && setStreams([]);
+            (refetch === -4) && setTags([]);
         }
         if(refetch === 1){
             console.log("Refetching users...");
