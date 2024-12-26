@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../Button";
 import UserCompAdmin from "./_comp/UserComp";
 import CategoryCompAdmin from "./_comp/CategoryComp";
+import CustomModal from "../CustomModal";
 
 export default function AdminContent(props){
     const defaultHeight = "10em";
@@ -23,11 +24,48 @@ export default function AdminContent(props){
             }}></div>
         )
     }
-    const renderUsers = () => {
-
-    }
     const [search, setSearch] = useState("");
     const [data, setData] = useState(props.dataList || []);
+    const [modal, setModal] = useState({
+        status: false,
+        action: 0,
+        value: -1,
+    });
+    const renderModal = (id, action) => {
+            let prevData = data.filter((item) => item.UserId == id || item.categoryId == id)[0];
+            console.log(prevData);
+            if(action == 1){
+                console.log("edit");
+                return(
+                    <CustomModal type={"edit"} data={prevData} offModal={() => setModal({
+                        status: false,
+                        action: 0,
+                        value: -1,
+                    })}/>
+                )
+            }
+            if(action == 2){
+                console.log("detail");
+                return(
+                    <CustomModal type={"detail"} data={prevData} offModal={() => setModal({
+                        status: false,
+                        action: 0,
+                        value: -1,
+                    })}/>
+                )
+            }
+            if(action == 3){
+                console.log("del");
+                return(
+                    <CustomModal type={"delete"} data={prevData} offModal={() => setModal({
+                        status: false,
+                        action: 0,
+                        value: -1,
+                    })}/>
+                )
+            }
+            
+    }
     if(props.current === "dashboard"){
         return (
             <>
@@ -59,7 +97,6 @@ export default function AdminContent(props){
         )
     }
     else if(props.current === "users"){
-        
         return (
             <>
                 <h1 className="league-spartan-bold citizenship fill__container ta__center">
@@ -119,25 +156,24 @@ export default function AdminContent(props){
                         <div style={{
                                 maxHeight: "36em",
                                 overflowY: "scroll",
-                                scrollbarColor: "#000000 #ffffff",
+                                // scrollbarColor: "#000000 #ffffff",
                             }}>
                             <div className="rr__flex-col rrf__row-small">
                                 {data.length > 0 ? data
                                 .filter((item) => item.UserName.toLowerCase().includes(search.toLowerCase()))
                                 .map((item, index) => 
-                                    <UserCompAdmin user={item} key={index}/>
-                                ): 
+                                    <UserCompAdmin user={item} key={index} renderModal={setModal}/>
+                                )
+                                : 
                                 <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
                                     No data found, try refreshing
                                 </span>
                                 }
                             </div>
                         </div>
-                
-                        
                     </div>
                 </div>
-                
+                {modal.status && renderModal(modal.value, modal.action)}
             </>
         )
     }
@@ -199,26 +235,27 @@ export default function AdminContent(props){
                             }}
                         />
                         <div style={{
-                                maxHeight: "36em",
-                                overflowY: "scroll",
-                                scrollbarColor: "#000000 #ffffff",
-                            }}>
+                            maxHeight: "36em",
+                            overflowY: "scroll",
+                            scrollbarColor: "#000000 #ffffff",
+                        }}>
                             <div className="rr__flex-col rrf__row-small">
                                 {data.length > 0 ? 
                                 data
                                 .filter((item) => item.categoryName.toLowerCase().includes(search.toLowerCase()))
                                 .map((item, index) => 
-                                    <CategoryCompAdmin category={item} key={index}/>
+                                    <CategoryCompAdmin category={item} key={index} renderModal={setModal}/>
                                 )
                                 : 
-                                    <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
-                                        No data found,try refreshing
-                                    </span>
+                                <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
+                                    No data found, try refreshing
+                                </span>
                                 }
                             </div>
                         </div>
                     </div>
                 </div>
+                {modal.status && renderModal(modal.value, modal.action)}
             </>
         )
     }
@@ -228,10 +265,13 @@ export default function AdminContent(props){
                 <h1 className="league-spartan-bold citizenship fill__container ta__center">
                     Streams Management
                 </h1>
-                <div className="rr__flex-row rrf__col-small def-pad-1 no__padding-tb">
-                    {renderSampleDiv()}
-                    {renderSampleDiv()}
-                    {renderSampleDiv()}
+                <div className="rr__flex-col rrf__row-small def-pad-1 no__padding-tb">
+                    <span className="league-spartan-bold fs__large-1 citizenship fill__container ta__left">
+                        Currently Live
+                    </span>
+                    <span className="league-spartan-bold fs__large-1 citizenship fill__container ta__left">
+                        History
+                    </span>
                 </div>
             </>
         )

@@ -29,23 +29,35 @@ export default function CategoryCompAdmin(props){
                     </div>
                 </div>
                 <div className="rr__flex-col rrf__row-small rrf__ai-center">
-                    <Button type="default" text="Edit" onClick={() => {}} styles={{
+                    <Button type="default" text="Edit" onClick={() => props.renderModal({
+                        status: true,
+                        action: 1,
+                        value: category.categoryId,
+                    })} styles={{
                         backgroundColor: "#4CAF50", // Green for edit
                         color: "#ffffff",
-                        fontWeight: 400,
+                        fontWeight: 300,
                         width: "4em",
                     }}/>
-                    <Button type="default" text="Delete" onClick={() => {}} styles={{
+                    <Button type="default" text="Delete" onClick={() => props.renderModal({
+                        status: true,
+                        action: 3,
+                        value: category.categoryId,
+                    })} styles={{
                         backgroundColor: "#f44336",
                         color: "#ffffff",
-                        fontWeight: 400,
+                        fontWeight: 300,
                          // Red for delete
                         width: "4em",
                     }}/>
-                    <Button type="default" text="Detail" onClick={() => {}} styles={{
+                    <Button type="default" text="Detail" onClick={() => props.renderModal({
+                        status: true,
+                        action: 2,
+                        value: category.categoryId,
+                    })} styles={{
                         backgroundColor: "#2196F3",
                         color: "#ffffff",
-                        fontWeight: 400,
+                        fontWeight: 300,
                          // Blue for detail
                         width: "4em",
                     }}/>

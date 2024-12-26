@@ -1133,7 +1133,7 @@ export default function CustomModal(props) {
         </div>
         </>
         );
-  } else if(props.type === "block-confirm"){
+  } else if (props.type === "block-confirm"){
     return (
       <>
         <div className="modal__holder">
@@ -1167,6 +1167,99 @@ export default function CustomModal(props) {
         </div>
       </>
     );
+  } else if (props.type === "template"){
+    return (
+      <>
+        <div className="modal__holder"
+        >
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-small">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Title
+              </span>
+            <div className="rr__flex-col rrf__jc-center rrf__row-small fill__container">
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                Content
+              </span>
+              <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+              </div>
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
+      </>
+    )
+  } else if (props.type === "edit"){
+    return <>
+      <div className="modal__holder">
+        <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
+          zIndex: 1000,
+        }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Edit info
+            </span>
+            <span className="league-spartan-semibold citizenship fill__container" style={{
+              wordWrap: "break-word",
+            }}>
+              {JSON.stringify(props.data).split(",").map((data, index) => 
+              <>
+                <span key={index}>{data}</span>
+                <br />
+              </>)}
+            </span>
+        </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+    </>
+  }
+  else if (props.type === "delete"){
+    return <>
+      <div className="modal__holder">
+        <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
+          zIndex: 1000,
+        }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Confirm deletion
+            </span>
+            <span className="fs__normal-3 league-spartan-semibold citizenship fill__container">
+              Are you sure you want to delete this?
+            </span>
+            <span className="league-spartan-semibold citizenship fill__container" style={{
+              wordWrap: "break-word",
+            }}>
+              {JSON.stringify(props.data).split(",").map((data, index) => 
+              <>
+                <span key={index}>{data}</span>
+                <br />
+              </>)}
+            </span>
+        </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+    </>
+  }
+  else if (props.type === "detail"){
+    return <>
+      <div className="modal__holder">
+        <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
+          zIndex: 1000,
+        }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Detailed info
+            </span>
+            <span className="league-spartan-semibold citizenship fill__container" style={{
+              wordWrap: "break-word",
+            }}>
+              {JSON.stringify(props.data).split(",").map((data, index) => 
+              <>
+                <span key={index}>{data}</span>
+                <br />
+              </>)}
+            </span>
+        </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+    </>
   }
 
 }
