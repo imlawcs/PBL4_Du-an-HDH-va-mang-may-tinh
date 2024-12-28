@@ -15,6 +15,9 @@ import {
   faVideo,
   faTrash,
   faTriangleExclamation,
+  faImagePortrait,
+  faImage,
+  faFileImage,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebook,
@@ -30,6 +33,8 @@ import { CategoryRoutes } from "../API/Category.routes";
 import CustomDatalist from "./CustomDatalist";
 import TagCard from "./TagCard";
 import { isEmpty, StreamRoutes, StreamStatus } from "../API/Stream.route";
+import { Colors } from "../constants/Colors";
+import { Assets } from "../constants/Assets";
 
 
 export default function CustomModal(props) {
@@ -1190,29 +1195,224 @@ export default function CustomModal(props) {
       </>
     )
   } else if (props.type === "edit"){
+    const [data, setData] = useState(props.data);
+    const [tempImgSrc, setTempImgSrc] = useState(props.data.profilePic || props.data.categoryPic || "");
+    const updateData = async () => {
+
+    }
+    if(props.data.UserId)
     return <>
       <div className="modal__holder">
-        <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
+        <div className="modal__layout-2 bg__color-2 rr__flex-col rrf__row-normal" style={{
           zIndex: 1000,
         }}>
             <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
                 Edit info
             </span>
-            <span className="league-spartan-semibold citizenship fill__container" style={{
-              wordWrap: "break-word",
-            }}>
-              {JSON.stringify(props.data).split(",").map((data, index) => 
-              <>
-                <span key={index}>{data}</span>
-                <br />
-              </>)}
-            </span>
+            <div className="rr__flex-col rrf__row-normal">
+              <div className="rr__flex-row rrf__col-normal">
+                <img src={tempImgSrc? tempImgSrc : Assets.defaultAvatar}
+                className="avatar__2x avatarPreview1" style={{
+                    width: "6em",
+                    height: "6em",
+                    objectFit: "cover",
+                }}/>
+                <div className="rr__flex-col rrf__row-tiny">
+                  <span className="fs__normal-3 league-spartan-semibold citizenship ta__left">
+                    User ID: {data.UserId}
+                  </span>
+                  <span className="fs__normal-3 league-spartan-semibold citizenship ta__left">
+                    Username: {data.UserName}
+                  </span>
+                  <input
+                    type="file"
+                    id="avatarInput"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      console.log(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          console.log(e.target.result);
+                          setTempImgSrc(e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  <BtnIcon
+                    icons={faFileImage}
+                    onClick={() => document.getElementById('avatarInput').click()}
+                  />
+                </div>
+              </div>
+                <Button
+                  type="default" 
+                  text="Role update"
+                  onClick={() => {}}
+                />
+            </div>
+            <div className="rr__flex-col rrf__row-tiny">
+              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                Display name
+              </span>
+              <input type="text" 
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                placeholder="Enter new displayname"
+                value={data.DisplayName}
+                onChange={(e) => {
+                  setData({...data, DisplayName: e.target.value});
+                }}
+              />
+            </div>
+            <div className="rr__flex-col rrf__row-tiny">
+              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                Email
+              </span>
+              <input type="email" 
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                placeholder="Enter new email"
+                value={data.Email}
+                onChange={(e) => {
+                  setData({...data, Email: e.target.value});
+                }}
+              />
+            </div>
+            <div className="rr__flex-col rrf__row-tiny">
+              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                Phone number
+              </span>
+              <input type="text" 
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                placeholder="Enter new phone number"
+                value={data.PhoneNumber}
+                onChange={(e) => {
+                  setData({...data, PhoneNumber: e.target.value});
+                }}
+              />
+            </div>
+            <div className="rr__flex-col rrf__row-tiny">
+              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                Bio
+              </span>
+              <textarea
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                placeholder="Enter new Bio"
+                style={{
+                  resize: "none",
+                  height: "5em",
+                }}
+                value={data.Bio}
+                onChange={(e) => {
+                  setData({...data, Bio: e.target.value});
+                }}
+              />
+            </div>
+            <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+            </div>
         </div>
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
     </>
-  }
-  else if (props.type === "delete"){
+    else return(
+      <>
+      <div className="modal__holder">
+        <div className="modal__layout-2 bg__color-2 rr__flex-col rrf__row-normal" style={{
+          zIndex: 1000,
+        }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Edit info
+            </span>
+            <div className="rr__flex-row rrf__col-normal">
+              <div className="rr__flex-col rrf__row-small">
+                <img src={tempImgSrc? tempImgSrc : Assets.defaultCategory} 
+                className="avatar__2x" 
+                style={{
+                      width: "14em",
+                      height: "16em",
+                      objectFit: "cover",
+                      borderRadius: "0.5em",
+                }}/>  
+                <input
+                    type="file"
+                    id="avatarInput"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      console.log(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          console.log(e.target.result);
+                          setTempImgSrc(e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                <Button 
+                  type="default" 
+                  text="Update image"
+                  onClick={() => document.getElementById('avatarInput').click()} 
+                  styles={{
+                    width: "auto",
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-small fill__container">
+                  <span className="fs__normal-3 league-spartan-semibold citizenship ta__left">
+                    ID: {data.categoryId}
+                  </span>
+                <div className="rr__flex-col rrf__row-tiny">
+                  <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                    Category name
+                  </span>
+                  <input type="text" 
+                      className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                      placeholder="Enter new phone number"
+                      value={data.categoryName}
+                      onChange={(e) => {
+                        setData({...data, categoryName: e.target.value});
+                      }}
+                    />
+                </div>
+                <div className="rr__flex-col rrf__row-tiny">
+                  <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                    Description
+                  </span>
+                  <textarea
+                    className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                    placeholder="Enter new Bio"
+                    style={{
+                      resize: "none",
+                      height: "5em",
+                    }}
+                    value={data.categoryDesc}
+                    onChange={(e) => {
+                      setData({...data, categoryDesc: e.target.value});
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+            </div>
+        </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+      </>
+    )
+  } else if (props.type === "delete"){
+    const [data, setData] = useState(props.data);
+    if(data.UserId)
     return <>
       <div className="modal__holder">
         <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
@@ -1222,23 +1422,95 @@ export default function CustomModal(props) {
                 Confirm deletion
             </span>
             <span className="fs__normal-3 league-spartan-semibold citizenship fill__container">
-              Are you sure you want to delete this?
+              Are you sure you want to delete this {data.UserId? "user":"category"}?
             </span>
-            <span className="league-spartan-semibold citizenship fill__container" style={{
-              wordWrap: "break-word",
-            }}>
-              {JSON.stringify(props.data).split(",").map((data, index) => 
-              <>
-                <span key={index}>{data}</span>
-                <br />
-              </>)}
-            </span>
+            <div className="rr__flex-row rrf__col-normal">
+            <img src={data.profilePic? data.profilePic : Assets.defaultAvatar}
+                className="avatar__2x avatarPreview1" style={{
+                    width: "6em",
+                    height: "6em",
+                    objectFit: "cover",
+                }}/>
+              <div className="rr__flex-col rrf__row-small">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>User ID:</b> {data.UserId}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Username:</b> {data.UserName}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Display name:</b> {data.DisplayName}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Role: </b> {data.Roles[0]? data.Roles[0].roleName : "undefined"}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Email: </b>{data.Email}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Phone number:</b> {data.PhoneNumber}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Bio:</b> {data.Bio? data.Bio : "undefined" }<br></br>
+                </span>
+              </div>
+            </div>
+            <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+            </div>
         </div>
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
     </>
-  }
-  else if (props.type === "detail"){
+    else return(
+      <>
+      <div className="modal__holder">
+        <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
+          zIndex: 1000,
+        }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Confirm deletion
+            </span>
+            <span className="fs__normal-3 league-spartan-semibold citizenship fill__container">
+              Are you sure you want to delete this {data.UserId? "user":"category"}?
+            </span>
+            <div className="rr__flex-row rrf__col-normal">
+              <img src={data.categoryPic? data.categoryPic : Assets.defaultCategory}
+                className="avatar__2x avatarPreview1" style={{
+                    width: "10em",
+                    height: "12em",
+                    objectFit: "cover",
+                    borderRadius: "0.5em",
+              }}/>
+              <div className="rr__flex-col rrf__row-small">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>ID: </b> {data.categoryId}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Name: </b> {data.categoryName}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Description: </b> {data.categoryDesc}<br></br>
+                </span>
+              </div>
+            </div>
+            <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+            </div>
+        </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+      </>
+    )
+  } else if (props.type === "detail"){
+    const [data, setData] = useState(props.data);
+    if(data.UserId)
     return <>
       <div className="modal__holder">
         <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
@@ -1247,19 +1519,327 @@ export default function CustomModal(props) {
             <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
                 Detailed info
             </span>
-            <span className="league-spartan-semibold citizenship fill__container" style={{
-              wordWrap: "break-word",
-            }}>
-              {JSON.stringify(props.data).split(",").map((data, index) => 
-              <>
-                <span key={index}>{data}</span>
-                <br />
-              </>)}
-            </span>
+            <div className="rr__flex-row rrf__col-normal">
+            <img src={data.profilePic? data.profilePic : Assets.defaultAvatar}
+                className="avatar__2x avatarPreview1" style={{
+                    width: "6em",
+                    height: "6em",
+                    objectFit: "cover",
+                }}/>
+              <div className="rr__flex-col rrf__row-small">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>ID:</b> {data.UserId}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Username:</b> {data.UserName}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Display name:</b> {data.DisplayName}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Role: </b> {data.Roles[0]? data.Roles[0].roleName : "undefined"}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Email: </b>{data.Email}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Phone number:</b> {data.PhoneNumber}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Bio:</b> {data.Bio? data.Bio : "undefined" }<br></br>
+                </span>
+              </div>
+            </div>
+            <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="OK" onClick={props.offModal} />
+            </div>
         </div>
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
     </>
-  }
+    else return (
+      <>
+      <div className="modal__holder">
+        <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
+          zIndex: 1000,
+        }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Detailed info
+            </span>
+            <div className="rr__flex-row rrf__col-normal">
+              <img src={data.categoryPic? data.categoryPic : Assets.defaultCategory}
+                className="avatar__2x avatarPreview1" style={{
+                    width: "10em",
+                    height: "12em",
+                    objectFit: "cover",
+                    borderRadius: "0.5em",
+              }}/>
+              <div className="rr__flex-col rrf__row-small">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>ID: </b> {data.categoryId}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Name: </b> {data.categoryName}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Description: </b> {data.categoryDesc}<br></br>
+                </span>
+              </div>
+            </div>
+            <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="OK" onClick={props.offModal} />
+            </div>
+        </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+      </>
+    )
+  } else if (props.type === "add"){
+    const addCheck = props.addCheck;
+    const [data, setData] = useState(
+      addCheck === "user"? {
+        UserName: "",
+        Password: "",
+        ConfirmPassword: "",
+        DisplayName: "",
+        Email: "",
+        PhoneNumber: "",
+        Bio: "",
+        Role: "",
+        profilePic: "",
 
+      }:
+      {
+        categoryName: "",
+        categoryDesc: "",
+        categoryPic: "",
+      }
+    );
+    if(addCheck === "user")
+    return(
+      <>
+        <div className="modal__holder">
+          <div className="modal__layout-2 bg__color-2 rr__flex-col rrf__row-normal" style={{
+            zIndex: 1000,
+          }}>
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                  Add user
+              </span>
+              <div className="rr__flex-col rrf__row-normal">
+                <div className="rr__flex-row rrf__col-normal rrf__ai-center">
+                  <img src={data.profilePic? data.profilePic : Assets.defaultAvatar}
+                  className="avatar__2x avatarPreview1" style={{
+                    width: "6em",
+                    height: "6em",
+                    objectFit: "cover",
+                  }}/>
+                  <div className="rr__flex-col rrf__row-tiny">
+                    <input
+                      type="file"
+                      id="avatarInput"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        console.log(file);
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (e) => {
+                            console.log(e.target.result);
+                            setData({...data, profilePic: e.target.result});
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    <Button
+                    type={"default"} 
+                    text={"Update image"} 
+                    onClick={() => document.getElementById('avatarInput').click()} 
+                    />  
+                  </div>
+                </div>
+                  <Button
+                    type="default" 
+                    text="Role update"
+                    onClick={() => {}}
+                  />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <input type="text" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Username"
+                  value={data.UserName}
+                  onChange={(e) => {
+                    setData({...data, UserName: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <input type="text" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Display name"
+                  value={data.DisplayName}
+                  onChange={(e) => {
+                    setData({...data, DisplayName: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <input type="email" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Email"
+                  value={data.Email}
+                  onChange={(e) => {
+                    setData({...data, Email: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <input type="text" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Phone number"
+                  value={data.PhoneNumber}
+                  onChange={(e) => {
+                    setData({...data, PhoneNumber: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <textarea
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Bio"
+                  style={{
+                    resize: "none",
+                    height: "5em",
+                  }}
+                  value={data.Bio}
+                  onChange={(e) => {
+                    setData({...data, Bio: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <input type="password" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Password"
+                  value={data.Password}
+                  onChange={(e) => {
+                    setData({...data, Password: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <input type="password"
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Confirm Password"
+                  value={data.Password}
+                  onChange={(e) => {
+                    setData({...data, Password: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="btn__holder rrf__jc-center">
+                  <Button type="default" text="Confirm" onClick={() => {}} />
+                  <Button type="default" text="Cancel" onClick={props.offModal}/>
+              </div>
+          </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+      </>
+    )
+    else return (
+      <>
+        <div className="modal__holder">
+        <div className="modal__layout-2 bg__color-2 rr__flex-col rrf__row-normal" style={{
+          zIndex: 1000,
+        }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Add new category
+            </span>
+            <div className="rr__flex-row rrf__col-normal">
+              <div className="rr__flex-col rrf__row-small">
+                <img src={data.categoryPic? data.categoryPic : Assets.defaultCategory} 
+                className="avatar__2x" 
+                style={{
+                      width: "14em",
+                      height: "16em",
+                      objectFit: "cover",
+                      borderRadius: "0.5em",
+                }}/>  
+                <input
+                    type="file"
+                    id="avatarInput"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      console.log(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          console.log(e.target.result);
+                          setTempImgSrc(e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                <Button 
+                  type="default" 
+                  text="Update image"
+                  onClick={() => document.getElementById('avatarInput').click()} 
+                  styles={{
+                    width: "auto",
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-small fill__container">
+                <div className="rr__flex-col rrf__row-tiny">
+                  <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                    Category name
+                  </span>
+                  <input type="text" 
+                      className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                      placeholder="Enter new phone number"
+                      value={data.categoryName}
+                      onChange={(e) => {
+                        setData({...data, categoryName: e.target.value});
+                      }}
+                    />
+                </div>
+                <div className="rr__flex-col rrf__row-tiny">
+                  <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                    Description
+                  </span>
+                  <textarea
+                    className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                    placeholder="Enter new Bio"
+                    style={{
+                      resize: "none",
+                      height: "5em",
+                    }}
+                    value={data.categoryDesc}
+                    onChange={(e) => {
+                      setData({...data, categoryDesc: e.target.value});
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+            </div>
+        </div>
+        <div className="bg__shadow" onClick={props.offModal}></div>
+      </div>
+      </>
+    )
+  }
 }

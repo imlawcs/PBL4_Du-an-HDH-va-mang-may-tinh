@@ -64,6 +64,16 @@ export default function AdminContent(props){
                     })}/>
                 )
             }
+            if(action == 4){
+                console.log("add");
+                return(
+                    <CustomModal type={"add"} addCheck={id==727? "user" : "category"} offModal={() => setModal({
+                        status: false,
+                        action: 0,
+                        value: -1,
+                    })}/>
+                )
+            }
             
     }
     if(props.current === "dashboard"){
@@ -115,7 +125,11 @@ export default function AdminContent(props){
                         styles={{
                             width: "100%",
                         }}
-                        onClick={() => console.log("Add User")} 
+                        onClick={() => setModal({
+                            status: true,
+                            action: 4,
+                            value: 727,
+                        })} 
                         />
                         <Button 
                         type="default" 
@@ -197,7 +211,11 @@ export default function AdminContent(props){
                         styles={{
                             width: "100%",
                         }}
-                        onClick={() => console.log("Add User")} 
+                        onClick={() => setModal({
+                            status: true,
+                            action: 4,
+                            value: 272,
+                        })} 
                         />
                         <Button 
                         type="default" 

@@ -13,7 +13,7 @@ export default function CategoryCompAdmin(props){
                 borderRadius: "0.5em",
             }}>
                 <div className="info__holder rr__flex-row rrf__col-normal rrf__ai-center">
-                    <img src={category.categoryAvatar? category.categoryAvatar : Assets.defaultCategory} className="avatar__2x" style={{
+                    <img src={category.categoryPic? category.categoryPic : Assets.defaultCategory} className="avatar__2x" style={{
                         width: "6em",
                         height: "8em",
                         objectFit: "cover",
