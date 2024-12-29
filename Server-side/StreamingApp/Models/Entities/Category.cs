@@ -14,6 +14,7 @@ namespace StreamingApp.Models.Entities
         
         [MaxLength(100)]
         public string CategoryDesc { get; set; }
+        public string? ImagePath { get; set; }
         
         public ICollection<StreamCategory> StreamCategories { get; set; } = new List<StreamCategory>();
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StreamingApp.Services;
+using StreamingApp.Models.DTOs;
 using StreamingApp.Models.Entities;
 
 namespace StreamingApp.Controllers
@@ -42,7 +43,7 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategoryAsync([FromBody] Category model)
+        public async Task<IActionResult> CreateCategoryAsync([FromForm] CategoryDTO model)
         {
             var category = await _categoryService.CreateCategoryAsync(model);
             if(!category.Succeeded)
