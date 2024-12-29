@@ -1310,6 +1310,21 @@ export default function CustomModal(props) {
                 }}
               />
             </div>
+            <div className="rr__flex-col rrf__row-tiny">
+              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                Role
+              </span>
+              <select
+                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                value={data.Role}
+                onChange={(e) => {
+                  setData({...data, Role: e.target.value});
+                }}
+                >
+                <option value="1">User</option>
+                <option value="2">Admin</option>
+              </select>
+            </div>
             <div className="btn__holder rrf__jc-center">
                 <Button type="default" text="Confirm" onClick={() => {}} />
                 <Button type="default" text="Cancel" onClick={props.offModal} />
@@ -1619,6 +1634,36 @@ export default function CustomModal(props) {
         categoryPic: "",
       }
     );
+    const [error, setError] = useState({});
+    const errorCheck = () => {
+      let newError = {};
+      if(addCheck === "user"){
+        if(data.UserName.trim() === "") newError.Username = "Username is required";
+        if(data.DisplayName.trim() === "") newError.DisplayName = "Display name is required";
+        if(data.Email.trim() === "") newError.Email = "Email is required";
+        if(data.PhoneNumber.trim() === "") newError.PhoneNumber = "Phone number is required";
+        if(data.Bio.trim() === "") newError.Bio = "Bio is required";
+        if(data.Password.trim() === "") newError.Password = "Password is required";
+        if(data.ConfirmPassword.trim() !== data.Password.trim()) newError.ConfirmPassword = "Confirm password is not matched";
+      } else {
+        if(data.categoryName.trim() === "") newError.categoryName = "Category name is required";
+        if(data.categoryDesc.trim() === "") newError.categoryDesc = "Category description is required";
+      }
+      setError(newError);
+      return Object.keys(newError).length === 0;
+    }
+    const handleForm = async () => {
+      const check = errorCheck();
+      if(!check) return;
+      if(addCheck === "user"){
+        console.log(data);
+
+      } else {
+        console.log(data);
+
+      }
+    }
+
     if(addCheck === "user")
     return(
       <>
@@ -1663,11 +1708,6 @@ export default function CustomModal(props) {
                     />  
                   </div>
                 </div>
-                  <Button
-                    type="default" 
-                    text="Role update"
-                    onClick={() => {}}
-                  />
               </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <input type="text" 
@@ -1677,7 +1717,12 @@ export default function CustomModal(props) {
                   onChange={(e) => {
                     setData({...data, UserName: e.target.value});
                   }}
-                />
+                  />
+                  {error.Username && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.Username}
+                    </span>
+                  )}
               </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <input type="text" 
@@ -1688,6 +1733,11 @@ export default function CustomModal(props) {
                     setData({...data, DisplayName: e.target.value});
                   }}
                 />
+                {error.DisplayName && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.DisplayName}
+                    </span>
+                )}
               </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <input type="email" 
@@ -1698,6 +1748,11 @@ export default function CustomModal(props) {
                     setData({...data, Email: e.target.value});
                   }}
                 />
+                {error.Email && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.Email}
+                    </span>
+                )}
               </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <input type="text" 
@@ -1708,6 +1763,11 @@ export default function CustomModal(props) {
                     setData({...data, PhoneNumber: e.target.value});
                   }}
                 />
+                  {error.PhoneNumber && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.PhoneNumber}
+                    </span>
+                  )}
               </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <textarea
@@ -1722,6 +1782,11 @@ export default function CustomModal(props) {
                     setData({...data, Bio: e.target.value});
                   }}
                 />
+                {error.Bio && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.Bio}
+                    </span>
+                )}
               </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <input type="password" 
@@ -1732,19 +1797,29 @@ export default function CustomModal(props) {
                     setData({...data, Password: e.target.value});
                   }}
                 />
+                {error.Password && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.Password}
+                    </span>
+                )}
               </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <input type="password"
                   className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                   placeholder="Confirm Password"
-                  value={data.Password}
+                  value={data.ConfirmPassword}
                   onChange={(e) => {
-                    setData({...data, Password: e.target.value});
+                    setData({...data, ConfirmPassword: e.target.value});
                   }}
                 />
+                {error.ConfirmPassword && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.ConfirmPassword}
+                    </span>
+                )}
               </div>
               <div className="btn__holder rrf__jc-center">
-                  <Button type="default" text="Confirm" onClick={() => {}} />
+                  <Button type="default" text="Confirm" onClick={handleForm} />
                   <Button type="default" text="Cancel" onClick={props.offModal}/>
               </div>
           </div>
@@ -1783,7 +1858,7 @@ export default function CustomModal(props) {
                         const reader = new FileReader();
                         reader.onload = (e) => {
                           console.log(e.target.result);
-                          setTempImgSrc(e.target.result);
+                          setData({...data, categoryPic: e.target.result});
                         };
                         reader.readAsDataURL(file);
                       }
@@ -1800,25 +1875,24 @@ export default function CustomModal(props) {
               </div>
               <div className="rr__flex-col rrf__row-small fill__container">
                 <div className="rr__flex-col rrf__row-tiny">
-                  <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
-                    Category name
-                  </span>
                   <input type="text" 
                       className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                      placeholder="Enter new phone number"
+                      placeholder="Category name"
                       value={data.categoryName}
                       onChange={(e) => {
                         setData({...data, categoryName: e.target.value});
                       }}
                     />
+                    {error.categoryName && (
+                      <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                        {error.categoryName}
+                      </span>
+                    )}
                 </div>
                 <div className="rr__flex-col rrf__row-tiny">
-                  <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
-                    Description
-                  </span>
                   <textarea
                     className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                    placeholder="Enter new Bio"
+                    placeholder="Description"
                     style={{
                       resize: "none",
                       height: "5em",
@@ -1828,12 +1902,17 @@ export default function CustomModal(props) {
                       setData({...data, categoryDesc: e.target.value});
                     }}
                   />
+                  {error.categoryDesc && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {error.categoryDesc}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
             
             <div className="btn__holder rrf__jc-center">
-                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Confirm" onClick={handleForm} />
                 <Button type="default" text="Cancel" onClick={props.offModal} />
             </div>
         </div>

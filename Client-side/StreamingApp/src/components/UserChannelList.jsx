@@ -5,6 +5,7 @@ import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 import { FollowRoutes } from "../API/Follow.routes";
 import { StreamRoutes } from "../API/Stream.route";
+import { Assets } from "../constants/Assets";
 
 export default function UserChannelList(props) {
     const [channels, setChannels] = useState([]);
@@ -65,7 +66,7 @@ export default function UserChannelList(props) {
                       }}
                       key={user.UserId}
                       isOffline={user.UserStatus? false : true}
-                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      profilePic={user.ProfilePic? user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
                       viewCount={user.ViewCount? user.ViewCount : 0}
@@ -104,7 +105,7 @@ export default function UserChannelList(props) {
                         navigate(`/user/${user.UserName}`);
                       }}
                       isOffline={user.UserStatus? false : true}
-                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      profilePic={user.ProfilePic? user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
                       viewCount={user.ViewCount? user.ViewCount : 0}

@@ -17,6 +17,7 @@ import MenuHolder from "./MenuHolder.main";
 import CustomModal from "./CustomModal";
 import { BlockRoutes } from "../API/Block.routes";
 import { useNavigate } from "react-router-dom";
+import { Assets } from "../constants/Assets";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
@@ -111,8 +112,7 @@ export default function StreamUserInfo(props) {
                 {/* content here */}
                 <div className="suiu__info-holder rr__flex-row fill__container">
                     <div className="uih__left-holder rr__flex-row">
-                          
-                            <img src={props.profilePic} className="avatar__2x"/>
+                            <img src={props.profilePic ? props.profilePic : Assets.defaultAvatar} className="avatar__2x"/>
                         
                         <div className="uih__context-holder rr__flex-col">
                             <div className="uihc__h-username league-spartan-semibold fs__large-1 citizenship">

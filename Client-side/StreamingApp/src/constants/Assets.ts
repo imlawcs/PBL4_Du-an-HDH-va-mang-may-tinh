@@ -1,4 +1,5 @@
+import defaultAvatarImg from '../assets/img/default.jpg';
 export const Assets = {
-    defaultAvatar: "https://i.imgur.com/neHVP5j.jpg",
+    defaultAvatar: defaultAvatarImg,
     defaultCategory: "https://i.imgur.com/tbmr3e8.jpg",
 }

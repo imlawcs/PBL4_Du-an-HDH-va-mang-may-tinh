@@ -131,13 +131,6 @@ export default function AdminContent(props){
                             value: 727,
                         })} 
                         />
-                        <Button 
-                        type="default" 
-                        text="Delete User" 
-                        styles={{
-                            width: "100%",
-                        }}
-                        onClick={() => console.log("Delete User")}/>
                         <Button type={"default"} text={"Refresh"} onClick={() => props.setRefetch(1)} styles={{
                             backgroundColor: "#2196F3",
                             width: "100%",
@@ -147,7 +140,7 @@ export default function AdminContent(props){
                             width: "100%",
                         }}/>
                         <span className="league-spartan-regular citizenship fs__normal-1">
-                            After wiping out previous data, click "Refresh" to see the changes or 
+                            After updating or wiping out previous data, click "Refresh" to see the changes or 
                             simply refresh to see the changes.
                         </span>
                     </div>
@@ -217,13 +210,6 @@ export default function AdminContent(props){
                             value: 272,
                         })} 
                         />
-                        <Button 
-                        type="default" 
-                        text="Delete multiple catecories" 
-                        styles={{
-                            width: "100%",
-                        }}
-                        onClick={() => console.log("Delete User")}/>
                         <Button type={"default"} text={"Refresh"} onClick={() => props.setRefetch(2)} styles={{
                             backgroundColor: "#2196F3",
                             width: "100%",
@@ -233,7 +219,7 @@ export default function AdminContent(props){
                             width: "100%",
                         }}/>
                         <span className="league-spartan-regular citizenship fs__normal-1">
-                            After wiping out previous data, click refresh to see the changes.
+                            After updating or wiping out previous data, click refresh to see the changes.
                         </span>
                     </div>
 
@@ -244,7 +230,7 @@ export default function AdminContent(props){
                             className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship fill__container"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search for user..."
+                            placeholder="Search for category..."
                             style={{
                                 paddingLeft: "1em !important",
                                 paddingTop: "0.5em",
