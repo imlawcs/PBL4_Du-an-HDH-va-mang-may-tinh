@@ -369,3 +369,8 @@
 .cur__pointer{
     cursor: pointer;
 }
+option{
+    background-color: var(--bg-color);
+    color: var(--secondary-color);
+    border-color: var(--border-color);
+}

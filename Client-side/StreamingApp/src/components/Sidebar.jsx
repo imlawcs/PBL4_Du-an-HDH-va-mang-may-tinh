@@ -1076,8 +1076,7 @@ export default function Sidebar(props) {
           </div>
       </>
     )
-  }
-  else {
+  } else {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
     const [messages, setMessages] = useState([]);
     const [userList, setUserList] = useState([]);

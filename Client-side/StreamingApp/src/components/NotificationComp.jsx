@@ -23,7 +23,7 @@ export default function NotificationComp(props){
                         paddingTop: "0.2em"
                     }}>
                         <span className="league-spartan-regular fs__normal-2 citizenship">
-                            <b>{props.user}</b>{props.message}
+                            <b>{props.user}</b>: {props.message}
                         </span>
                         <span className="league-spartan-light fs__small-3 citizenship">
                             {props.time? props.time + " ago" : "Just now"}

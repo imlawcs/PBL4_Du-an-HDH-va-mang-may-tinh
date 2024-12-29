@@ -16,6 +16,11 @@ export default function UserNamePage() {
         setUsername(params.username);
         // SignalRTest.serverOff().then(() => {
             SignalRTest.joinRoom(user.UserName, params.username);
+            SignalRTest.getClientPeerConnection().ontrack = (event) => {
+                const remoteVideo = document.getElementById('remote__stream');
+                remoteVideo.srcObject = event.streams[0];
+                alert("Track received");
+            }
         // });
         return () => {
             console.log("Stop loading stream...");

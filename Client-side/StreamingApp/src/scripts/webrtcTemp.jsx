@@ -231,14 +231,17 @@ connection.on("error", async (message) => {
 
 let peerConnection = new RTCPeerConnection(servers);
 
-peerConnection.ontrack = (event) => {
-    const remoteVideo = document.getElementById('remote__stream');
-    remoteVideo.srcObject = event.streams[0];
-    alert("Track received");
-}
+// peerConnection.ontrack = (event) => {
+//     const remoteVideo = document.getElementById('remote__stream');
+//     remoteVideo.srcObject = event.streams[0];
+//     alert("Track received");
+// }
 
 
 export const SignalRTest = {
+        getClientPeerConnection(){
+            return peerConnection;
+        },
         getConnection(){
             return connection;
         },

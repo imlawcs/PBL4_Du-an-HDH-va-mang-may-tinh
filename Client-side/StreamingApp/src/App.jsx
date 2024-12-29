@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Blocked from "./pages/Blocked";
 import TagPage from "./pages/TagPage";
 import NotiProvider from "./hooks/NotiProvider";
+import AdminRouteCheck from "./components/admin/AdminRouteCheck";
 
 function App() {
   return (
@@ -35,7 +36,9 @@ function App() {
             </Route>
             <Route path="searchResult" element={<SearchResult />} />
             <Route path="browsing" element={<Browsing />} />
-            <Route path="admin" element={<AdminPage />} />
+            <Route element={<AdminRouteCheck />}>
+              <Route path="admin" element={<AdminPage />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

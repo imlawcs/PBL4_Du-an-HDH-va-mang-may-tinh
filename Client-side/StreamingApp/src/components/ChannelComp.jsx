@@ -1,4 +1,5 @@
 import '../assets/css/ChannelComp.css'
+import { Assets } from '../constants/Assets';
 export default function ChannelComp(props) {
     function shortenNumber(number) {
         if(number >= 1000000000){
@@ -15,13 +16,14 @@ export default function ChannelComp(props) {
           return number;
         }
     }
+    const profilePic = props.profilePic? props.profilePic : Assets.defaultAvatar;
     if(props.type == "default"){
         return (
             <div className="cn__comp-2" style={{
                 backgroundImage: `url('${props.userBg}')`
             }}>
                 <div className="blur__layer rr__flex-col">
-                    <img src={props.profilePic} className="cn__avatar-2" />
+                    <img src={profilePic} className="cn__avatar-2" />
                     <span className="league-spartan-semibold fs__large-1 citizenship no__user-select">{props.userName}</span>
                 </div>
             </div>
@@ -34,7 +36,7 @@ export default function ChannelComp(props) {
                     backgroundColor: "transparent",
                 }}>
                     <div className="left__side-comp">
-                        <img src={props.profilePic} className="cn__avatar-2" />
+                        <img src={profilePic} className="cn__avatar-2" />
                         <div className="txt__content-holder" style={{
                             rowGap: "0.3em",
                             marginLeft: "0.5em"
@@ -53,7 +55,7 @@ export default function ChannelComp(props) {
             return(
                 <div className="cn__comp" onClick={props.onClick}>
                     <div className="left__side-comp">
-                        <img src={props.profilePic} className="cn__avatar" />
+                        <img src={profilePic} className="cn__avatar" />
                         <div className="txt__content-holder">
                             <span className="league-spartan-semibold fs__normal-2 no__user-select">{props.userName}</span>
                             <span className="league-spartan-light fs__small-3">{props.category}</span>
@@ -71,7 +73,7 @@ export default function ChannelComp(props) {
         else return(
             <div className="cn__comp" onClick={props.onClick}>
                 <div className="left__side-comp">
-                    <img src={props.profilePic} className="cn__avatar" />
+                    <img src={profilePic} className="cn__avatar" />
                     <div className="txt__content-holder">
                         <span className="league-spartan-semibold fs__normal-2">{props.userName}</span>
                         
