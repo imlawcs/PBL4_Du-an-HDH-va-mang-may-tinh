@@ -39,6 +39,7 @@ import { TagRoutes } from "../API/Tag.routes";
 import { FollowRoutes } from "../API/Follow.routes";
 import { BlockRoutes } from "../API/Block.routes";
 import TagCard from "./TagCard";
+import { Assets } from "../constants/Assets";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -457,7 +458,7 @@ export default function Sidebar(props) {
                   cateViewCount={12727}
                   categoryName={content.categoryName}
                   categoryId={content.categoryId}
-                  categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                  categoryPic={content.imagePath? CategoryRoutes.IMAGE_PATH + content.imagePath : Assets.defaultCategory}
                 />
               ))
               :
@@ -716,7 +717,7 @@ export default function Sidebar(props) {
                           cateViewCount={12727}
                           categoryName={content.categoryName}
                           categoryId={content.categoryId}
-                          categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                          categoryPic={content.imagePath? CategoryRoutes.IMAGE_PATH + content.imagePath : Assets.defaultCategory}
                         />
                       ))
                    : 
@@ -793,7 +794,7 @@ export default function Sidebar(props) {
                   cateViewCount={12727}
                   type={"default"}
                   categoryName={currentCategory.categoryName}
-                  categoryPic="https://i.imgur.com/tbmr3e8.jpg"
+                  categoryPic={currentCategory.imagePath? CategoryRoutes.IMAGE_PATH + currentCategory.imagePath : Assets.defaultCategory}
                   categoryDesc={currentCategory.categoryDesc}
                 />
                 <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
@@ -969,7 +970,7 @@ export default function Sidebar(props) {
                         cateViewCount={12727}
                         categoryName={content.categoryName}
                         categoryId={content.categoryId}
-                        categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                        categoryPic={content.imagePath? CategoryRoutes.IMAGE_PATH + content.imagePath : Assets.defaultCategory}
                     />
                       )):
                       <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">

@@ -39,16 +39,16 @@ export default function AdminSideBar({ setOption }){
                     type={toggleTmp==="users"? "toggle" : ""}
                 />
                 <SbMenuLabel 
-                    text="Streams"
-                    icon={faBroadcastTower}
-                    onClick={() => handleClick("streams")}
-                    type={toggleTmp==="streams"? "toggle" : ""}
-                />
-                <SbMenuLabel 
                     text="Categories"
                     icon={faLayerGroup}
                     onClick={() => handleClick("categories")}
                     type={toggleTmp==="categories"? "toggle" : ""}
+                />
+                <SbMenuLabel 
+                    text="Streams"
+                    icon={faBroadcastTower}
+                    onClick={() => handleClick("streams")}
+                    type={toggleTmp==="streams"? "toggle" : ""}
                 />
             </div>
         </>

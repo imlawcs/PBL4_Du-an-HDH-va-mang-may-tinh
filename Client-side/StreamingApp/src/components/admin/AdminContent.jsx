@@ -3,6 +3,8 @@ import Button from "../Button";
 import UserCompAdmin from "./_comp/UserComp";
 import CategoryCompAdmin from "./_comp/CategoryComp";
 import CustomModal from "../CustomModal";
+import StreamCompAdmin from "./_comp/StreamComp";
+import { StreamStatus } from "../../API/Stream.route";
 
 export default function AdminContent(props){
     const defaultHeight = "10em";
@@ -41,7 +43,7 @@ export default function AdminContent(props){
                         status: false,
                         action: 0,
                         value: -1,
-                    })}/>
+                    })} refresh={props.setRefetch}/>
                 )
             }
             if(action == 2){
@@ -61,7 +63,7 @@ export default function AdminContent(props){
                         status: false,
                         action: 0,
                         value: -1,
-                    })}/>
+                    })} refresh={props.setRefetch}/>
                 )
             }
             if(action == 4){
@@ -71,7 +73,7 @@ export default function AdminContent(props){
                         status: false,
                         action: 0,
                         value: -1,
-                    })}/>
+                    })} refresh={props.setRefetch}/>
                 )
             }
             
@@ -168,8 +170,8 @@ export default function AdminContent(props){
                             <div className="rr__flex-col rrf__row-small">
                                 {data.length > 0 ? data
                                 .filter((item) => item.UserName.toLowerCase().includes(search.toLowerCase()))
-                                .map((item, index) => 
-                                    <UserCompAdmin user={item} key={index} renderModal={setModal}/>
+                                .map((item) => 
+                                    <UserCompAdmin user={item} key={item.UserId} renderModal={setModal}/>
                                 )
                                 : 
                                 <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
@@ -229,7 +231,9 @@ export default function AdminContent(props){
                         <input type="text"
                             className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship fill__container"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                            }}
                             placeholder="Search for category..."
                             style={{
                                 paddingLeft: "1em !important",
@@ -244,11 +248,12 @@ export default function AdminContent(props){
                             scrollbarColor: "#000000 #ffffff",
                         }}>
                             <div className="rr__flex-col rrf__row-small">
-                                {data.length > 0 ? 
+                                {data
+                                .filter((item) => item?.categoryName?.toLowerCase().trim().includes(search?.toLowerCase().trim() || '')).length > 0 ? 
                                 data
-                                .filter((item) => item.categoryName.toLowerCase().includes(search.toLowerCase()))
-                                .map((item, index) => 
-                                    <CategoryCompAdmin category={item} key={index} renderModal={setModal}/>
+                                .filter((item) => item?.categoryName?.toLowerCase().trim().includes(search?.toLowerCase().trim() || ''))
+                                .map((item) => 
+                                    <CategoryCompAdmin category={item} key={item.categoryId} renderModal={setModal}/>
                                 )
                                 : 
                                 <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
@@ -270,12 +275,45 @@ export default function AdminContent(props){
                     Streams Management
                 </h1>
                 <div className="rr__flex-col rrf__row-small def-pad-1 no__padding-tb">
+                    <Button type={"default"} text={"Refresh"} onClick={() => props.setRefetch(3)} styles={{
+                        backgroundColor: "#2196F3",
+                        width: "100%",
+                    }}/>
                     <span className="league-spartan-bold fs__large-1 citizenship fill__container ta__left">
                         Currently Live
                     </span>
+                    <div className="rr__flex-col rrf__row-normal def-pad-1 no__padding-tb">
+                        {data.filter((item) => item.isLive == true).length > 0 ? 
+                        data
+                        .filter((item) => item.isLive == true)
+                        .map((item) =>
+                        <StreamCompAdmin stream={item} key={item.streamId} renderModal={setModal}/>
+                        )
+                        :
+                        <>
+                            <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
+                                No currently live stream
+                            </span>
+                        </>}
+                        
+                    </div>
                     <span className="league-spartan-bold fs__large-1 citizenship fill__container ta__left">
                         History
                     </span>
+                    <div className="rr__flex-col rrf__row-normal def-pad-1 no__padding-tb">
+                        {data.filter((item) => item.isLive == false && item.streamStatus == StreamStatus.FINISHED).length > 0 ? 
+                        data
+                        .filter((item) => item.isLive == false && item.streamStatus == StreamStatus.FINISHED)
+                        .map((item) =>
+                        <StreamCompAdmin stream={item} key={item.streamId} renderModal={setModal}/>
+                        )
+                        :
+                        <>
+                            <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
+                                No currently live stream
+                            </span>
+                        </>}
+                    </div>
                 </div>
             </>
         )

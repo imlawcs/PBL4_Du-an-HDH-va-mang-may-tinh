@@ -35,6 +35,8 @@ import TagCard from "./TagCard";
 import { isEmpty, StreamRoutes, StreamStatus } from "../API/Stream.route";
 import { Colors } from "../constants/Colors";
 import { Assets } from "../constants/Assets";
+import { ApiConstants } from "../API/ApiConstants";
+import { prepareFormData } from "../scripts/FormDataHandling";
 
 
 export default function CustomModal(props) {
@@ -1196,7 +1198,7 @@ export default function CustomModal(props) {
     )
   } else if (props.type === "edit"){
     const [data, setData] = useState(props.data);
-    const [tempImgSrc, setTempImgSrc] = useState(props.data.profilePic || props.data.categoryPic || "");
+    const [tempImgSrc, setTempImgSrc] = useState(props.data.imagePath || props.data.categoryPic || "");
     const updateData = async () => {
 
     }
@@ -1211,7 +1213,7 @@ export default function CustomModal(props) {
             </span>
             <div className="rr__flex-col rrf__row-normal">
               <div className="rr__flex-row rrf__col-normal">
-                <img src={tempImgSrc? tempImgSrc : Assets.defaultAvatar}
+                <img src={tempImgSrc? ApiConstants.BASE_URL + tempImgSrc : Assets.defaultAvatar}
                 className="avatar__2x avatarPreview1" style={{
                     width: "6em",
                     height: "6em",
@@ -1344,7 +1346,7 @@ export default function CustomModal(props) {
             </span>
             <div className="rr__flex-row rrf__col-normal">
               <div className="rr__flex-col rrf__row-small">
-                <img src={tempImgSrc? tempImgSrc : Assets.defaultCategory} 
+                <img src={tempImgSrc? ApiConstants.BASE_URL + tempImgSrc : Assets.defaultCategory} 
                 className="avatar__2x" 
                 style={{
                       width: "14em",
@@ -1427,6 +1429,25 @@ export default function CustomModal(props) {
     )
   } else if (props.type === "delete"){
     const [data, setData] = useState(props.data);
+    const handleDelete = async () => {
+      if(data.UserId){
+        if(data.Roles[0] != undefined && data.Roles[0].roleName === "Admin"){ 
+          alert("Cannot delete admin");
+          return;
+        }
+        await UserRoutes.deleteUser(data.UserId).then((res) => {
+          console.log(res);
+          props.refresh(1);
+          props.offModal();
+        });
+      } else {
+        await CategoryRoutes.deleteCategory(data.categoryId).then((res) => {
+          console.log(res);
+          props.refresh(2);
+          props.offModal();
+        });
+      }
+    }
     if(data.UserId)
     return <>
       <div className="modal__holder">
@@ -1473,7 +1494,7 @@ export default function CustomModal(props) {
               </div>
             </div>
             <div className="btn__holder rrf__jc-center">
-                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Confirm" onClick={handleDelete} />
                 <Button type="default" text="Cancel" onClick={props.offModal} />
             </div>
         </div>
@@ -1493,7 +1514,7 @@ export default function CustomModal(props) {
               Are you sure you want to delete this {data.UserId? "user":"category"}?
             </span>
             <div className="rr__flex-row rrf__col-normal">
-              <img src={data.categoryPic? data.categoryPic : Assets.defaultCategory}
+              <img src={data.imagePath? ApiConstants.BASE_URL + data.imagePath : Assets.defaultCategory}
                 className="avatar__2x avatarPreview1" style={{
                     width: "10em",
                     height: "12em",
@@ -1515,7 +1536,7 @@ export default function CustomModal(props) {
               </div>
             </div>
             <div className="btn__holder rrf__jc-center">
-                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Confirm" onClick={handleDelete} />
                 <Button type="default" text="Cancel" onClick={props.offModal} />
             </div>
         </div>
@@ -1618,23 +1639,21 @@ export default function CustomModal(props) {
     const [data, setData] = useState(
       addCheck === "user"? {
         UserName: "",
-        Password: "",
-        ConfirmPassword: "",
         DisplayName: "",
         Email: "",
         PhoneNumber: "",
-        Bio: "",
-        Role: "",
-        profilePic: "",
-
+        Password: "",
+        ConfirmPassword: "",
       }:
       {
-        categoryName: "",
-        categoryDesc: "",
-        categoryPic: "",
+        CategoryName: "",
+        CategoryDesc: "",
+        ImagePath: null,
       }
     );
     const [error, setError] = useState({});
+    const [formError, setFormError] = useState("");
+    const [tempImgSrc, setTempImgSrc] = useState("");
     const errorCheck = () => {
       let newError = {};
       if(addCheck === "user"){
@@ -1642,25 +1661,37 @@ export default function CustomModal(props) {
         if(data.DisplayName.trim() === "") newError.DisplayName = "Display name is required";
         if(data.Email.trim() === "") newError.Email = "Email is required";
         if(data.PhoneNumber.trim() === "") newError.PhoneNumber = "Phone number is required";
-        if(data.Bio.trim() === "") newError.Bio = "Bio is required";
         if(data.Password.trim() === "") newError.Password = "Password is required";
         if(data.ConfirmPassword.trim() !== data.Password.trim()) newError.ConfirmPassword = "Confirm password is not matched";
       } else {
-        if(data.categoryName.trim() === "") newError.categoryName = "Category name is required";
-        if(data.categoryDesc.trim() === "") newError.categoryDesc = "Category description is required";
+        if(data.CategoryName.trim() === "") newError.categoryName = "Category name is required";
+        if(data.CategoryDesc.trim() === "") newError.categoryDesc = "Category description is required";
       }
       setError(newError);
       return Object.keys(newError).length === 0;
     }
     const handleForm = async () => {
+      setFormError("");
       const check = errorCheck();
       if(!check) return;
       if(addCheck === "user"){
         console.log(data);
-
+        Auth.signUp(data).then((res) => {
+          console.log(res);
+          setFormError(res.message);
+          props.refresh(1);
+          props.offModal();
+        });
       } else {
         console.log(data);
-
+        const formData = prepareFormData(data);
+        console.log(formData);
+        CategoryRoutes.addNewCategory(data).then((res) => {
+          console.log(res);
+          setFormError(res);
+          props.refresh(2);
+          props.offModal();
+        });
       }
     }
 
@@ -1672,43 +1703,8 @@ export default function CustomModal(props) {
             zIndex: 1000,
           }}>
               <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
-                  Add user
+                  Add a new user
               </span>
-              <div className="rr__flex-col rrf__row-normal">
-                <div className="rr__flex-row rrf__col-normal rrf__ai-center">
-                  <img src={data.profilePic? data.profilePic : Assets.defaultAvatar}
-                  className="avatar__2x avatarPreview1" style={{
-                    width: "6em",
-                    height: "6em",
-                    objectFit: "cover",
-                  }}/>
-                  <div className="rr__flex-col rrf__row-tiny">
-                    <input
-                      type="file"
-                      id="avatarInput"
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        console.log(file);
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (e) => {
-                            console.log(e.target.result);
-                            setData({...data, profilePic: e.target.result});
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                    <Button
-                    type={"default"} 
-                    text={"Update image"} 
-                    onClick={() => document.getElementById('avatarInput').click()} 
-                    />  
-                  </div>
-                </div>
-              </div>
               <div className="rr__flex-col rrf__row-tiny">
                 <input type="text" 
                   className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
@@ -1770,25 +1766,6 @@ export default function CustomModal(props) {
                   )}
               </div>
               <div className="rr__flex-col rrf__row-tiny">
-                <textarea
-                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                  placeholder="Bio"
-                  style={{
-                    resize: "none",
-                    height: "5em",
-                  }}
-                  value={data.Bio}
-                  onChange={(e) => {
-                    setData({...data, Bio: e.target.value});
-                  }}
-                />
-                {error.Bio && (
-                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
-                      {error.Bio}
-                    </span>
-                )}
-              </div>
-              <div className="rr__flex-col rrf__row-tiny">
                 <input type="password" 
                   className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                   placeholder="Password"
@@ -1818,6 +1795,11 @@ export default function CustomModal(props) {
                     </span>
                 )}
               </div>
+                {formError !== "" && (
+                  <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                    {formError}
+                  </span>
+                )}
               <div className="btn__holder rrf__jc-center">
                   <Button type="default" text="Confirm" onClick={handleForm} />
                   <Button type="default" text="Cancel" onClick={props.offModal}/>
@@ -1838,7 +1820,7 @@ export default function CustomModal(props) {
             </span>
             <div className="rr__flex-row rrf__col-normal">
               <div className="rr__flex-col rrf__row-small">
-                <img src={data.categoryPic? data.categoryPic : Assets.defaultCategory} 
+                <img src={tempImgSrc? tempImgSrc : Assets.defaultCategory} 
                 className="avatar__2x" 
                 style={{
                       width: "14em",
@@ -1853,12 +1835,13 @@ export default function CustomModal(props) {
                     style={{ display: 'none' }}
                     onChange={(e) => {
                       const file = e.target.files[0];
+                      setData({...data, ImagePath: file});
                       console.log(file);
                       if (file) {
                         const reader = new FileReader();
                         reader.onload = (e) => {
                           console.log(e.target.result);
-                          setData({...data, categoryPic: e.target.result});
+                          setTempImgSrc(e.target.result);
                         };
                         reader.readAsDataURL(file);
                       }
@@ -1878,9 +1861,9 @@ export default function CustomModal(props) {
                   <input type="text" 
                       className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
                       placeholder="Category name"
-                      value={data.categoryName}
+                      value={data.CategoryName}
                       onChange={(e) => {
-                        setData({...data, categoryName: e.target.value});
+                        setData({...data, CategoryName: e.target.value});
                       }}
                     />
                     {error.categoryName && (
@@ -1897,9 +1880,9 @@ export default function CustomModal(props) {
                       resize: "none",
                       height: "5em",
                     }}
-                    value={data.categoryDesc}
+                    value={data.CategoryDesc}
                     onChange={(e) => {
-                      setData({...data, categoryDesc: e.target.value});
+                      setData({...data, CategoryDesc: e.target.value});
                     }}
                   />
                   {error.categoryDesc && (
@@ -1908,6 +1891,11 @@ export default function CustomModal(props) {
                     </span>
                   )}
                 </div>
+                  {formError !== "" && (
+                    <span className="error rr__color-secondary fs__normal-1 league-spartan-regular">
+                      {formError}
+                    </span>
+                  )}
               </div>
             </div>
             

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Assets } from "../../../constants/Assets";
 import { Colors } from "../../../constants/Colors";
 import Button from "../../Button";
+import { CategoryRoutes } from "../../../API/Category.routes";
 
 export default function CategoryCompAdmin(props){
     const [category, setCategory] = useState(props.category||{});
@@ -13,7 +14,7 @@ export default function CategoryCompAdmin(props){
                 borderRadius: "0.5em",
             }}>
                 <div className="info__holder rr__flex-row rrf__col-normal rrf__ai-center">
-                    <img src={category.categoryPic? category.categoryPic : Assets.defaultCategory} className="avatar__2x" style={{
+                    <img src={category.imagePath? CategoryRoutes.IMAGE_PATH + category.imagePath : Assets.defaultCategory} className="avatar__2x" style={{
                         width: "6em",
                         height: "8em",
                         objectFit: "cover",
