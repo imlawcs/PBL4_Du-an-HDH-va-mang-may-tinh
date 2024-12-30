@@ -72,6 +72,25 @@ namespace StreamingApp.Controllers
             return Ok("Delete user successfully");
         }
 
+        [HttpPut("{id}/update-image")]
+        public async Task<IActionResult> UpdateImageUserAsync(int id, [FromForm] UserUpdateImageDTO model)
+        {
+            var User = await _userService.GetUserByIdAsync(id);
+            if( User == null) 
+                return NotFound("User not found");
+            
+            if(id!=model.UserId)
+                return BadRequest("Id is not match");
+            
+            var result = await _userService.UpdateImageUserAsync(id,model);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok("Update image of user successfully");
+
+        }
+
         [HttpPut("{id}/update-password")]
         public async Task<IActionResult> UpdatePassword(int id, [FromBody] UserUpdatePasswordDto userUpdatePasswordDto)
         {
