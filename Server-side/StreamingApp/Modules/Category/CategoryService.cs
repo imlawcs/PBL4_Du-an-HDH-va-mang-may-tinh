@@ -32,7 +32,7 @@ namespace StreamingApp.Services
             return CategoryManager.GetCategoryByIdAsync(id);
         }
 
-        public Task<(bool Succeeded, string[] Errors)> UpdateCategoryAsync(int id,Category model)
+        public Task<(bool Succeeded, string[] Errors)> UpdateCategoryAsync(int id,CategoryUpdateDTO model)
         {
             return CategoryManager.UpdateCategoryAsync(id,model);
         }

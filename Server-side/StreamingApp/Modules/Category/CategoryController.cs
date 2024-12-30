@@ -54,7 +54,7 @@ namespace StreamingApp.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategoryAsync(int id,Category model)
+        public async Task<IActionResult> UpdateCategoryAsync(int id,[FromForm] CategoryUpdateDTO model)
         {
             if(id!=model.CategoryId) 
                 return BadRequest("Id is not match");

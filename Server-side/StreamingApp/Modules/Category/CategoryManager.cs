@@ -24,6 +24,11 @@ namespace StreamingApp.Managers
             return allowedTypes.Contains(file.ContentType.ToLower());
         }
 
+        public bool CategoryExists(int id, string categoryName)
+        {
+            return _context.Categories.Any(c => c.CategoryName == categoryName && c.CategoryId != id);
+        }
+
         public bool CategoryExists(string categoryName)
         {
             return _context.Categories.Any(c => c.CategoryName == categoryName);
@@ -70,18 +75,34 @@ namespace StreamingApp.Managers
             return category;
         }
 
-        public async Task<(bool Succeeded, string[] Errors)>UpdateCategoryAsync(int id, Category category)
+        public async Task<(bool Succeeded, string[] Errors)>UpdateCategoryAsync(int id, CategoryUpdateDTO category)
         {
             var categoryToUpdate = await _context.Categories.FindAsync(id);
             if (categoryToUpdate == null) return (false, new string[] { "Category not found" });
+
+            if(category.ImagePath != null)
+            {
+                if (!IsValidImage(category.ImagePath))
+                return (false, new[] { "Invalid image format" });
+
+                try
+                {
+                    categoryToUpdate.ImagePath = await _fileService.SaveFileAsync(category.ImagePath);
+                }
+                catch (Exception)
+                {
+                    return (false, new[] { "Error uploading image" });
+                }
+            }
             
-            if(CategoryExists(category.CategoryName))
+            if(CategoryExists(id,category.CategoryName))
             {
                 return (false, new string[] { "Category name already exists" });
             }
 
             categoryToUpdate.CategoryName = category.CategoryName;
             categoryToUpdate.CategoryDesc = category.CategoryDesc;
+
             await _context.SaveChangesAsync();
             return (true, new string[] {"Update category successfully"});
         }
