@@ -112,6 +112,22 @@ export const UserRoutes = {
             return error.message;
         }
     },
+    updateProfilePic: async (id: string, data: any) => {
+        try{
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.USER.GET_USER_BY_ID + id + "/update-image", {
+                method: "PUT",
+                body: data
+            });
+            const responseText = await response.text();
+            if(!response.ok) {
+                throw new Error("Failed to update profile pic");
+            }
+            return responseText;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    },
     deleteUser: async (id: string) => {
         try{
             const response = await fetch(ApiConstants.BASE_URL + ApiConstants.USER.GET_USER_BY_ID + id, {

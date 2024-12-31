@@ -15,6 +15,7 @@ import NotificationComp from "./NotificationComp";
 import MenuHolder from "./MenuHolder.main";
 import { NotiContext } from "../hooks/NotiProvider";
 import { Assets } from "../constants/Assets";
+import { ApiConstants } from "../API/ApiConstants";
 export default function NavBar(props) {
   const route = props.routing;
   const auth = useAuth();
@@ -60,7 +61,7 @@ export default function NavBar(props) {
       <ProfileMenu
         userName={user? user.DisplayName : "null"}
         roleCheck={user.Roles? user.Roles.filter((role) => role.roleName === "Admin").length > 0 : false}
-        imgLink={user.ProfilePic? user.ProfilePic : Assets.defaultAvatar}
+        imgLink={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
         logout={handleLogout}
       />
     );

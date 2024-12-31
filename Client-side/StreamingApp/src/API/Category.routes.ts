@@ -1,3 +1,4 @@
+import { uptime } from "process";
 import { ApiConstants } from "./ApiConstants";
 
 export const CategoryRoutes = {
@@ -50,6 +51,30 @@ export const CategoryRoutes = {
         } catch (error) {
             console.error('Error:', error);
             return "Error occurred while adding category";
+        }
+    },
+    updateCategory: async (id: string, category: FormData) => {
+        // const formData = new FormData();
+        // formData.append('CategoryName', category["CategoryName"] as string);
+        // formData.append('CategoryDesc', category["CategoryDesc"] as string);
+        // formData.append('ImagePath', category["ImagePath"] as File);
+        try {
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.CATEGORY.GET_CATEGORIES_BY_ID + id, {
+                method: 'PUT',
+                body: category
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Server response:', errorText);
+                return "Failed to update category with id: " + id;
+            }
+            
+            const data = await response.text();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            return "Error occurred while updating category";
         }
     },
     deleteCategory: async (categoryId: string) => {

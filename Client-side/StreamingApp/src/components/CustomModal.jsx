@@ -904,11 +904,25 @@ export default function CustomModal(props) {
       </>
     );
   } else if (props.type === "account__setting profile-pic") {
+    const [tempSrc, setTempSrc] = useState(userGlobal.ProfilePic? ApiConstants.BASE_URL + userGlobal.ProfilePic : null);
+    const profilePicUpdate = async (file) => {
+      const formData = new FormData();
+      formData.append('UserId', userGlobal.UserId);
+      formData.append('ImagePath', file);
+      await UserRoutes.updateProfilePic(userGlobal.UserId, formData).then((res) => {
+        console.log(res);
+        Auth.updateUserData();
+      });
+    }
     return (
       <>
         <div className="modal__layout rr__flex-row rrf__col-normal bg__color-2 citizenship def-pad-1">
           <div className="smd__label-3">
-            <img src="https://i.imgur.com/tbmr3e8.png" className="avatar__2x" id="avatarPreview" />
+            <img src={tempSrc? tempSrc : Assets.defaultAvatar} className="avatar__2x" id="avatarPreview" 
+            style={{
+              objectFit: "cover",
+            }}
+            />
           </div>
           <div className="rr__flex-col fill__container rrf__row-small mx-auto">
             <div className="rr__flex-row rrf__col-normal">
@@ -919,13 +933,14 @@ export default function CustomModal(props) {
                 style={{ display: 'none' }}
                 onChange={(e) => {
                   const file = e.target.files[0];
-                  console.log(file);
                   if (file) {
+                    profilePicUpdate(file);
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                      document.getElementById('avatarPreview').src = e.target.result;
+                      setTempSrc(e.target.result);
                     };
                     reader.readAsDataURL(file);
+                    
                   }
                 }}
               />
@@ -937,7 +952,7 @@ export default function CustomModal(props) {
               <BtnIcon 
                 icons={faTrash} 
                 onClick={() => {
-                  document.getElementById('avatarPreview').src = "https://i.imgur.com/tbmr3e8.png";
+                  
                 }}
               />
             </div>
@@ -1198,9 +1213,56 @@ export default function CustomModal(props) {
     )
   } else if (props.type === "edit"){
     const [data, setData] = useState(props.data);
-    const [tempImgSrc, setTempImgSrc] = useState(props.data.imagePath || props.data.categoryPic || "");
+    const [avatarChanged, setAvatarChanged] = useState(false);
+    const [tempImgSrc, setTempImgSrc] = useState(props.data.imagePath? ApiConstants.BASE_URL + props.data.imagePath : props.data.ProfilePic? ApiConstants.BASE_URL + props.data.ProfilePic : null);
+    const [tempImgFile, setTempImgFile] = useState(null);
+    const [modalType, setModalType] = useState(0);
     const updateData = async () => {
-
+      const postData = props.data.UserId ? {
+        UserId: data.UserId, 
+        UserName: data.UserName,
+        DisplayName: data.DisplayName,
+        Email: data.Email,
+        PhoneNumber: data.PhoneNumber,
+        Bio: data.Bio,
+      } : (() => {
+        const formData = new FormData();
+        formData.append('CategoryId', data.categoryId);
+        formData.append('CategoryName', data.categoryName);
+        formData.append('CategoryDesc', data.categoryDesc);
+        if(tempImgFile)
+        formData.append('ImagePath', tempImgFile);
+        
+        return formData;
+      })();
+      console.log("run update");
+      if (props.data.UserId) {
+        await UserRoutes.updateUser(data.UserId, postData).then((res) => {
+          console.log(res);
+        });
+        if (tempImgFile) {
+          await profilePicUpdate();
+        }
+        props.refresh(1);
+        props.offModal();
+      } else {
+        await CategoryRoutes.updateCategory(data.categoryId, postData).then((res) => {
+          console.log(res);
+          props.refresh(2);
+          props.offModal();
+        });
+      }
+    }
+    const userRoleUpdate = async () => {
+      console.log("userrole");
+    }
+    const profilePicUpdate = async () => {
+      const formData = new FormData();
+      formData.append('UserId', data.UserId);
+      formData.append('ImagePath', tempImgFile);
+      await UserRoutes.updateProfilePic(data.UserId, formData).then((res) => {
+        console.log(res);
+      });
     }
     if(props.data.UserId)
     return <>
@@ -1211,124 +1273,137 @@ export default function CustomModal(props) {
             <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
                 Edit info
             </span>
-            <div className="rr__flex-col rrf__row-normal">
-              <div className="rr__flex-row rrf__col-normal">
-                <img src={tempImgSrc? ApiConstants.BASE_URL + tempImgSrc : Assets.defaultAvatar}
-                className="avatar__2x avatarPreview1" style={{
-                    width: "6em",
-                    height: "6em",
-                    objectFit: "cover",
-                }}/>
-                <div className="rr__flex-col rrf__row-tiny">
-                  <span className="fs__normal-3 league-spartan-semibold citizenship ta__left">
-                    User ID: {data.UserId}
-                  </span>
-                  <span className="fs__normal-3 league-spartan-semibold citizenship ta__left">
-                    Username: {data.UserName}
-                  </span>
-                  <input
-                    type="file"
-                    id="avatarInput"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      console.log(file);
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                          console.log(e.target.result);
-                          setTempImgSrc(e.target.result);
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                  <BtnIcon
-                    icons={faFileImage}
+            {modalType != 1 ? <>
+              <div className="rr__flex-col rrf__row-normal">
+                <div className="rr__flex-row rrf__col-normal">
+                  <img src={tempImgSrc? tempImgSrc : Assets.defaultAvatar}
+                  className="avatar__2x avatarPreview1" style={{
+                      width: "6em",
+                      height: "6em",
+                      objectFit: "cover",
+                  }}/>
+                  <div className="rr__flex-col rrf__row-tiny">
+                    <span className="fs__normal-3 league-spartan-semibold citizenship ta__left">
+                      User ID: {data.UserId}
+                    </span>
+                    <span className="fs__normal-3 league-spartan-semibold citizenship ta__left">
+                      Username: {data.UserName}
+                    </span>
+                    <input
+                      type="file"
+                      id="avatarInput"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        setTempImgFile(file);
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (e) => {
+                            console.log(e.target.result);
+                            setTempImgSrc(e.target.result);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    <Button
+                    type="default" 
+                    text="Update avatar"
                     onClick={() => document.getElementById('avatarInput').click()}
-                  />
+                    />
+                    {avatarChanged && 
+                      <span className="fs__normal-1 rr__color-secondary league-spartan-regular ta__left">
+                        Avatar changed  
+                      </span>
+                    }
+                  </div>
                 </div>
+                  <Button
+                    type="default" 
+                    text="Status update"
+                    onClick={() => {setModalType(1)}}
+                  />
               </div>
-                <Button
-                  type="default" 
-                  text="Role update"
-                  onClick={() => {}}
+              <div className="rr__flex-col rrf__row-tiny">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  Display name
+                </span>
+                <input type="text" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Enter new displayname"
+                  value={data.DisplayName}
+                  onChange={(e) => {
+                    setData({...data, DisplayName: e.target.value});
+                  }}
                 />
-            </div>
-            <div className="rr__flex-col rrf__row-tiny">
-              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
-                Display name
-              </span>
-              <input type="text" 
-                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                placeholder="Enter new displayname"
-                value={data.DisplayName}
-                onChange={(e) => {
-                  setData({...data, DisplayName: e.target.value});
-                }}
-              />
-            </div>
-            <div className="rr__flex-col rrf__row-tiny">
-              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
-                Email
-              </span>
-              <input type="email" 
-                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                placeholder="Enter new email"
-                value={data.Email}
-                onChange={(e) => {
-                  setData({...data, Email: e.target.value});
-                }}
-              />
-            </div>
-            <div className="rr__flex-col rrf__row-tiny">
-              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
-                Phone number
-              </span>
-              <input type="text" 
-                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                placeholder="Enter new phone number"
-                value={data.PhoneNumber}
-                onChange={(e) => {
-                  setData({...data, PhoneNumber: e.target.value});
-                }}
-              />
-            </div>
-            <div className="rr__flex-col rrf__row-tiny">
-              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
-                Bio
-              </span>
-              <textarea
-                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                placeholder="Enter new Bio"
-                style={{
-                  resize: "none",
-                  height: "5em",
-                }}
-                value={data.Bio}
-                onChange={(e) => {
-                  setData({...data, Bio: e.target.value});
-                }}
-              />
-            </div>
-            <div className="rr__flex-col rrf__row-tiny">
-              <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
-                Role
-              </span>
-              <select
-                className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
-                value={data.Role}
-                onChange={(e) => {
-                  setData({...data, Role: e.target.value});
-                }}
-                >
-                <option value="1">User</option>
-                <option value="2">Admin</option>
-              </select>
-            </div>
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  Email
+                </span>
+                <input type="email" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Enter new email"
+                  value={data.Email}
+                  onChange={(e) => {
+                    setData({...data, Email: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  Phone number
+                </span>
+                <input type="text" 
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Enter new phone number"
+                  value={data.PhoneNumber}
+                  onChange={(e) => {
+                    setData({...data, PhoneNumber: e.target.value});
+                  }}
+                />
+              </div>
+              <div className="rr__flex-col rrf__row-tiny">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  Bio
+                </span>
+                <textarea
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  placeholder="Enter new Bio"
+                  style={{
+                    resize: "none",
+                    height: "5em",
+                  }}
+                  value={data.Bio}
+                  onChange={(e) => {
+                    setData({...data, Bio: e.target.value});
+                  }}
+                />
+              </div>
+            </>:
+            <>
+              <div className="rr__flex-col rrf__row-tiny">
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  Role
+                </span>
+                <select
+                  className="smd__input fs__normal-1 league-spartan-regular no__bg citizenship def-pad-2"
+                  value={data.Role}
+                  onChange={(e) => {
+                    setData({...data, Role: e.target.value});
+                  }}
+                  >
+                  <option value="1">User</option>
+                  <option value="2">Admin</option>
+                </select>
+              </div>
+              <div className="btn__holder">
+                <Button type="default" text="Back" onClick={() => setModalType(0)}/>
+              </div>
+            </>}
             <div className="btn__holder rrf__jc-center">
-                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Confirm" onClick={modalType == 1 ? userRoleUpdate : updateData} />
                 <Button type="default" text="Cancel" onClick={props.offModal} />
             </div>
         </div>
@@ -1346,7 +1421,7 @@ export default function CustomModal(props) {
             </span>
             <div className="rr__flex-row rrf__col-normal">
               <div className="rr__flex-col rrf__row-small">
-                <img src={tempImgSrc? ApiConstants.BASE_URL + tempImgSrc : Assets.defaultCategory} 
+                <img src={tempImgSrc? tempImgSrc : Assets.defaultCategory} 
                 className="avatar__2x" 
                 style={{
                       width: "14em",
@@ -1361,6 +1436,7 @@ export default function CustomModal(props) {
                     style={{ display: 'none' }}
                     onChange={(e) => {
                       const file = e.target.files[0];
+                      setTempImgFile(file);
                       console.log(file);
                       if (file) {
                         const reader = new FileReader();
@@ -1419,7 +1495,7 @@ export default function CustomModal(props) {
             </div>
             
             <div className="btn__holder rrf__jc-center">
-                <Button type="default" text="Confirm" onClick={() => {}} />
+                <Button type="default" text="Confirm" onClick={updateData} />
                 <Button type="default" text="Cancel" onClick={props.offModal} />
             </div>
         </div>
@@ -1461,7 +1537,7 @@ export default function CustomModal(props) {
               Are you sure you want to delete this {data.UserId? "user":"category"}?
             </span>
             <div className="rr__flex-row rrf__col-normal">
-            <img src={data.profilePic? data.profilePic : Assets.defaultAvatar}
+            <img src={data.ProfilePic? ApiConstants.BASE_URL + data.ProfilePic : Assets.defaultAvatar}
                 className="avatar__2x avatarPreview1" style={{
                     width: "6em",
                     height: "6em",
@@ -1556,7 +1632,7 @@ export default function CustomModal(props) {
                 Detailed info
             </span>
             <div className="rr__flex-row rrf__col-normal">
-            <img src={data.profilePic? data.profilePic : Assets.defaultAvatar}
+            <img src={data.ProfilePic? ApiConstants.BASE_URL + data.ProfilePic : Assets.defaultAvatar}
                 className="avatar__2x avatarPreview1" style={{
                     width: "6em",
                     height: "6em",
@@ -1605,7 +1681,7 @@ export default function CustomModal(props) {
                 Detailed info
             </span>
             <div className="rr__flex-row rrf__col-normal">
-              <img src={data.categoryPic? data.categoryPic : Assets.defaultCategory}
+              <img src={data.imagePath? ApiConstants.BASE_URL + data.imagePath : Assets.defaultCategory}
                 className="avatar__2x avatarPreview1" style={{
                     width: "10em",
                     height: "12em",

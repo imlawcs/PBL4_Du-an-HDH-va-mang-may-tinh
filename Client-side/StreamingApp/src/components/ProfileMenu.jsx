@@ -19,6 +19,10 @@ export default function ProfileMenu(props) {
           src={props.imgLink}
           alt="User profile pic"
           onClick={() => setIsChecked(!isChecked)}
+          style={{
+            cursor: "pointer",
+            objectFit: "cover",
+          }}
         />
       </div>
     );
@@ -31,6 +35,10 @@ export default function ProfileMenu(props) {
             src={props.imgLink}
             alt="User profile pic"
             onClick={() => setIsChecked(!isChecked)}
+            style={{
+              cursor: "pointer",
+              objectFit: "cover",
+            }}
           />
         </div>
         <div className="dd__menu">
@@ -39,6 +47,10 @@ export default function ProfileMenu(props) {
               className="img__holder"
               src={props.imgLink}
               alt="User profile pic"
+              style={{
+                cursor: "pointer",
+                objectFit: "cover",
+              }}
             />
             <div className="uih__name league-spartan-semibold">
               {props.userName}
