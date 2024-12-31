@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using StreamingApp.Models.DTOs;
 using StreamingApp.Models.Entities;
+using StreamingApp.Services;
 
 namespace StreamingApp.Managers
 {
@@ -9,9 +10,12 @@ namespace StreamingApp.Managers
         private readonly AppDbContext _context;
         private readonly User_RoleManager _userRoleManager;
 
-        public UserManager(AppDbContext context, User_RoleManager userRoleManager) {
+        private readonly IFileService _fileService;
+
+        public UserManager(AppDbContext context, User_RoleManager userRoleManager, IFileService fileService) {
             _context = context;
             _userRoleManager = userRoleManager;
+            _fileService = fileService;
         }
 
         //create new user
@@ -143,6 +147,41 @@ namespace StreamingApp.Managers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
             if (user == null) return null;
             return user;
+        }
+
+        private bool IsValidImage(IFormFile file)
+        {
+            if (file.Length > 5 * 1024 * 1024) // 5MB limit
+                return false;
+
+            var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif" };
+            return allowedTypes.Contains(file.ContentType.ToLower());
+        }
+
+        internal async Task<(bool Succeeded, string[] Errors)> UpdateImageUserAsync(int id, UserUpdateImageDTO model)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) {
+                return (false, new []{"User not found"});
+            }
+
+            if(model.ImagePath!=null){
+                if (!IsValidImage(model.ImagePath))
+                    return (false, new[] { "Invalid image format" });
+
+                try
+                {
+                    user.ProfilePic = await _fileService.SaveFileAsync(model.ImagePath);
+                }
+                catch (Exception)
+                {
+                    return (false, new[] { "Error uploading image" });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return (true, new [] {"Update image successfully"});
+        
         }
     }
 }

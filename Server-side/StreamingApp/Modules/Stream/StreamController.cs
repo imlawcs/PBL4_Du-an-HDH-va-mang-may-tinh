@@ -89,6 +89,24 @@ namespace StreamingApp.Controllers
             return Ok(stream.Stream.StreamId);
             
         }
+        [HttpPut("{id}/update-image")]
+        public async Task<IActionResult> UpdateImageStreamAsync(int id, [FromForm] StreamUpdateImageDTO model)
+        {
+            var stream = await _streamService.GetStreamByIdAsync(id);
+            if( stream == null) 
+                return NotFound("Stream not found");
+            
+            if(id!=model.StreamId)
+                return BadRequest("Id is not match");
+            
+            var result = await _streamService.UpdateImageStreamAsync(id,model);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok("Update category successfully");
+
+        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStreamAsync(int id, [FromBody] StreamUpdateDTO model)
@@ -166,6 +184,8 @@ namespace StreamingApp.Controllers
             }
             return Ok("Update stream successfully");
         }
+
+        
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStreamAsync(int id)

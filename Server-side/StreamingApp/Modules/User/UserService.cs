@@ -121,6 +121,9 @@ namespace StreamingApp.Services
             return UserManager.GetUserByName(name);
         }
 
-       
+        public Task<(bool Succeeded, string[] Errors)> UpdateImageUserAsync(int id, UserUpdateImageDTO model)
+        {
+            return UserManager.UpdateImageUserAsync(id, model);
+        }
     }
 }

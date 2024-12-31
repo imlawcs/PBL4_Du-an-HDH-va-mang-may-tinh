@@ -37,6 +37,11 @@ namespace StreamingApp.Services
             return StreamManager.GetStreamByIdAsync(id);
         }
 
+        public Task<(bool Succeeded, string[] Errors)> UpdateImageStreamAsync(int id, StreamUpdateImageDTO model)
+        {
+            return StreamManager.UpdateImageStreamAsync(id, model);
+        }
+
         public Task<(bool Succeeded, string[] Errors)> UpdateStreamAsync(Models.Entities.Stream stream)
         {
             return StreamManager.UpdateStreamAsync(stream);
