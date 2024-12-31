@@ -105,7 +105,7 @@ export default function UserChannelList(props) {
                     type={"link-type"}
                     text={"Show more"}
                     onClick={() => {
-                        
+                    
                     }}
                   />}
                 </div>

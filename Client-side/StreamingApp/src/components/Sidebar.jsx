@@ -907,7 +907,7 @@ export default function Sidebar(props) {
                 
                       <ChannelComp type="search"
                         key={index}
-                        profilePic={user.ProfilePic? user.ProfilePic : defaultImage}
+                        profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : defaultImage}
                         userName={user.UserName}
                         followers={user.followers? user.followers : 0}
                         onClick={() => {
@@ -1156,21 +1156,31 @@ export default function Sidebar(props) {
     return (
       <>
         <div className="main__position">
-          <div className="sidebar bg__color-2 rr__flex-row">
+          <div className="sidebar bg__color-2 rr__flex-row" style={{
+            flex: 1,
+          }}>
           <UserChannelList user={userGlobal} />
             <div className="main__content bg__color-vid">
               {/* <img className="bg__img" src={smBackground} alt="background"/> */}
               <div className="video__holder rr__flex-col rrf__jc-center rrf__ai-center bg__color-00">
-                {/* <span className="fs__title-5 league-spartan-regular citizenship ta__center fill__container">
+                {!streamData.isLive && 
+                <span className="fs__title-5 league-spartan-regular citizenship ta__center fill__container"
+                style={{
+                  // marginTop: "1em",
+                  // width: "16em",
+                }}
+                >
                   Stream is offline
-                </span> */}
-
+                </span>}
                   <video style={{
                       width: "100%",
                       height: "100%",
-                    }
-                  } id="remote__stream" autoPlay={true} controls={true} preload="metadata"></video>
+                      display: streamData.isLive? "block" : "none",
+                    }}
+                  id="remote__stream" autoPlay={true} controls={true} preload="metadata">
 
+                
+                  </video>
               </div>
 
               <StreamUserInfo
@@ -1188,7 +1198,10 @@ export default function Sidebar(props) {
                 status={streamData.isLive !== undefined ? streamData.isLive : false}
               />
             </div>
-            <StreamChat messages={messages} userList={userList}/>
+            
+            {streamData.isLive ? 
+            <StreamChat messages={messages} userList={userList}/> 
+            : <></>}
           </div>
         </div>
       </>

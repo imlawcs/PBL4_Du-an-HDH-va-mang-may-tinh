@@ -42,7 +42,7 @@ export default function ChannelComp(props) {
                             marginLeft: "0.5em"
                         }}>
                             <span className="league-spartan-semibold fs__normal-2 no__user-select">{props.userName}</span>
-                            <span className="league-spartan-light fs__normal-1"><b>{props.followers}</b> followers</span>
+                            {/* <span className="league-spartan-light fs__normal-1"><b>{props.followers}</b> followers</span> */}
                         </div>
                     </div>
                 </div>
