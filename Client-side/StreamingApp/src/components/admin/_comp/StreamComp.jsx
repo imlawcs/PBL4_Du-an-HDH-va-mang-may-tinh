@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Colors } from "../../../constants/Colors";
 import Button from "../../Button";
 import { Assets } from "../../../constants/Assets";
+import { ApiConstants } from "../../../API/ApiConstants";
 
 export default function StreamCompAdmin(props){
     const [stream, setStream] = useState(props.stream|| {} );
@@ -14,14 +15,15 @@ export default function StreamCompAdmin(props){
                 borderRadius: "0.5em",
             }}>
                 <div className="info__holder rr__flex-row rrf__col-normal rrf__ai-center">
-                    <img src={stream.thumbnail? stream.thumbnail : Assets.defaultThumbnail} className="avatar__2x" style={{
+                    <img src={stream.streamThumbnail? ApiConstants.BASE_URL + stream.streamThumbnail : Assets.defaultThumbnail} className="avatar__2x" style={{
                         width: "8em",
                         height: "4em",
                         borderRadius: "0.4em",
+                        objectFit: "cover",
                     }}/>
                     <div className="rr__flex-col rrf__jc-space-between">
                         <div className="league-spartan-bold fs__normal-3 citizenship">
-                            {stream.streamName}
+                            {stream.streamTitle}
                         </div>
                         <div className="league-spartan-light fs__normal-2 citizenship">
                             {stream.streamDesc}

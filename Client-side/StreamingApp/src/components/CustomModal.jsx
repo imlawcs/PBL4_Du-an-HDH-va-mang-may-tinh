@@ -448,6 +448,8 @@ export default function CustomModal(props) {
     const [inputCategory, setInputCategory] = useState("");
     const [inputTagStandAlone, setInputTagStandAlone] = useState("");
     const [inputDesc, setInputDesc] = useState("");
+    const [tempThumbnail, setTempThumbnail] = useState(null);
+    const [tempImgFile, setTempImgFile] = useState(null);
     //data for stream submit
     const [selectedCategory, setSelectedCategory] = useState({});
     //string handling
@@ -479,6 +481,7 @@ export default function CustomModal(props) {
             setPrevStreamData(res || {});
               setTitle(res.streamTitle || "");
               setInputDesc(res.streamDesc, "");
+              setTempThumbnail(res.streamThumbnail? ApiConstants.BASE_URL + res.streamThumbnail : null);
               CategoryRoutes.getCategoryById(res.streamCategories[0].categoryId).then((res1) => {
                 setInputCategory(res1.categoryName || "");
                 setSelectedCategory({
@@ -570,8 +573,18 @@ export default function CustomModal(props) {
       setInfo([...info, newInfo].filter((value, index, self) => self.indexOf(value) === index)); //remove duplicate
     }
     //create or update stream
+    const thumbnailUpload = async (streamId) => {
+      if(tempImgFile) {
+        const formData = new FormData();
+        formData.append("StreamId", streamId);
+        formData.append("ImagePath", tempImgFile);
+        StreamRoutes.updateThumbnail(streamId, formData).then((res) => {
+          console.log(res);
+          return Promise.resolve(res);
+        });
+      }
+    }
     const handleStreamCreate = async () => {
-       
           console.log("inputtagcheck");
           let tagIdList = [];
           const inputTagsList = inputTagStandAlone.split(",")
@@ -616,6 +629,10 @@ export default function CustomModal(props) {
             console.log("Create stream 1");
             StreamRoutes.createStream(data).then((res) => {
               console.log(res);
+              
+              if(tempImgFile) {
+                thumbnailUpload(res);
+              }
               //reset prevStreamData
               StreamRoutes.getStreamById(res).then((res1) => {
                 console.log(res1);
@@ -629,6 +646,9 @@ export default function CustomModal(props) {
             console.log("Create stream 2");
             StreamRoutes.createStream(data).then((res) => {
               console.log(res);
+              if(tempImgFile) {
+                thumbnailUpload(res);
+              }
               //reset prevStreamData
               StreamRoutes.getStreamById(res).then((res1) => {
                 console.log(res1);
@@ -647,6 +667,9 @@ export default function CustomModal(props) {
               streamDesc: inputDesc,
               streamCategoryId: selectedCategory.categoryId,
               streamTagIds: tagListTemp,
+            }
+            if(tempImgFile) {
+              thumbnailUpload(prevStreamData.streamId);
             }
             // console.log("update data: " + JSON.stringify(data));
             StreamRoutes.updateStream(prevStreamData.streamId, data).then((res) => {
@@ -855,6 +878,49 @@ export default function CustomModal(props) {
               </div>
               </div>
               
+            </div>
+            <div className="rr__flex-col">
+              <label className="smd__label fs__normal-2 league-spartan-regular">
+                Thumbnail
+              </label>
+              <img 
+              className="def-pad-1"
+              src={tempThumbnail? tempThumbnail : Assets.defaultThumbnail}
+              alt="thumbnail" 
+              srcset="" 
+              style={{
+                width: "15em",
+                height: "8em",
+                objectFit: "cover",
+                cursor: "pointer",
+              }}
+              onClick={() => document.getElementById('avatarInput').click()}
+              />
+              <span className="fs__normal-1 league-spartan-regular" 
+              style={{
+                marginLeft: "1em",
+              }}
+              >
+                Click into the image to upload thumbnail
+              </span>
+              <input
+                    type="file"
+                    id="avatarInput"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      setTempImgFile(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          console.log(e.target.result);
+                          setTempThumbnail(e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                  }}
+              />
             </div>
             <div className="rr__flex-row rrf__ai-center">
               {error.length > 0 && <FontAwesomeIcon icon={faTriangleExclamation} style={{

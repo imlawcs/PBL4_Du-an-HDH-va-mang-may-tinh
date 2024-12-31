@@ -1,4 +1,6 @@
+import { ApiConstants } from "../API/ApiConstants";
 import "../assets/css/VideoContent.css";
+import { Assets } from "../constants/Assets";
 import TagCard from "./TagCard";
 
 export default function VideoContent(props) {
@@ -9,7 +11,8 @@ export default function VideoContent(props) {
           <div
             className="thumbnail__small"
             style={{
-              backgroundImage: `url(${props.thumbnail})`,
+              backgroundImage: `url(${props.thumbnail? props.thumbnail : Assets.defaultThumbnail})`,
+              backgroundSize: "cover",
             }}
             onClick={props.onClick}
           >

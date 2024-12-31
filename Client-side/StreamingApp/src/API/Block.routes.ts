@@ -5,7 +5,7 @@ export const BlockRoutes = {
         try{
             const response = await fetch(ApiConstants.BASE_URL + ApiConstants.BLOCK.GET_ALL_BLOCKED);
             if(!response.ok) {
-                throw new Error("Failed to get blocked users");
+                return [];
             }
             const data = await response.json();
             return data;
