@@ -3,6 +3,7 @@ import MenuOptionBtn from "./MenuOptionBtn";
 import {
   faArrowRightFromBracket,
   faCode,
+  faHome,
   faUserGear,
   faWaveSquare,
 } from "@fortawesome/free-solid-svg-icons";
@@ -58,6 +59,11 @@ export default function ProfileMenu(props) {
           </div>
           <div className="opt__holder">
             <MenuOptionBtn
+              icon={faHome}
+              optionName="Home"
+              onClick={() => navigate("/")}
+            />
+            <MenuOptionBtn
               icon={faWaveSquare}
               optionName="Stream Manager"
               onClick={() => navigate("/streamManager")}
@@ -67,7 +73,6 @@ export default function ProfileMenu(props) {
               optionName="Profile Settings"
               onClick={() => navigate("/accountSetting")}
             />
-            
             {props.roleCheck && 
             <>
               <MenuOptionBtn
