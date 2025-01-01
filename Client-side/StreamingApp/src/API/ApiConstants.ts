@@ -1,5 +1,5 @@
 export const ApiConstants = {
-    BASE_URL: "https://localhost:3001",
+    BASE_URL: import.meta.env.VITE_BASE_URL,
     LOGIN: '/api/auth/login',
     SIGNUP: '/api/auth/register',
     CLAIMS: {

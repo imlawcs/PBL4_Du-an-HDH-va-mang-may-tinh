@@ -6,14 +6,29 @@ import { useNavigate } from "react-router-dom";
 import { FollowRoutes } from "../API/Follow.routes";
 import { StreamRoutes } from "../API/Stream.route";
 import { Assets } from "../constants/Assets";
+import { ApiConstants } from "../API/ApiConstants";
+import { BlockRoutes } from "../API/Block.routes";
 
 export default function UserChannelList(props) {
     const [channels, setChannels] = useState([]);
     const [userFollowList, setUserFollowList] = useState([]);
+    const [userBlockList, setUserBlockList] = useState([]);
     const [userGlobal, setUserGlobal] = useState(props.user);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem("site"));
     const navigate = useNavigate();
+    const blockCheck = (channel, blockComp) => {
+        //filter out
+        //case1: this channel blocked userGlobal
+        // blockComp.ChannelId == channel.UserId && blockComp.BlockedId == userGlobal.UserId
+        //case2: userGlobal blocked this channel
+        // blockComp.ChannelId == userGlobal.UserId && blockComp.BlockedId == channel.UserId
+        return(
+          (blockComp.channelId == channel.UserId && blockComp.blockedId == userGlobal.UserId || 
+          blockComp.channelId == userGlobal.UserId && blockComp.blockedId == channel.UserId)
+        )
+
+    }
     function adminCheck(channel) {
         if (channel.Roles && channel.Roles.filter((role) => role.roleName === "Admin").length > 0) {
             return true;
@@ -27,10 +42,15 @@ export default function UserChannelList(props) {
       });
       const fetchUserFollow = userGlobal && FollowRoutes.GetAllChannelsByFollowerId(userGlobal.UserId).then((res) => {
         console.log("User follow list:", res);
-        setUserFollowList(res);
+        setUserFollowList(res || []);
         return Promise.resolve();
       });
-        Promise.all([fetchUserList, fetchUserFollow]).then(() => {
+      const fectchAllBlocked = userGlobal && BlockRoutes.getAllBlockedUsers().then((res) => {
+        console.log("User block list:", res);
+        setUserBlockList(res || []);
+        return Promise.resolve();
+      })
+        Promise.all([fetchUserList, fetchUserFollow, fectchAllBlocked]).then(() => {
           setLoading(false);
         });
     }, []);
@@ -42,7 +62,7 @@ export default function UserChannelList(props) {
                 {loading ? 
                 <>
                     <span className="cn__holder-label league-spartan-bold fs__large-1">
-                        Loading...
+                      Loading...
                     </span>
                 </> 
                 : 
@@ -53,9 +73,11 @@ export default function UserChannelList(props) {
                 </div>
                 <div className="cn__holder-comps">
                   {channels
+                  .filter((channel) => userBlockList.filter((block) => blockCheck(channel, block)).length <= 0)
                   .filter((channel) => userFollowList.filter((follow) => follow.channelId === channel.UserId).length>0).length > 0
                   ? 
                   channels
+                  .filter((channel) => userBlockList.filter((block) => blockCheck(channel, block)).length <= 0)
                   .filter((user) => userFollowList.filter((follow) => follow.channelId === user.UserId).length > 0)
                   .filter((user) => adminCheck(user) === false)
                   .slice(0, 5)
@@ -66,7 +88,7 @@ export default function UserChannelList(props) {
                       }}
                       key={user.UserId}
                       isOffline={user.UserStatus? false : true}
-                      profilePic={user.ProfilePic? user.ProfilePic : Assets.defaultAvatar}
+                      profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
                       viewCount={user.ViewCount? user.ViewCount : 0}
@@ -83,7 +105,7 @@ export default function UserChannelList(props) {
                     type={"link-type"}
                     text={"Show more"}
                     onClick={() => {
-                        
+                    
                     }}
                   />}
                 </div>
@@ -93,8 +115,10 @@ export default function UserChannelList(props) {
                 </div>
                 <div className="cn__holder-comps">
                   {/* map user here */}
-                  {channels.length > 0 && 
+                  {channels
+                  .length > 0 && 
                   channels
+                  .filter((channel) => userBlockList.filter((block) => blockCheck(channel, block)).length === 0) //filter out blocked users
                   .filter((channel) => userFollowList.filter((follow) => follow.channelId === channel.UserId).length === 0) //get nhung ai chua follow
                   .filter((user) => adminCheck(user) === false)
                   .slice(0, 5)
@@ -105,7 +129,7 @@ export default function UserChannelList(props) {
                         navigate(`/user/${user.UserName}`);
                       }}
                       isOffline={user.UserStatus? false : true}
-                      profilePic={user.ProfilePic? user.ProfilePic : Assets.defaultAvatar}
+                      profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
                       viewCount={user.ViewCount? user.ViewCount : 0}

@@ -3,6 +3,7 @@ import { Colors } from "../../../constants/Colors";
 import Button from "../../Button";
 import "../../../assets/css/UserCompAdmin.css";
 import { useState } from "react";
+import { ApiConstants } from "../../../API/ApiConstants";
 export default function UserCompAdmin(props){
     const [user, setUser] = useState(props.user|| {} );
     return (
@@ -13,9 +14,10 @@ export default function UserCompAdmin(props){
             borderRadius: "0.5em",
         }}>
             <div className="info__holder rr__flex-row rrf__col-normal rrf__ai-center">
-                <img src={props.profilePic? props.profilePic : Assets.defaultAvatar} className="avatar__2x" style={{
+                <img src={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar} className="avatar__2x" style={{
                     width: "4em",
                     height: "4em",
+                    objectFit: "cover",
                 }}/>
                 <div className="rr__flex-col rrf__jc-space-between">
                     <div className="league-spartan-bold fs__normal-3 citizenship">

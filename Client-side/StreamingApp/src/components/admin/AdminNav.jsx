@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/AuthProvider";
 import ProfileMenu from "../ProfileMenu";
 import { useState } from "react";
 import { Assets } from "../../constants/Assets";
+import { ApiConstants } from "../../API/ApiConstants";
 export default function AdminNav(){
     const navigate = useNavigate();
     const auth = useAuth();
@@ -17,7 +18,7 @@ export default function AdminNav(){
           <ProfileMenu
             userName={user? user.UserName : "null"}
             roleCheck={user.Roles? user.Roles.filter((role) => role.roleName === "Admin").length > 0 : false}
-            imgLink={user.ProfilePic? user.ProfilePic : Assets.defaultAvatar}
+            imgLink={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
             logout={handleLogout}
           />
         );
