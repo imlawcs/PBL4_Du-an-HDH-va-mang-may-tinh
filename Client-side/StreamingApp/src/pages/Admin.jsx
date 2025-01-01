@@ -24,7 +24,13 @@ export default function AdminPage() {
             case "dashboard":
                     return (
                     <>
-                        <AdminContent current="dashboard" />
+                        <AdminContent 
+                        key={JSON.stringify({users, categories, streams})}
+                        current="dashboard" 
+                        dataList={{users, categories, streams}} 
+                        setRefetch={setRefetch}
+                        setOption={setOption}
+                        />
                     </>
                     )
             case "users":

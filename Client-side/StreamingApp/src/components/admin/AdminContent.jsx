@@ -1,10 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../Button";
 import UserCompAdmin from "./_comp/UserComp";
 import CategoryCompAdmin from "./_comp/CategoryComp";
 import CustomModal from "../CustomModal";
 import StreamCompAdmin from "./_comp/StreamComp";
-import { StreamStatus } from "../../API/Stream.route";
+import { compareDates, StreamStatus } from "../../API/Stream.route";
+import { use } from "react";
+import { Colors } from "../../constants/Colors";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faList, faUsers, faVideo } from "@fortawesome/free-solid-svg-icons";
+import { Bar, Line } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    BarElement,
+    Scale
+} from 'chart.js';
+import { AdminCheck } from "../../scripts/AdminCheck";
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
 export default function AdminContent(props){
     const defaultHeight = "10em";
@@ -33,8 +61,11 @@ export default function AdminContent(props){
         action: 0,
         value: -1,
     });
+    useEffect(() => {
+        console.log("Modal status:", modal);
+    }, [modal]);
     const renderModal = (id, action) => {
-            let prevData = data.filter((item) => item.UserId == id || item.categoryId == id)[0];
+            let prevData = data.filter((item) => item.UserId == id || item.categoryId == id || item.streamId == id)[0];
             console.log(prevData);
             if(action == 1){
                 console.log("edit");
@@ -79,31 +110,225 @@ export default function AdminContent(props){
             
     }
     if(props.current === "dashboard"){
+        const renderData = () => {
+            return (
+                <>
+                <div className="fill__container rr__flex-col rrf__row-small rrf__ai-center rrf__jc-center" 
+                style={{
+                    height: defaultHeight, 
+                    backgroundColor: Colors.primary,
+                    borderRadius: "0.5em",
+                    cursor: "pointer",
+                }}
+                onClick={() => props.setOption("users")}
+                >
+                    <FontAwesomeIcon 
+                        icon={faUsers}
+                        size="3x"
+                        color="#ffffff"
+                    />
+                    <span className="league-spartan-regular citizenship fs__normal-3">
+                        {data.users.length} active users
+                    </span>
+                </div>
+                <div className="fill__container rr__flex-col rrf__row-small rrf__ai-center rrf__jc-center" 
+                style={{
+                    height: defaultHeight, 
+                    backgroundColor: Colors.primary,
+                    borderRadius: "0.5em",
+                    cursor: "pointer",
+                }}
+                onClick={() => props.setOption("categories")}
+                >
+                    <FontAwesomeIcon 
+                        icon={faList}
+                        size="3x"
+                        color="#ffffff"
+                    />
+                    <span className="league-spartan-regular citizenship fs__normal-3">
+                        {data.categories.length} categories
+                    </span>
+                </div>
+                <div className="fill__container rr__flex-col rrf__row-small rrf__ai-center rrf__jc-center" 
+                style={{
+                    height: defaultHeight, 
+                    backgroundColor: Colors.primary,
+                    borderRadius: "0.5em",
+                    cursor: "pointer",
+                }}
+                onClick={() => props.setOption("streams")}
+                >
+                    <FontAwesomeIcon
+                        icon={faVideo}
+                        size="3x"
+                        color="#ffffff"
+                    />
+                    <span className="league-spartan-regular citizenship fs__normal-3">
+                        {data.streams.length} streaming datas
+                    </span>
+                </div>
+                </>
+            )
+        }
+        const renderChart = () => {
+            return(
+                <>
+                <div style={{
+                    flex: 1
+                }}>
+                    <Line 
+                    style={{
+                        backgroundColor: Colors.primary,
+                        borderColor: Colors.secondary,
+                        borderWidth: 1,
+                        borderRadius: "0.5em",
+                        padding: "0.5em",
+                        
+                    }}
+                        data={{
+                            labels: [...new Set(data.streams.map(item => 
+                                `${new Date(item.streamDate).toLocaleString('default', { month: 'long' })} ${new Date(item.streamDate).getFullYear()}`))],
+                            datasetIdKey: "streams",
+                            datasets: [
+                                {
+                                    label: "Number of Streams per Month",
+                                    data: [...new Set(data.streams.map(item => 
+                                        `${new Date(item.streamDate).toLocaleString('default', { month: 'long' })} ${new Date(item.streamDate).getFullYear()}`))].map(monthYear => 
+                                            data.streams.filter(stream => 
+                                                `${new Date(stream.streamDate).toLocaleString('default', { month: 'long' })} ${new Date(stream.streamDate).getFullYear()}` === monthYear
+                                            ).length
+                                        ),
+                                    backgroundColor: Colors.primary,
+                                    borderColor: Colors.secondary,
+                                    borderWidth: 1,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: Colors.secondary,
+                                    pointBorderColor: Colors.primary,
+                                    pointHoverBackgroundColor: Colors.primary,
+                                    pointHoverBorderColor: Colors.secondary,
+                                }
+                            ]
+                        }}
+                        options={{
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }}
+                    />
+                </div>
+                <div style={{
+                    flex: 1
+                }}>
+                    <Bar 
+                        style={{
+                            backgroundColor: Colors.primary,
+                            borderColor: Colors.secondary,
+                            borderWidth: 1,
+                            borderRadius: "0.5em",
+                            padding: "0.5em",
+                            width: "50vh",
+                        }}
+                        data={{
+                            labels: [...new Set(data.users.filter((a) => !AdminCheck(a)).map(item => 
+                                `${new Date(item.registerDate).toLocaleString('default', { month: 'long' })} ${new Date(item.registerDate).getFullYear()}`))],
+                            datasets: [
+                                {
+                                    label: "New Users per Month",
+                                    data: [...new Set(data.users.filter((a) => !AdminCheck(a)).map(item => 
+                                        `${new Date(item.registerDate).toLocaleString('default', { month: 'long' })} ${new Date(item.registerDate).getFullYear()}`))].map(monthYear => 
+                                            data.users.filter(user => 
+                                                `${new Date(user.registerDate).toLocaleString('default', { month: 'long' })} ${new Date(user.registerDate).getFullYear()}` === monthYear
+                                            ).length
+                                        ),
+                                    backgroundColor: Colors.secondary,
+                                    borderColor: Colors.primary,
+                                    borderWidth: 1
+                                }
+                            ]
+                        }}
+                        options={{
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }}
+                    />
+                </div>
+                <div style={{
+                    flex: 1
+                }}>
+                    <Bar 
+                        style={{
+                            backgroundColor: Colors.primary,
+                            borderColor: Colors.secondary,
+                            borderWidth: 1,
+                            borderRadius: "0.5em",
+                            padding: "0.5em",
+                            width: "50vh",
+                        }}
+                        data={{
+                            labels: [...new Set(data.streams.flatMap(stream => 
+                                stream.streamCategories.map(cat => 
+                                    data.categories.find(c => c.categoryId === cat.categoryId)?.categoryName
+                                )
+                            ))],
+                            datasets: [{
+                                label: "Streams per Category",
+                                data: [...new Set(data.streams.flatMap(stream => 
+                                    stream.streamCategories.map(cat => cat.categoryId)
+                                ))].map(catId => 
+                                    data.streams.filter(stream => 
+                                        stream.streamCategories.some(cat => cat.categoryId === catId)
+                                    ).length
+                                ),
+                                backgroundColor: Colors.secondary,
+                                borderColor: Colors.primary,
+                                borderWidth: 1
+                            }]
+                        }}
+                        options={{
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }}
+                    />
+                </div>
+                </>
+            )
+        }
         return (
             <>
-                <h1 className="league-spartan-bold citizenship fill__container ta__center">
+                <h1 className="league-spartan-bold citizenship fill__container ta__center fs__title-2">
                     Dashboard
                 </h1>
+                <span className="league-spartan-regular citizenship fs__normal-3 fill__container ta__center">
+                    Navigate through the sidebar menu to see the details
+                </span>
                 <div className="rr__flex-row rrf__col-small def-pad-1 no__padding-tb">
-                    {renderSampleDiv()}
-                    {renderSampleDiv()}
-                    {renderSampleDiv()}
+                    {renderData()}
                 </div>
-                <div className="rr__flex-row rrf__col-small def-pad-1 no__padding-tb">
-                    {renderSampleDiv("20em")}
-                    {renderSampleDiv("20em")}
-                    {renderSampleDiv("20em")}
-                    {renderSampleDiv("20em")}
-                </div>
-                <div className="rr__flex-row rrf__col-small def-pad-1 no__padding-tb">
-                    {renderSampleDiv("20em", 6)}
-                    <div className="rr__flex-col rrf__row-small fill__container fill__y" style={{
-                        flex: 7,
-                    }}>
-                        {renderSampleDiv("auto", 1)}
-                        {renderSampleDiv("auto", 1)}
-                        {renderSampleDiv("auto", 1)}
-                    </div>
+                <div className="rr__flex-row rrf__col-small def-pad-1 no__padding-tb"
+                    style={{
+                        maxWidth: "100%",
+                    }}
+                >
+                    {renderChart()}
                 </div>
             </>
         )
@@ -137,10 +362,10 @@ export default function AdminContent(props){
                             backgroundColor: "#2196F3",
                             width: "100%",
                         }}/>
-                        <Button type={"default"} text={"Try wiping data"} onClick={() => props.setRefetch(-1)} styles={{
+                        {/* <Button type={"default"} text={"Try wiping data"} onClick={() => props.setRefetch(-1)} styles={{
                             backgroundColor: "#f44336",
                             width: "100%",
-                        }}/>
+                        }}/> */}
                         <span className="league-spartan-regular citizenship fs__normal-1">
                             After updating or wiping out previous data, click "Refresh" to see the changes or 
                             simply refresh to see the changes.
@@ -216,10 +441,10 @@ export default function AdminContent(props){
                             backgroundColor: "#2196F3",
                             width: "100%",
                         }}/>
-                        <Button type={"default"} text={"Try wiping data"} onClick={() => props.setRefetch(-2)} styles={{
+                        {/* <Button type={"default"} text={"Try wiping data"} onClick={() => props.setRefetch(-2)} styles={{
                             backgroundColor: "#f44336",
                             width: "100%",
-                        }}/>
+                        }}/> */}
                         <span className="league-spartan-regular citizenship fs__normal-1">
                             After updating or wiping out previous data, click refresh to see the changes.
                         </span>
@@ -282,7 +507,9 @@ export default function AdminContent(props){
                     <span className="league-spartan-bold fs__large-1 citizenship fill__container ta__left">
                         Currently Live
                     </span>
-                    <div className="rr__flex-col rrf__row-normal def-pad-1 no__padding-tb">
+                    <div className="rr__flex-col rrf__row-normal def-pad-1 no__padding-tb" style={{
+                        flexDirection: "column-reverse",
+                    }}>
                         {data.filter((item) => item.isLive == true).length > 0 ? 
                         data
                         .filter((item) => item.isLive == true)
@@ -300,7 +527,9 @@ export default function AdminContent(props){
                     <span className="league-spartan-bold fs__large-1 citizenship fill__container ta__left">
                         History
                     </span>
-                    <div className="rr__flex-col rrf__row-normal def-pad-1 no__padding-tb">
+                    <div className="rr__flex-col rrf__row-normal def-pad-1 no__padding-tb" style={{
+                        flexDirection: "column-reverse",
+                    }}>
                         {data.filter((item) => item.isLive == false && item.streamStatus == StreamStatus.FINISHED).length > 0 ? 
                         data
                         .filter((item) => item.isLive == false && item.streamStatus == StreamStatus.FINISHED)
@@ -315,6 +544,7 @@ export default function AdminContent(props){
                         </>}
                     </div>
                 </div>
+                {modal.status && renderModal(modal.value, modal.action)}
             </>
         )
     }
