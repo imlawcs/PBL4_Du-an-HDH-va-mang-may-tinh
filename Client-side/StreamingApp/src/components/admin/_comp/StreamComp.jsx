@@ -5,9 +5,9 @@ import { Assets } from "../../../constants/Assets";
 import { ApiConstants } from "../../../API/ApiConstants";
 
 export default function StreamCompAdmin(props){
-    const [stream, setStream] = useState(props.stream|| {} );
+    const [stream, setStream] = useState(props.stream|| {});
     return (
-        <>
+        
             <div className="user__comp-admin fill__container rr__flex-row rrf__ai-center rrf__jc-space-between" style={{
                 backgroundColor: Colors.primary,
                 padding: "0.5em",
@@ -28,10 +28,13 @@ export default function StreamCompAdmin(props){
                         <div className="league-spartan-light fs__normal-2 citizenship">
                             {stream.streamDesc}
                         </div>
+                        <div className="league-spartan-light fs__normal-2 citizenship">
+                            {new Date(stream.streamDate).toLocaleString()}
+                        </div>
                     </div>
                 </div>
                 <div className="rr__flex-row rrf__col-small rrf__ai-center">
-                    <Button type="default" text="Edit" onClick={() => 
+                    {/* <Button type="default" text="Edit" onClick={() => 
                         props.renderModal({
                             status: true,
                             action: 1,
@@ -54,7 +57,7 @@ export default function StreamCompAdmin(props){
                         color: "#ffffff",
                         fontWeight: 300,
                          // Red for delete
-                    }}/>
+                    }}/> */}
                     <Button type="default" text="Detail" onClick={() => 
                         props.renderModal({
                             status: true,
@@ -68,6 +71,5 @@ export default function StreamCompAdmin(props){
                     }}/>
                 </div>
             </div>
-        </>
     )
 }

@@ -1,7 +1,7 @@
 import TagCard from "./TagCard";
 import '../assets/css/StreamUserInfo.css'
 import BtnIcon from "./BtnIcon";
-import { faBan, faEllipsis, faEye, faHeart, faInfoCircle, faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faEllipsis, faEye, faHeart, faInfoCircle, faShareFromSquare, faWrench } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "./Button";
 import { useEffect, useRef, useState } from "react";
@@ -102,6 +102,14 @@ export default function StreamUserInfo(props) {
                 setShowToast(true);
                 navigate(`/blocked?self=${encodeURIComponent(userGlobal.UserId)}&blocked=${encodeURIComponent(props.channelId)}&name=${encodeURIComponent(props.qname)}`);
             });
+    }
+    const HandleModAssign = () => {
+        console.log("Assign moderator");
+        if(userGlobal.UserId === undefined){
+            setToastMessage("Please login");
+            setShowToast(true);
+            return;
+        }
         
 
     }
@@ -171,8 +179,16 @@ export default function StreamUserInfo(props) {
                                     setShowMoreMenu(false);
                                 }}
                                 />
+                                <MenuOptionBtn icon={faWrench} optionName={"Assign moderator"} styles={{
+                                width: "100%"
+                                }}
+                                onClick={() => {
+                                    setMoreMenuOption(3);
+                                    setShowMoreMenu(false);
+                                }}
+                                />
                             </MenuHolder>
-                            {moreMenuOption === 1 && (
+                            {moreMenuOption === 1 ? (
                                 <CustomModal 
                                     type={"block-confirm"}
                                     offModal={() => setMoreMenuOption(0)}
@@ -181,7 +197,18 @@ export default function StreamUserInfo(props) {
                                         HandleBlock();
                                     }}
                                 />
-                            )}
+                            ): moreMenuOption === 3 ? 
+                            (<>
+                                <CustomModal 
+                                    type={"moderator-confirm"}
+                                    offModal={() => setMoreMenuOption(0)}
+                                    user={props.userName}
+                                    confirm={() => {
+                                        HandleModAssign();
+                                    }}
+                                />
+                            </>) 
+                            : <></>}
                         </div>
                     </div>
                 </div>
@@ -191,10 +218,6 @@ export default function StreamUserInfo(props) {
                         <span className="fs__normal-3 league-spartan-regular">{shortenNumber(props.flCount)} Followers</span>
                         <div className="uah__desc league-spartan-light fs__normal-2">
                             {props.desc || `This is ${props.userName}'s stream. Enjoy!`}
-                        </div>
-                        <div className="uihr__btn-holder rr__flex-col">
-                            <Button type={"link-type"} text={"btn_1"} onClick={doNothing()}/>
-                            <Button type={"link-type"} text={"btn_2"} onClick={doNothing()}/>
                         </div>
                     </div>
                 </div>

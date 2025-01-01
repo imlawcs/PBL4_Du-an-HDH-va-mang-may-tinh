@@ -1631,6 +1631,9 @@ export default function CustomModal(props) {
                   }}>Phone number:</b> {data.PhoneNumber}<br></br>
                   <b style={{
                     color: Colors.secondary,
+                  }}>Registered date:</b> {new Date(data.RegisterDate).toLocaleString()}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
                   }}>Bio:</b> {data.Bio? data.Bio : "undefined" }<br></br>
                 </span>
               </div>
@@ -1726,6 +1729,9 @@ export default function CustomModal(props) {
                   }}>Phone number:</b> {data.PhoneNumber}<br></br>
                   <b style={{
                     color: Colors.secondary,
+                  }}>Registered date:</b> {new Date(data.RegisterDate).toLocaleString()}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
                   }}>Bio:</b> {data.Bio? data.Bio : "undefined" }<br></br>
                 </span>
               </div>
@@ -1737,7 +1743,9 @@ export default function CustomModal(props) {
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
     </>
-    else return (
+    else 
+    if(data.categoryId)
+    return (
       <>
       <div className="modal__holder">
         <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
@@ -1774,6 +1782,59 @@ export default function CustomModal(props) {
         </div>
         <div className="bg__shadow" onClick={props.offModal}></div>
       </div>
+      </>
+    )
+    return (
+      <>
+        <div className="modal__holder">
+          <div className="modal__layout bg__color-2 rr__flex-col rrf__row-small" style={{
+            zIndex: 1000,
+          }}>
+            <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+              Detailed info
+            </span>
+            <div className="rr__flex-row rrf__col-normal">
+              <img src={data.streamThumbnail ? ApiConstants.BASE_URL + data.streamThumbnail : Assets.defaultThumbnail}
+                className="avatar__2x avatarPreview1" style={{
+                  width: "16em", 
+                  height: "9em",
+                  objectFit: "cover",
+                  borderRadius: "0.5em",
+                }}/>
+              <div className="rr__flex-col rrf__row-small" style={{
+                marginBottom: "1em",
+              }}>
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Stream ID: </b> {data.streamId}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Title: </b> {data.streamTitle}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Description: </b> {data.streamDesc}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Author: </b> {data.user.userName}<br></br>
+                  <b style={{
+                    color: Colors.secondary,
+                  }}>Stream Date: </b> {new Date(data.streamDate).toLocaleString()}<br></br>
+                </span>
+                <Button
+                type="default" 
+                text="View this user" 
+                onClick={() => {
+                  navigate(`/user/${data.user.userName}`);
+                }}/>
+              </div>
+            </div>
+            <div className="btn__holder rrf__jc-center">
+              <Button type="default" text="OK" onClick={props.offModal} />
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
       </>
     )
   } else if (props.type === "add"){
@@ -2050,5 +2111,28 @@ export default function CustomModal(props) {
       </div>
       </>
     )
+  } else if (props.type === "moderator-confirm"){
+    return(
+      <>
+        <div className="modal__holder"
+        >
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-small">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                Assigning Moderator
+              </span>
+            <div className="rr__flex-col rrf__jc-center rrf__row-small fill__container">
+              <span className="fs__normal-2 league-spartan-light citizenship ta__center">
+                Are you sure to grand moderator role of your channel to {props.user || "user"}?
+              </span>
+              <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Confirm" onClick={props.confirm} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+              </div>
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
+      </>
+      )
   }
 }

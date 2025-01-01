@@ -35,5 +35,14 @@ export const ApiConstants = {
         GET_BLOCKED_BY_ID: '/api/Blocked/',
         BLOCK: '/api/Blocked/block',
         UNBLOCK: '/api/Blocked/unblock',
+    },
+    ROLE: {
+        GET_ROLES: '/api/Role',
+        GET_ROLE_BY_ID: '/api/Role/',
+        ASSIGN_ROLE: '/api/Role/assign-role',
+        REMOVE_ROLE: '/api/Role/remove-role',
+        ASSIGN_MOD: '/api/Role/assign-mod',
+        REMOVE_MOD: '/api/Role/remove-mod',
+        GET_MODS_OF_CHANNEL: (id: string) => `/api/Role/${id}-mod`,
     }
 }

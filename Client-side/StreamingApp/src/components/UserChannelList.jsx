@@ -8,6 +8,7 @@ import { StreamRoutes } from "../API/Stream.route";
 import { Assets } from "../constants/Assets";
 import { ApiConstants } from "../API/ApiConstants";
 import { BlockRoutes } from "../API/Block.routes";
+import { AdminCheck } from "../scripts/AdminCheck";
 
 export default function UserChannelList(props) {
     const [channels, setChannels] = useState([]);
@@ -28,12 +29,6 @@ export default function UserChannelList(props) {
           blockComp.channelId == userGlobal.UserId && blockComp.blockedId == channel.UserId)
         )
 
-    }
-    function adminCheck(channel) {
-        if (channel.Roles && channel.Roles.filter((role) => role.roleName === "Admin").length > 0) {
-            return true;
-        }
-        return false;
     }
     useEffect(() =>  {
       const fetchUserList = UserRoutes.getUsers().then((res) => {
@@ -79,7 +74,7 @@ export default function UserChannelList(props) {
                   channels
                   .filter((channel) => userBlockList.filter((block) => blockCheck(channel, block)).length <= 0)
                   .filter((user) => userFollowList.filter((follow) => follow.channelId === user.UserId).length > 0)
-                  .filter((user) => adminCheck(user) === false)
+                  .filter((user) => AdminCheck(user) === false)
                   .slice(0, 5)
                   .map((user) => (
                     <ChannelComp
@@ -120,7 +115,7 @@ export default function UserChannelList(props) {
                   channels
                   .filter((channel) => userBlockList.filter((block) => blockCheck(channel, block)).length === 0) //filter out blocked users
                   .filter((channel) => userFollowList.filter((follow) => follow.channelId === channel.UserId).length === 0) //get nhung ai chua follow
-                  .filter((user) => adminCheck(user) === false)
+                  .filter((user) => AdminCheck(user) === false)
                   .slice(0, 5)
                   .map((user) => (
                     <ChannelComp
@@ -135,7 +130,7 @@ export default function UserChannelList(props) {
                       viewCount={user.ViewCount? user.ViewCount : 0}
                     />
                   ))}
-                  {channels.filter((user) => adminCheck(user) === false).length > 5 && 
+                  {channels.filter((user) => AdminCheck(user) === false).length > 5 && 
                   <Button
                     type={"link-type"}
                     text={"Show more"}
