@@ -59,8 +59,8 @@ export default function CategoryComp(props) {
             <img src={props.categoryPic} className="cate__c-bg" />
             <div className="cate__content-holder rr__flex-col"
             style={{
-            wordWrap: "break-word",
-            width: "9.375em"
+              wordWrap: "break-word",
+              width: "9.375em"
             }}
             >
             <span className={`fs__normal-2 citizenship league-spartan-semibold`}

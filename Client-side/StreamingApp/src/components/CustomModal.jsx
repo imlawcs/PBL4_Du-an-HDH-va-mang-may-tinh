@@ -57,7 +57,7 @@ export default function CustomModal(props) {
       let newErrors = {};
       const signup = await Auth.logIn({Username, Password}).then((res) => {
         if(res.error){
-          newErrors.form = "invalid username or password";
+          newErrors.form = res.error;
         }
         return Promise.resolve(res);
       });
