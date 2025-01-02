@@ -20,7 +20,10 @@ export default function ChannelComp(props) {
     if(props.type == "default"){
         return (
             <div className="cn__comp-2" style={{
-                backgroundImage: `url('${props.userBg}')`
+                backgroundImage: `url('${props.userBg}')`,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
             }}>
                 <div className="blur__layer rr__flex-col">
                     <img src={profilePic} className="cn__avatar-2" />

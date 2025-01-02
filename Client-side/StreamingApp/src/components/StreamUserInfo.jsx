@@ -18,6 +18,8 @@ import CustomModal from "./CustomModal";
 import { BlockRoutes } from "../API/Block.routes";
 import { useNavigate } from "react-router-dom";
 import { Assets } from "../constants/Assets";
+import { RoleRoutes } from "../API/Role.routes";
+import { ModCheck } from "../scripts/AdminCheck";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
@@ -45,6 +47,7 @@ export default function StreamUserInfo(props) {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [isModerator, setIsModerator] = useState(false);
     const [moreMenuOption, setMoreMenuOption] = useState(0);
     const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0, width: 0 });
     const menuRef = useRef(null);
@@ -52,6 +55,10 @@ export default function StreamUserInfo(props) {
         FollowRoutes.FollowCheck(props.channelId, userGlobal.UserId).then((res) => {
             console.log("isfollowed: ", res);
             setIsFollowed(res);
+        });
+        ModCheck(userGlobal.UserId, props.channelId).then((res) => {
+            console.log("isModerator: ", res);
+            setIsModerator(res);
         });
     }, [])
     
@@ -109,6 +116,32 @@ export default function StreamUserInfo(props) {
             setToastMessage("Please login");
             setShowToast(true);
             return;
+        }
+        if(!isModerator){
+            RoleRoutes.addRole({
+                ChannelId: userGlobal.UserId,
+                UserId: props.channelId,
+                RoleId: 3
+            }).then((res) => {
+                console.log(res);
+                setToastMessage("Moderator assigned");
+                setIsModerator(true);
+                setShowToast(true);
+                setMoreMenuOption(0);
+            });
+        }
+        else{
+            RoleRoutes.removeRole({
+                ChannelId: userGlobal.UserId,
+                UserId: props.channelId,
+                RoleId: 3
+            }).then((res) => {
+                console.log(res);
+                setToastMessage("Moderator removed");
+                setIsModerator(false);
+                setShowToast(true);
+                setMoreMenuOption(0);
+            });
         }
         
 
@@ -179,7 +212,7 @@ export default function StreamUserInfo(props) {
                                     setShowMoreMenu(false);
                                 }}
                                 />
-                                <MenuOptionBtn icon={faWrench} optionName={"Assign moderator"} styles={{
+                                <MenuOptionBtn icon={faWrench} optionName={isModerator? "Remove moderator" : "Assign Moderator"} styles={{
                                 width: "100%"
                                 }}
                                 onClick={() => {
@@ -202,6 +235,7 @@ export default function StreamUserInfo(props) {
                                 <CustomModal 
                                     type={"moderator-confirm"}
                                     offModal={() => setMoreMenuOption(0)}
+                                    modcheck={isModerator}
                                     user={props.userName}
                                     confirm={() => {
                                         HandleModAssign();

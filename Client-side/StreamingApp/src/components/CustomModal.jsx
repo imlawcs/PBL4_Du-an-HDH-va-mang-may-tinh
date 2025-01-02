@@ -1015,12 +1015,6 @@ export default function CustomModal(props) {
                 text="Update" 
                 onClick={() => document.getElementById('avatarInput').click()}
               />
-              <BtnIcon 
-                icons={faTrash} 
-                onClick={() => {
-                  
-                }}
-              />
             </div>
             <span className="fs__normal-1 league-spartan-light citizenship">
               Must be a valid image file
@@ -1321,6 +1315,12 @@ export default function CustomModal(props) {
     }
     const userRoleUpdate = async () => {
       console.log("userrole");
+      const postData = {
+        ChannelId: data.UserId,
+        UserId: data.UserId,
+        Role: data.Role,
+      }
+
     }
     const profilePicUpdate = async () => {
       const formData = new FormData();
@@ -1461,7 +1461,7 @@ export default function CustomModal(props) {
                   }}
                   >
                   <option value="1">User</option>
-                  <option value="2">Admin</option>
+                  <option value="3">Admin</option>
                 </select>
               </div>
               <div className="btn__holder">
@@ -1883,7 +1883,6 @@ export default function CustomModal(props) {
           console.log(res);
           setFormError(res.message);
           props.refresh(1);
-          props.offModal();
         });
       } else {
         console.log(data);
@@ -1893,7 +1892,6 @@ export default function CustomModal(props) {
           console.log(res);
           setFormError(res);
           props.refresh(2);
-          props.offModal();
         });
       }
     }
@@ -2118,11 +2116,11 @@ export default function CustomModal(props) {
         >
           <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-small">
               <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
-                Assigning Moderator
+                {!props.modcheck? "Grant moderator role" : "Revoke moderator role"}
               </span>
             <div className="rr__flex-col rrf__jc-center rrf__row-small fill__container">
               <span className="fs__normal-2 league-spartan-light citizenship ta__center">
-                Are you sure to grand moderator role of your channel to {props.user || "user"}?
+                Are you sure to {!props.modcheck? "Grant moderator role" : "revoke moderator role"} of your channel to {props.user || "user"}?
               </span>
               <div className="btn__holder rrf__jc-center">
                 <Button type="default" text="Confirm" onClick={props.confirm} />
@@ -2134,5 +2132,26 @@ export default function CustomModal(props) {
         </div>
       </>
       )
+  } else if (props.type === "confirm"){
+    return (
+      <>
+        <div className="modal__holder"
+        >
+          <div className="login__modal modal__layout bg__color-2 rr__flex-col rrf__row-small">
+              <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
+                {props.title}
+              </span>
+            <div className="rr__flex-col rrf__jc-center rrf__row-small fill__container">
+              {props.children}
+              <div className="btn__holder rrf__jc-center">
+                <Button type="default" text="Confirm" onClick={props.confirm} />
+                <Button type="default" text="Cancel" onClick={props.offModal} />
+              </div>
+            </div>
+          </div>
+          <div className="bg__shadow" onClick={props.offModal}></div>
+        </div>
+      </>
+    )
   }
 }

@@ -71,12 +71,12 @@ export default function Sidebar(props) {
                   icon={faTowerBroadcast}
                   onClick={() => setOption(1)}
                 />
-                <SbMenuLabel
+                {/* <SbMenuLabel
                   type={option == 2 ? "toggle" : ""}
                   text="Analytics"
                   icon={faBarChart}
                   onClick={() => setOption(2)}
-                />
+                /> */}
               </div>
             </div>
           </div>
@@ -402,7 +402,7 @@ export default function Sidebar(props) {
                       key={index}
                       title={content.streamTitle}
                       thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
-                        profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.profilePic : Assets.defaultAvatar}
+                        profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       displayName={content.user.displayName}
                       category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -585,7 +585,7 @@ export default function Sidebar(props) {
                          key={index}
                          title={content.streamTitle}
                          thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
-                         profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.profilePic : Assets.defaultAvatar}
+                         profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                          displayName={content.user.displayName}
                          category={categoryList.filter((item) => item.categoryId == content.streamCategories[0].categoryId)[0].categoryName}
                          tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -612,9 +612,9 @@ export default function Sidebar(props) {
                       }}
                       type={"default"}
                       key={index}
-                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
-                      userBg={user.UserBg? user.UserBg : "https://i.imgur.com/rbuyoEE.jpg"}
+                      userBg={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                     />
                   ))
                   :
@@ -737,7 +737,7 @@ export default function Sidebar(props) {
                       key={index}
                       title={content.streamTitle}
                       thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
-                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.profilePic : Assets.defaultAvatar}
+                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       displayName={content.user.displayName}
                       category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -810,7 +810,7 @@ export default function Sidebar(props) {
                       key={index}
                       title={content.streamTitle}
                       thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
-                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.profilePic : Assets.defaultAvatar}
+                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       userName={content.user.userName}
                       category={currentCategory.categoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -907,7 +907,7 @@ export default function Sidebar(props) {
                 
                       <ChannelComp type="search"
                         key={index}
-                        profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : defaultImage}
+                        profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                         userName={user.UserName}
                         followers={user.followers? user.followers : 0}
                         onClick={() => {
@@ -941,7 +941,7 @@ export default function Sidebar(props) {
                       key={index}
                       title={content.streamTitle}
                       thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
-                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.profilePic : Assets.defaultAvatar}
+                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       userName={content.user.userName}
                       category={currentCategory.CategoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -1052,7 +1052,7 @@ export default function Sidebar(props) {
                         key={index}
                         title={content.streamTitle}
                         thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
-                        profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.profilePic : Assets.defaultAvatar}
+                        profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                         userName={content.user.userName}
                         category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
                         tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}

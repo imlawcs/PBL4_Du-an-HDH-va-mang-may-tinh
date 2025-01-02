@@ -197,7 +197,6 @@ export default function NavBar(props) {
             text={"Browsing"}
             onClick={() => navigate("/browsing")}
           />
-          <Button type={"default-2"} text={"More"} />
         </div>
         <div className="middle__ch">
           <input

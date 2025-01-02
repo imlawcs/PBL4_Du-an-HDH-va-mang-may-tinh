@@ -234,7 +234,7 @@ let peerConnection = new RTCPeerConnection(servers);
 peerConnection.ontrack = (event) => {
     const remoteVideo = document.getElementById('remote__stream');
     remoteVideo.srcObject = event.streams[0];
-    alert("Track received");
+    // alert("Track received");
 }
 
 
