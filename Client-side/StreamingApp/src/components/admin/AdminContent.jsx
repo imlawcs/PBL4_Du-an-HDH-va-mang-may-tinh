@@ -235,48 +235,6 @@ export default function AdminContent(props){
                             width: "50vh",
                         }}
                         data={{
-                            labels: [...new Set(data.users.filter((a) => !AdminCheck(a)).map(item => 
-                                `${new Date(item.registerDate).toLocaleString('default', { month: 'long' })} ${new Date(item.registerDate).getFullYear()}`))],
-                            datasets: [
-                                {
-                                    label: "New Users per Month",
-                                    data: [...new Set(data.users.filter((a) => !AdminCheck(a)).map(item => 
-                                        `${new Date(item.registerDate).toLocaleString('default', { month: 'long' })} ${new Date(item.registerDate).getFullYear()}`))].map(monthYear => 
-                                            data.users.filter(user => 
-                                                `${new Date(user.registerDate).toLocaleString('default', { month: 'long' })} ${new Date(user.registerDate).getFullYear()}` === monthYear
-                                            ).length
-                                        ),
-                                    backgroundColor: Colors.secondary,
-                                    borderColor: Colors.primary,
-                                    borderWidth: 1
-                                }
-                            ]
-                        }}
-                        options={{
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1
-                                    }
-                                }
-                            }
-                        }}
-                    />
-                </div>
-                <div style={{
-                    flex: 1
-                }}>
-                    <Bar 
-                        style={{
-                            backgroundColor: Colors.primary,
-                            borderColor: Colors.secondary,
-                            borderWidth: 1,
-                            borderRadius: "0.5em",
-                            padding: "0.5em",
-                            width: "50vh",
-                        }}
-                        data={{
                             labels: [...new Set(data.streams.flatMap(stream => 
                                 stream.streamCategories.map(cat => 
                                     data.categories.find(c => c.categoryId === cat.categoryId)?.categoryName
@@ -366,10 +324,6 @@ export default function AdminContent(props){
                             backgroundColor: "#f44336",
                             width: "100%",
                         }}/> */}
-                        <span className="league-spartan-regular citizenship fs__normal-1">
-                            After updating or wiping out previous data, click "Refresh" to see the changes or 
-                            simply refresh to see the changes.
-                        </span>
                     </div>
                     <div className="rr__flex-col rrf__row-small fill__container" style={{
                         flex: 4,
@@ -445,9 +399,6 @@ export default function AdminContent(props){
                             backgroundColor: "#f44336",
                             width: "100%",
                         }}/> */}
-                        <span className="league-spartan-regular citizenship fs__normal-1">
-                            After updating or wiping out previous data, click refresh to see the changes.
-                        </span>
                     </div>
 
                     <div className="rr__flex-col rrf__row-small fill__container" style={{

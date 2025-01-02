@@ -27,7 +27,7 @@ export default function UserCompAdmin(props){
                         {user.Email}
                     </div>
                     <div className="league-spartan-light fs__normal-2 citizenship">
-                        {user.Roles[0]? user.Roles[0].roleName: "undefined"}
+                        {user.Roles.length > 0? user.Roles.some((role) => role.roleName === "Admin")? "Admin" : "User" : "undefined"}
                     </div>
                 </div>
             </div>
