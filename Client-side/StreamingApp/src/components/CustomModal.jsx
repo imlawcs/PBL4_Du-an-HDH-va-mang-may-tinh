@@ -57,7 +57,7 @@ export default function CustomModal(props) {
       let newErrors = {};
       const signup = await Auth.logIn({Username, Password}).then((res) => {
         if(res.error){
-          newErrors.form = "invalid username or password";
+          newErrors.form = res.error;
         }
         return Promise.resolve(res);
       });
@@ -1313,13 +1313,21 @@ export default function CustomModal(props) {
         });
       }
     }
-    const userRoleUpdate = async () => {
-      console.log("userrole");
+    const userStatusChange = async () => {
+      console.log("suspend");
       const postData = {
-        ChannelId: data.UserId,
         UserId: data.UserId,
-        Role: data.Role,
+        UserName: data.UserName,
+        Email: data.Email,
+        PhoneNumber: data.PhoneNumber,
+        DisplayName: data.DisplayName,
+        UserStatus: data.UserStatus != null ? data.UserStatus? false : true : false,
       }
+      await UserRoutes.updateUser(data.UserId, postData).then((res) => {
+        console.log(res);
+        props.refresh(1);
+        props.offModal();
+      });
 
     }
     const profilePicUpdate = async () => {
@@ -1339,7 +1347,7 @@ export default function CustomModal(props) {
             <span className="fs__large-3 league-spartan-semibold citizenship ta__center">
                 Edit info
             </span>
-            {modalType != 1 ? <>
+            {modalType == 0 ? <>
               <div className="rr__flex-col rrf__row-normal">
                 <div className="rr__flex-row rrf__col-normal">
                   <img src={tempImgSrc? tempImgSrc : Assets.defaultAvatar}
@@ -1448,9 +1456,10 @@ export default function CustomModal(props) {
                 />
               </div>
             </>:
+            modalType == 1?
             <>
               <div className="rr__flex-col rrf__row-tiny">
-                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                {/* <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
                   Role
                 </span>
                 <select
@@ -1462,14 +1471,27 @@ export default function CustomModal(props) {
                   >
                   <option value="1">User</option>
                   <option value="3">Admin</option>
-                </select>
+                </select> */}
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  User status: {data.UserStatus != null ? data.UserStatus? "Active": "Suspended" : "Active"}
+                </span>
+                <Button type={"default"} text={data.UserStatus != null ? data.UserStatus? "Suspend this user": "Activate" : "Suspend this user"} onClick={() => {
+                  setModalType(2);
+                }}/>
               </div>
               <div className="btn__holder">
                 <Button type="default" text="Back" onClick={() => setModalType(0)}/>
               </div>
-            </>}
+            </>
+            :
+            <>
+                <span className="fs__normal-2 league-spartan-regular citizenship ta__left">
+                  Are you sure you want to {data.UserStatus != null ? data.UserStatus? "suspend": "activate" : "suspend"} this user?
+                </span>
+            </>
+            }
             <div className="btn__holder rrf__jc-center">
-                <Button type="default" text="Confirm" onClick={modalType == 1 ? userRoleUpdate : updateData} />
+                {<Button type="default" text="Confirm" onClick={modalType != 2? updateData : userStatusChange} />}
                 <Button type="default" text="Cancel" onClick={props.offModal} />
             </div>
         </div>

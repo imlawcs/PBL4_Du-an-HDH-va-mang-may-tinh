@@ -20,7 +20,9 @@ export default function UserCompAdmin(props){
                     objectFit: "cover",
                 }}/>
                 <div className="rr__flex-col rrf__jc-space-between">
-                    <div className="league-spartan-bold fs__normal-3 citizenship">
+                    <div className="league-spartan-bold fs__normal-3 citizenship" style={{
+                        color: user.UserStatus == false? "#FF000F": "#fff",
+                    }}>
                         {user.DisplayName}
                     </div>
                     <div className="league-spartan-light fs__normal-2 citizenship">

@@ -9,7 +9,7 @@ export const ModCheck = async (channelId: string, checkUserId: string) => {
     // console.log(mods);
     if (mods.length > 0) {
         // console.log(mods.filter((mod: any) => mod.userId == checkUserId).length > 0);
-        return mods.filter((mod: any) => mod.userId == checkUserId).length > 0;
+        return mods.filter((mod: any) => mod.userId == checkUserId || mod.userName == checkUserId).length > 0;
     }
     return false;
 }

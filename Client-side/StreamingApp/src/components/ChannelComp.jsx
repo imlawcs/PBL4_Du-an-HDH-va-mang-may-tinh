@@ -61,15 +61,15 @@ export default function ChannelComp(props) {
                         <img src={profilePic} className="cn__avatar" />
                         <div className="txt__content-holder">
                             <span className="league-spartan-semibold fs__normal-2 no__user-select">{props.userName}</span>
-                            <span className="league-spartan-light fs__small-3">{props.category}</span>
+                            {/* <span className="league-spartan-light fs__normal-1 no__user-select">{props.category}</span> */}
                         </div>
                     </div>
                 <div className="view__count">
                     <div className="live__dot"></div>
                     
-                    <div className="fs__normal-1 league-spartan-semibold">
+                    {/* <div className="fs__normal-1 league-spartan-semibold">
                         {shortenNumber(props.viewCount)}
-                    </div>
+                    </div> */}
                 </div>
                 </div>
             )

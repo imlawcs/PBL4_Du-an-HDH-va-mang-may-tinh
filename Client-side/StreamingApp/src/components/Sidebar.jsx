@@ -41,6 +41,8 @@ import { BlockRoutes } from "../API/Block.routes";
 import TagCard from "./TagCard";
 import { Assets } from "../constants/Assets";
 import { ApiConstants } from "../API/ApiConstants";
+import { RoleRoutes } from "../API/Role.routes";
+import { ModCheck } from "../scripts/AdminCheck";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -1088,6 +1090,14 @@ export default function Sidebar(props) {
     const [user, setUser] = useState("");
     const [currentCategory, setCurrentCategory] = useState("");
     const [currentTags, setCurrentTags] = useState([]);
+    const [modList, setModList] = useState([]);
+    const moderatorCheck = (username) => {
+      let check = false;
+      ModCheck(user.UserId, username).then((res) => {
+        check = res;
+      });
+      return check;
+    }
     useEffect(() => {
       try{
         UserRoutes.getUserByName(userRoute).then((res) => {
@@ -1098,6 +1108,7 @@ export default function Sidebar(props) {
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
+            
             StreamRoutes.getMostRecentStreamByUser(res.UserId).then((res1) => {
               console.log(res1);
               TagRoutes.getAllTags().then((res2) => {
@@ -1139,7 +1150,7 @@ export default function Sidebar(props) {
             userName: username,
             chatContext: message,
             timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
-            badge: badge,
+            badge: badge != "" ? badge : moderatorCheck(username) ? "moderator" : null,
           }
         ]);
       });

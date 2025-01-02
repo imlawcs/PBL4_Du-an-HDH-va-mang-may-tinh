@@ -15,6 +15,7 @@ export default function UserChannelList(props) {
     const [userFollowList, setUserFollowList] = useState([]);
     const [userBlockList, setUserBlockList] = useState([]);
     const [userGlobal, setUserGlobal] = useState(props.user);
+    const [streamList, setStreamList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem("site"));
     const navigate = useNavigate();
@@ -28,13 +29,19 @@ export default function UserChannelList(props) {
           (blockComp.channelId == channel.UserId && blockComp.blockedId == userGlobal.UserId || 
           blockComp.channelId == userGlobal.UserId && blockComp.blockedId == channel.UserId)
         )
-
+    }
+    const liveCheck = (channel) => {
+        return streamList.filter((stream) => stream.user.userId === channel.UserId && stream.isLive).length > 0
     }
     useEffect(() =>  {
       const fetchUserList = UserRoutes.getUsers().then((res) => {
         setChannels(res);
         return Promise.resolve();
       });
+      const fetchStream = StreamRoutes.getAllStreams().then((res) => {
+        setStreamList(res);
+        return Promise.resolve();
+      })
       const fetchUserFollow = userGlobal && FollowRoutes.GetAllChannelsByFollowerId(userGlobal.UserId).then((res) => {
         console.log("User follow list:", res);
         setUserFollowList(res || []);
@@ -45,7 +52,7 @@ export default function UserChannelList(props) {
         setUserBlockList(res || []);
         return Promise.resolve();
       })
-        Promise.all([fetchUserList, fetchUserFollow, fectchAllBlocked]).then(() => {
+        Promise.all([fetchUserList, fetchStream, fetchUserFollow, fectchAllBlocked]).then(() => {
           setLoading(false);
         });
     }, []);
@@ -82,7 +89,7 @@ export default function UserChannelList(props) {
                         navigate(`/user/${user.UserName}`);
                       }}
                       key={user.UserId}
-                      isOffline={user.UserStatus? false : true}
+                      isOffline={!liveCheck(user)}
                       profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
@@ -123,7 +130,7 @@ export default function UserChannelList(props) {
                       onClick={() => {
                         navigate(`/user/${user.UserName}`);
                       }}
-                      isOffline={user.UserStatus? false : true}
+                      isOffline={!liveCheck(user)}
                       profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
                       category={user.Category? user.Category : "null"}
