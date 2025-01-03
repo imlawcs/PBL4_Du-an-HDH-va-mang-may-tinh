@@ -1201,6 +1201,7 @@ export default function Sidebar(props) {
                 qname={userRoute}
                 title={streamData.streamTitle}
                 desc={streamData.streamDesc}
+                date={streamData.streamDate}
                 category={currentCategory || "error"}
                 tagList={currentTags}
                 profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}

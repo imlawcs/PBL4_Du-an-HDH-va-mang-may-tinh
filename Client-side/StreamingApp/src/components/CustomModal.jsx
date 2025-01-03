@@ -325,6 +325,8 @@ export default function CustomModal(props) {
          });
       } else if (status === "stop") {
         console.log("Stop");
+        setServerStatus(false);
+        setPreviewStatus(false);
         StreamRoutes.getMostRecentStreamByUser(userGlobal.UserId).then((res) => {
           if (res.streamStatus === StreamStatus.FINISHED) {
             info.push(`${new Date().toLocaleString()}: ` + "Stopped" + "\n") ;
@@ -344,8 +346,7 @@ export default function CustomModal(props) {
                 info.push(`${new Date().toLocaleString()}: ` + res1.streamMessage + "\n");
                 info.push(`${new Date().toLocaleString()}: ` + "Stream stopping" + "\n");
                 SignalRTest.stop();
-                setServerStatus(false);
-                setPreviewStatus(false);
+                
                 document.getElementById('offline_label').style.display = 'block';
               });
             }
@@ -660,23 +661,25 @@ export default function CustomModal(props) {
           else if(prevStreamData.streamStatus === StreamStatus.UNFINISHED) {
             //update stream
             console.log("Update stream");
-            const data = {
-              streamId: prevStreamData.streamId,
-              // UserId: userGlobal.UserId,
-              streamTitle: title,
-              streamDesc: inputDesc,
-              streamCategoryId: selectedCategory.categoryId,
-              streamTagIds: tagListTemp,
-            }
-            if(tempImgFile) {
-              thumbnailUpload(prevStreamData.streamId);
-            }
-            // console.log("update data: " + JSON.stringify(data));
-            StreamRoutes.updateStream(prevStreamData.streamId, data).then((res) => {
-              StreamRoutes.getStreamById(prevStreamData.streamId).then((res) => {
-                setPrevStreamData(res);
+            StreamRoutes.getStreamById(prevStreamData.streamId).then((res) => {
+              const data = {
+                streamId: prevStreamData.streamId,
+                streamTitle: title,
+                streamDesc: inputDesc,
+                streamCategoryId: selectedCategory.categoryId,
+                streamTagIds: tagListTemp,
+                isLive: res.isLive,
+              }
+              if(tempImgFile) {
+                thumbnailUpload(prevStreamData.streamId);
+              }
+              // console.log("update data: " + JSON.stringify(data));
+              StreamRoutes.updateStream(prevStreamData.streamId, data).then((res) => {
+                StreamRoutes.getStreamById(prevStreamData.streamId).then((res) => {
+                  setPrevStreamData(res);
+                });
+                infoLog(res);
               });
-              infoLog(res);
             });
           }
           else console.error("Stream status error");
