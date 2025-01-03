@@ -249,7 +249,7 @@ export default function StreamUserInfo(props) {
                 <div className="user__about-holder rr__flex-col citizenship">
                     <span className="fs__large-3 league-spartan-semibold">About {props.userName}</span>
                     <div className="uah__context-holder rr__flex-col">
-                        <span className="fs__normal-3 league-spartan-regular">{shortenNumber(props.flCount)} Followers</span>
+                        <span className="fs__normal-3 league-spartan-regular">Most recent stream: {new Date(props.date).toLocaleString()}</span>
                         <div className="uah__desc league-spartan-light fs__normal-2">
                             {props.desc || `This is ${props.userName}'s stream. Enjoy!`}
                         </div>
