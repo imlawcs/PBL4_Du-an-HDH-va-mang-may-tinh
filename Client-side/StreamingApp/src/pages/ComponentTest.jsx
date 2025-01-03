@@ -17,6 +17,7 @@ import TagCard from "../components/TagCard";
 import { NotiContext } from "../hooks/NotiProvider";
 import BtnIcon from "../components/BtnIcon";
 import NotificationComp from "../components/NotificationComp";
+import { ModCheck } from "../scripts/AdminCheck";
 export default function ComponentTest() {
   const navigate = useNavigate();
   const notiBtnRef = useRef(null);
@@ -24,7 +25,17 @@ export default function ComponentTest() {
   const [notiList, setNotiList] = useState([]);
   const [ready, socket] = useContext(NotiContext);
   const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0, width: 0 });
+  const moderatorCheck = async (username) => {
+    try {
+        const check = await ModCheck("6", username);
+        return check;
+    } catch (err) {
+        console.error("Error checking moderator status:", err);
+        return false;
+    }
+  }
   useEffect(() => {
+    console.log({badge: moderatorCheck("huukhoa01")? "moderator" : ""});
     if(ready && socket)
     {
       socket.on("ReceiveNotification", (user, message) => {
@@ -133,6 +144,8 @@ export default function ComponentTest() {
             onClick={handleSelectTag}
           />
         </div> */}
+        
+
         <Button type="default" text="Test Websocket" onClick={() => {
           socket.invoke("SendNotification", "usertest" , "Test Notification");
         }}/>

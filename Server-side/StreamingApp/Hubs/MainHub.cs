@@ -61,7 +61,7 @@ namespace StreamingApp.Hubs
             {
                 if (room1.RoomName.Equals(user))
                 {
-                    await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message, "owner");
+                    await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
                 }
                 else
                     await Clients.Group(hostConnectionId).SendAsync("SendMessage", user, message);
