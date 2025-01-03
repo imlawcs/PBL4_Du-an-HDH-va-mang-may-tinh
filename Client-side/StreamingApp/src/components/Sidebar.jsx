@@ -1090,14 +1090,17 @@ export default function Sidebar(props) {
     const [user, setUser] = useState("");
     const [currentCategory, setCurrentCategory] = useState("");
     const [currentTags, setCurrentTags] = useState([]);
-    const [modList, setModList] = useState([]);
-    const moderatorCheck = (username) => {
-      let check = false;
-      ModCheck(user.UserId, username).then((res) => {
-        check = res;
-      });
-      return check;
+    
+    const moderatorCheck = async (username) => {
+      try {
+          const check = await ModCheck(user.UserId, username);
+          return check;
+      } catch (err) {
+          console.error("Error checking moderator status:", err);
+          return false;
+      }
     }
+    
     useEffect(() => {
       try{
         UserRoutes.getUserByName(userRoute).then((res) => {
@@ -1108,7 +1111,6 @@ export default function Sidebar(props) {
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
-            
             StreamRoutes.getMostRecentStreamByUser(res.UserId).then((res1) => {
               console.log(res1);
               TagRoutes.getAllTags().then((res2) => {
@@ -1142,7 +1144,7 @@ export default function Sidebar(props) {
     
     useEffect(() => {
       if(connection == null) return;
-      connection.on("sendMessage", (username, message, badge) => {
+      connection.on("sendMessage", (username, message) => {
         console.log(`${username}: ` + message);
         setMessages(prevMessages => [
           ...prevMessages,
@@ -1150,7 +1152,7 @@ export default function Sidebar(props) {
             userName: username,
             chatContext: message,
             timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
-            badge: badge != "" ? badge : moderatorCheck(username) ? "moderator" : null,
+            badge: username === userRoute ? "owner" : moderatorCheck(username)? "moderator" : null,
           }
         ]);
       });
