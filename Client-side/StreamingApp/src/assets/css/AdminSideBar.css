@@ -3,5 +3,5 @@
     height: 100vh;
     background-color: var(--primary-color);
     border-right: 0.16em var(--border-color) solid;
-    z-index: 9999;
+    /* z-index: 9999; */
 }

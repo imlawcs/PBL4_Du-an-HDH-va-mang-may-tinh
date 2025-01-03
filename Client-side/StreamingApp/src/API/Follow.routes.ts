@@ -20,6 +20,7 @@ export const FollowRoutes = {
         }
         try{
             const data = await FollowRoutes.GetAllFollowing().then((res) => {
+                if(res === undefined) return [];
                 return res.filter((follow: any) => follow.followerId === followerId);
             });
             return data;

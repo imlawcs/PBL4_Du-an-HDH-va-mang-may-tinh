@@ -49,15 +49,12 @@ namespace StreamingApp.Services
 
             user.UserName = model.UserName;
             user.DisplayName = model.DisplayName;
-            if(model.Bio != null)
-            user.Bio = model.Bio;
-            if(model.ProfilePic != null)
-            user.ProfilePic = model.ProfilePic;
-            user.Email = model.Email;
-            if(model.PhoneNumber != null)
             user.PhoneNumber = model.PhoneNumber;
-            if(model.IsEmailNoti != null)
-            user.IsEmailNoti = model.IsEmailNoti;
+            user.Email = model.Email;
+            if(model.Bio != null) user.Bio = model.Bio;
+            if(model.ProfilePic != null) user.ProfilePic = model.ProfilePic;
+            if(model.IsEmailNoti != null) user.IsEmailNoti = model.IsEmailNoti;
+            if(model.UserStatus != null) user.UserStatus = model.UserStatus;
 
             try
             {
@@ -121,6 +118,9 @@ namespace StreamingApp.Services
             return UserManager.GetUserByName(name);
         }
 
-       
+        public Task<(bool Succeeded, string[] Errors)> UpdateImageUserAsync(int id, UserUpdateImageDTO model)
+        {
+            return UserManager.UpdateImageUserAsync(id, model);
+        }
     }
 }

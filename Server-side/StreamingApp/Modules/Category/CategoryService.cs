@@ -12,7 +12,7 @@ namespace StreamingApp.Services
         {
             CategoryManager = categoryManager ?? throw new ArgumentNullException(nameof(categoryManager));
         }
-        public Task<(bool Succeeded, string[] Errors, Category? category)> CreateCategoryAsync(Category model)
+        public Task<(bool Succeeded, string[] Errors, Category? category)> CreateCategoryAsync(CategoryDTO model)
         {
             return CategoryManager.CreateCategoryAsync(model);
         }
@@ -32,7 +32,7 @@ namespace StreamingApp.Services
             return CategoryManager.GetCategoryByIdAsync(id);
         }
 
-        public Task<(bool Succeeded, string[] Errors)> UpdateCategoryAsync(int id,Category model)
+        public Task<(bool Succeeded, string[] Errors)> UpdateCategoryAsync(int id,CategoryUpdateDTO model)
         {
             return CategoryManager.UpdateCategoryAsync(id,model);
         }

@@ -105,6 +105,22 @@ export const StreamRoutes = {
             console.error(error);
         }
     },
+    updateThumbnail: async (id: string, data: FormData) => {
+        try{
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.STREAM.GET_STREAM_BY_ID + id + "/update-image", {
+                method: "PUT",
+                body: data
+            });
+            const responseText = await response.text();
+            if(!response.ok) {
+                throw new Error("Failed to update thumbnail");
+            }
+            return responseText;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    },
     getMostRecentStreamByUser: async (userid: string) => {
         try {
             const data = await StreamRoutes.getAllStreams().then((streams) => {

@@ -56,6 +56,9 @@ namespace StreamingApp.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
@@ -183,6 +186,9 @@ namespace StreamingApp.Migrations
                     b.Property<int>("StreamStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("StreamThumbnail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("StreamTitle")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -309,7 +315,7 @@ namespace StreamingApp.Migrations
                             UserId = 1,
                             DisplayName = "admin",
                             Email = "admin@gmail.com",
-                            Password = "$2a$11$g9pN87CcGIp/HAdre73c4uGi.HtuL4lwxehKLD5SJ1gqetwoOjncm",
+                            Password = "$2a$11$CL.zpc2J/PxhCcRHMeyzD.oFA1gIt.DKvMfLcrLCOa2OaNOY4HU9e",
                             PhoneNumber = "1111111111",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "Admin Placeholder"
@@ -319,7 +325,7 @@ namespace StreamingApp.Migrations
                             UserId = 2,
                             DisplayName = "Dao Le Hanh Nguyen",
                             Email = "daolehanhnguyen@gmail.com",
-                            Password = "$2a$11$wLRfB6CnaPMeBAcRSjlikutWdTj0MBOMrqvdbPB5qXRB3y8ZpzYA.",
+                            Password = "$2a$11$i70fY42UT0mou8qJjEvEhuKAtI2G.z2tZj9x8735AAfhScPK.Gsmy",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin1"
@@ -329,7 +335,7 @@ namespace StreamingApp.Migrations
                             UserId = 3,
                             DisplayName = "Huynh Thuy Minh Nguyet",
                             Email = "minhnguyetdn2004@gmail.com",
-                            Password = "$2a$11$ZklyDXi2x8lBbhHLJkFGRuN4gOz4jqcp31ZJvdiUW84m6qcnJsiIC",
+                            Password = "$2a$11$GV5I0ol9hH3I.Nl8BvzZYOHx68OKc6x0LR.TZp3/Fiommp0Vxiede",
                             PhoneNumber = "0775500744",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin2"
@@ -339,7 +345,7 @@ namespace StreamingApp.Migrations
                             UserId = 4,
                             DisplayName = "Nguyen Huu Khoa",
                             Email = "huukhoa04@gmail.com",
-                            Password = "$2a$11$A/1DMADK9TmFtQBfCakHU.JFNSiRsC.YUlj8nYW.vQgy8W7DtFHre",
+                            Password = "$2a$11$5sz7f0oZkGe5pEw/7t0cseZ4Tk34Lu6XIXn4V8UVGuKYcBCup3mD6",
                             PhoneNumber = "0333414094",
                             RegisterDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin3"

@@ -12,5 +12,6 @@ namespace StreamingApp.Services
         Task<bool> DeleteUserAsync(int id);
         Task<(bool Succeeded, string[] Errors)> UpdatePasswordAsync(UserUpdatePasswordDto userUpdatePasswordDto);
         Task<String> GetUserByNameAsync(string name);
+        Task<(bool Succeeded, string[] Errors)> UpdateImageUserAsync(int id, UserUpdateImageDTO model);
     }
 }

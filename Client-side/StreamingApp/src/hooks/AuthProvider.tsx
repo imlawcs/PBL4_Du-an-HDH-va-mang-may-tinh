@@ -34,7 +34,11 @@ const AuthProvider = ({ children }) => {
               const data = await response.json();
               localStorage.setItem("site", data.token);
               const userData = await UserRoutes.fetchUser(data.token);
-              console.log(userData);
+              console.log(userData.UserStatus);
+              if(userData.UserStatus != null && userData.UserStatus == false) {
+                logOut();
+                return({error: "User is suspended."});
+              }
               if(userData) localStorage.setItem("user", JSON.stringify(userData))// Store the JWT token
               navigate(0); // Redirect to the home page
               return;

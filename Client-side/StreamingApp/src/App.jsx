@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Blocked from "./pages/Blocked";
 import TagPage from "./pages/TagPage";
 import NotiProvider from "./hooks/NotiProvider";
+import AdminRouteCheck from "./components/admin/AdminRouteCheck";
 
 function App() {
   return (
@@ -27,7 +28,6 @@ function App() {
             <Route path="tag/:tagid" element={<TagPage />} />
             <Route path="/user/:username" element={<UserNamePage />} />
             <Route element={<PrivateRoute />}>
-              <Route path="test" element={<ComponentTest />} />
               <Route path="streamManager" element={<StreamManager />} />
               <Route path="following" element={<Following />} />
               <Route path="accountSetting" element={<AccountSetting />} />
@@ -35,7 +35,10 @@ function App() {
             </Route>
             <Route path="searchResult" element={<SearchResult />} />
             <Route path="browsing" element={<Browsing />} />
-            <Route path="admin" element={<AdminPage />} />
+            <Route element={<AdminRouteCheck />}>
+              <Route path="test" element={<ComponentTest />} />
+              <Route path="admin" element={<AdminPage />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

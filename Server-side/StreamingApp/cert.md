@@ -44,7 +44,7 @@ namespace StreamingApp
                           {
                               serverOptions.ConfigureHttpsDefaults(httpsOptions =>
                               {
-                                  httpsOptions.ServerCertificate = new X509Certificate2("./DevCert/certificate.pfx", "yourpassword");
+                                  httpsOptions.ServerCertificate = new X509Certificate2("./DevCert/localhost_22122024.pfx", "yourpassword");
                               });
                           }); 
                 });

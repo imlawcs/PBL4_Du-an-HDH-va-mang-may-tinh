@@ -67,7 +67,7 @@ namespace StreamingApp.Managers
             {
                 Console.WriteLine("Room in list: " + room.RoomName);
             }
-            return StreamRooms.FirstOrDefault(room => room.RoomName.Equals(name, StringComparison.Ordinal));
+            return StreamRooms.LastOrDefault(room => room.RoomName.Equals(name, StringComparison.Ordinal));
         }
 
         public object? RemoveConnection(string connectionId)

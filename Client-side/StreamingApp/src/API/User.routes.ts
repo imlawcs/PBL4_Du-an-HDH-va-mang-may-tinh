@@ -42,6 +42,28 @@ export const UserRoutes = {
             console.error(error);
         }
     },
+    addUser: async (data: any) => {
+        try{
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.USER.GET_USER, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Connection": "keep-alive"
+                },
+                body: JSON.stringify(data)
+            });
+            const responseText = await response.text();
+            if(!response.ok) {
+                throw new Error(responseText.split('\"')[1]);
+            }
+            return responseText;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    },
     updateUser: async (id: string, data: any) => {
         try{
             console.log(JSON.stringify(data));
@@ -88,6 +110,37 @@ export const UserRoutes = {
         } catch (error) {
             console.error(error.message);
             return error.message;
+        }
+    },
+    updateProfilePic: async (id: string, data: any) => {
+        try{
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.USER.GET_USER_BY_ID + id + "/update-image", {
+                method: "PUT",
+                body: data
+            });
+            const responseText = await response.text();
+            if(!response.ok) {
+                throw new Error("Failed to update profile pic");
+            }
+            return responseText;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    },
+    deleteUser: async (id: string) => {
+        try{
+            const response = await fetch(ApiConstants.BASE_URL + ApiConstants.USER.GET_USER_BY_ID + id, {
+                method: "DELETE"
+            });
+            const responseText = await response.text();
+            if(!response.ok) {
+                throw new Error("Failed to delete user with id:" + id);
+            }
+            return responseText;
+        }
+        catch (error) {
+            console.error(error);
         }
     },
     fetchUser: async (token: string) => {

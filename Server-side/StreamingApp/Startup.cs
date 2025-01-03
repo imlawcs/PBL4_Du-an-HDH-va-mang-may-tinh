@@ -10,6 +10,7 @@ using StreamingApp.Middlewares;
 using StreamingApp.Services;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 
 namespace StreamingApp
 {
@@ -94,6 +95,9 @@ namespace StreamingApp
             services.AddScoped<UserManager>();
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<IFileService, FileService>();
+
+
             // Đăng ký JWT Authentication
             services.AddAuthentication(options =>
             {
@@ -170,6 +174,12 @@ namespace StreamingApp
 
             app.UseRouting();
             app.UseCors("ClientPermission");
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, "uploads")),
+                RequestPath = "/uploads"
+            });
+
 
             // app.UseAuthentication();
             // app.UseMiddleware<JwtMiddleware>();

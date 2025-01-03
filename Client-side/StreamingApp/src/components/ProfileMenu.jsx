@@ -3,6 +3,7 @@ import MenuOptionBtn from "./MenuOptionBtn";
 import {
   faArrowRightFromBracket,
   faCode,
+  faHome,
   faUserGear,
   faWaveSquare,
 } from "@fortawesome/free-solid-svg-icons";
@@ -19,6 +20,10 @@ export default function ProfileMenu(props) {
           src={props.imgLink}
           alt="User profile pic"
           onClick={() => setIsChecked(!isChecked)}
+          style={{
+            cursor: "pointer",
+            objectFit: "cover",
+          }}
         />
       </div>
     );
@@ -31,6 +36,10 @@ export default function ProfileMenu(props) {
             src={props.imgLink}
             alt="User profile pic"
             onClick={() => setIsChecked(!isChecked)}
+            style={{
+              cursor: "pointer",
+              objectFit: "cover",
+            }}
           />
         </div>
         <div className="dd__menu">
@@ -39,12 +48,21 @@ export default function ProfileMenu(props) {
               className="img__holder"
               src={props.imgLink}
               alt="User profile pic"
+              style={{
+                cursor: "pointer",
+                objectFit: "cover",
+              }}
             />
             <div className="uih__name league-spartan-semibold">
               {props.userName}
             </div>
           </div>
           <div className="opt__holder">
+            <MenuOptionBtn
+              icon={faHome}
+              optionName="Home"
+              onClick={() => navigate("/")}
+            />
             <MenuOptionBtn
               icon={faWaveSquare}
               optionName="Stream Manager"
@@ -55,7 +73,6 @@ export default function ProfileMenu(props) {
               optionName="Profile Settings"
               onClick={() => navigate("/accountSetting")}
             />
-            
             {props.roleCheck && 
             <>
               <MenuOptionBtn

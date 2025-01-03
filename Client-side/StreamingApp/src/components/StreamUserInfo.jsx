@@ -1,7 +1,7 @@
 import TagCard from "./TagCard";
 import '../assets/css/StreamUserInfo.css'
 import BtnIcon from "./BtnIcon";
-import { faBan, faEllipsis, faEye, faHeart, faInfoCircle, faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faEllipsis, faEye, faHeart, faInfoCircle, faShareFromSquare, faWrench } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "./Button";
 import { useEffect, useRef, useState } from "react";
@@ -17,6 +17,9 @@ import MenuHolder from "./MenuHolder.main";
 import CustomModal from "./CustomModal";
 import { BlockRoutes } from "../API/Block.routes";
 import { useNavigate } from "react-router-dom";
+import { Assets } from "../constants/Assets";
+import { RoleRoutes } from "../API/Role.routes";
+import { ModCheck } from "../scripts/AdminCheck";
 export default function StreamUserInfo(props) {
     function doNothing() {
         return;
@@ -44,6 +47,7 @@ export default function StreamUserInfo(props) {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [isModerator, setIsModerator] = useState(false);
     const [moreMenuOption, setMoreMenuOption] = useState(0);
     const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0, width: 0 });
     const menuRef = useRef(null);
@@ -51,6 +55,10 @@ export default function StreamUserInfo(props) {
         FollowRoutes.FollowCheck(props.channelId, userGlobal.UserId).then((res) => {
             console.log("isfollowed: ", res);
             setIsFollowed(res);
+        });
+        ModCheck(userGlobal.UserId, props.channelId).then((res) => {
+            console.log("isModerator: ", res);
+            setIsModerator(res);
         });
     }, [])
     
@@ -101,6 +109,40 @@ export default function StreamUserInfo(props) {
                 setShowToast(true);
                 navigate(`/blocked?self=${encodeURIComponent(userGlobal.UserId)}&blocked=${encodeURIComponent(props.channelId)}&name=${encodeURIComponent(props.qname)}`);
             });
+    }
+    const HandleModAssign = () => {
+        console.log("Assign moderator");
+        if(userGlobal.UserId === undefined){
+            setToastMessage("Please login");
+            setShowToast(true);
+            return;
+        }
+        if(!isModerator){
+            RoleRoutes.addRole({
+                ChannelId: userGlobal.UserId,
+                UserId: props.channelId,
+                RoleId: 3
+            }).then((res) => {
+                console.log(res);
+                setToastMessage("Moderator assigned");
+                setIsModerator(true);
+                setShowToast(true);
+                setMoreMenuOption(0);
+            });
+        }
+        else{
+            RoleRoutes.removeRole({
+                ChannelId: userGlobal.UserId,
+                UserId: props.channelId,
+                RoleId: 3
+            }).then((res) => {
+                console.log(res);
+                setToastMessage("Moderator removed");
+                setIsModerator(false);
+                setShowToast(true);
+                setMoreMenuOption(0);
+            });
+        }
         
 
     }
@@ -111,8 +153,7 @@ export default function StreamUserInfo(props) {
                 {/* content here */}
                 <div className="suiu__info-holder rr__flex-row fill__container">
                     <div className="uih__left-holder rr__flex-row">
-                          
-                            <img src={props.profilePic} className="avatar__2x"/>
+                            <img src={props.profilePic ? props.profilePic : Assets.defaultAvatar} className="avatar__2x"/>
                         
                         <div className="uih__context-holder rr__flex-col">
                             <div className="uihc__h-username league-spartan-semibold fs__large-1 citizenship">
@@ -171,8 +212,16 @@ export default function StreamUserInfo(props) {
                                     setShowMoreMenu(false);
                                 }}
                                 />
+                                <MenuOptionBtn icon={faWrench} optionName={isModerator? "Remove moderator" : "Assign Moderator"} styles={{
+                                width: "100%"
+                                }}
+                                onClick={() => {
+                                    setMoreMenuOption(3);
+                                    setShowMoreMenu(false);
+                                }}
+                                />
                             </MenuHolder>
-                            {moreMenuOption === 1 && (
+                            {moreMenuOption === 1 ? (
                                 <CustomModal 
                                     type={"block-confirm"}
                                     offModal={() => setMoreMenuOption(0)}
@@ -181,20 +230,28 @@ export default function StreamUserInfo(props) {
                                         HandleBlock();
                                     }}
                                 />
-                            )}
+                            ): moreMenuOption === 3 ? 
+                            (<>
+                                <CustomModal 
+                                    type={"moderator-confirm"}
+                                    offModal={() => setMoreMenuOption(0)}
+                                    modcheck={isModerator}
+                                    user={props.userName}
+                                    confirm={() => {
+                                        HandleModAssign();
+                                    }}
+                                />
+                            </>) 
+                            : <></>}
                         </div>
                     </div>
                 </div>
                 <div className="user__about-holder rr__flex-col citizenship">
                     <span className="fs__large-3 league-spartan-semibold">About {props.userName}</span>
                     <div className="uah__context-holder rr__flex-col">
-                        <span className="fs__normal-3 league-spartan-regular">{shortenNumber(props.flCount)} Followers</span>
+                        <span className="fs__normal-3 league-spartan-regular">Most recent stream: {new Date(props.date).toLocaleString()}</span>
                         <div className="uah__desc league-spartan-light fs__normal-2">
                             {props.desc || `This is ${props.userName}'s stream. Enjoy!`}
-                        </div>
-                        <div className="uihr__btn-holder rr__flex-col">
-                            <Button type={"link-type"} text={"btn_1"} onClick={doNothing()}/>
-                            <Button type={"link-type"} text={"btn_2"} onClick={doNothing()}/>
                         </div>
                     </div>
                 </div>

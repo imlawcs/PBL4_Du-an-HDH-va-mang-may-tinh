@@ -11,5 +11,6 @@ namespace StreamingApp.Services
         Task<bool> DeleteStreamAsync(int id);
         Task<(bool Succeeded, string[] Errors, Models.Entities.Stream? Stream)> CreateStreamAsync(Stream stream);
         Task<(bool Succeeded, string[] Errors)> UpdateStreamAsync(Stream stream);
+        Task<(bool Succeeded, string[] Errors)> UpdateImageStreamAsync(int id, StreamUpdateImageDTO model);
     }
 }

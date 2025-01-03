@@ -21,6 +21,7 @@ export default function ComponentTest() {
   const navigate = useNavigate();
   const notiBtnRef = useRef(null);
   const [notiOpen, setNotiOpen] = useState(false);
+  const [notiList, setNotiList] = useState([]);
   const [ready, socket] = useContext(NotiContext);
   const [inputPosition, setInputPosition] = useState({ top: 0, left: 0, height: 0, width: 0 });
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function ComponentTest() {
     {
       socket.on("ReceiveNotification", (user, message) => {
         console.log(`${user}: ${message}`);
+        setNotiList(notiList => [...notiList, { user, message }]);
       });
     }
   }, [ready, socket]);
@@ -151,28 +153,29 @@ export default function ComponentTest() {
           top: `${inputPosition.top}px`,
           right: `${inputPosition.left - inputPosition.height + 43}px`,
           display: notiOpen ? "flex" : "none",
-        }}>
-          <NotificationComp
-            user="UserTest"
-            message=" just turned on his stream"
-            onClick={() => {
-              console.log("Clicked");
-            }}
-          />
-          <NotificationComp
-            user="UserTest"
-            message=" just turned on his stream"
-            onClick={() => {
-              console.log("Clicked");
-            }}
-          />
-          <NotificationComp
-            user="UserTest"
-            message=" just turned on his stream"
-            onClick={() => {
-              console.log("Clicked");
-            }}
-          />
+          maxHeight: "30em",
+          overflowY: "scroll",
+        }}
+        title="Notification"
+        >
+          {notiList.length == 0? 
+          <>
+            <span className="league-spartan-semibold fs__normal-2 citizenship">
+              No new notifications
+            </span>
+          </>
+          :
+           notiList.map((noti, index) => (
+            <NotificationComp 
+              key={index}
+              user={noti.user}
+              message={noti.message}
+              time={new Date().toLocaleTimeString()}
+              onClick={() => {
+                console.log("Clicked");
+              }}
+            />
+          ))}
         </MenuHolder>
       </div>
     </>

@@ -39,6 +39,10 @@ import { TagRoutes } from "../API/Tag.routes";
 import { FollowRoutes } from "../API/Follow.routes";
 import { BlockRoutes } from "../API/Block.routes";
 import TagCard from "./TagCard";
+import { Assets } from "../constants/Assets";
+import { ApiConstants } from "../API/ApiConstants";
+import { RoleRoutes } from "../API/Role.routes";
+import { ModCheck } from "../scripts/AdminCheck";
 export default function Sidebar(props) {
   const lorem =
     "lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem  Ipsum has been the industry's standard dummy text ever since the 1500s,  when an unknown printer took a galley of type and scrambled it to make a  type specimen book. It has survived not only five centuries, but also  the leap into electronic typesetting, remaining essentially unchanged.";
@@ -69,12 +73,12 @@ export default function Sidebar(props) {
                   icon={faTowerBroadcast}
                   onClick={() => setOption(1)}
                 />
-                <SbMenuLabel
+                {/* <SbMenuLabel
                   type={option == 2 ? "toggle" : ""}
                   text="Analytics"
                   icon={faBarChart}
                   onClick={() => setOption(2)}
-                />
+                /> */}
               </div>
             </div>
           </div>
@@ -399,8 +403,8 @@ export default function Sidebar(props) {
                 <VideoContent
                       key={index}
                       title={content.streamTitle}
-                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
-                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
+                        profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       displayName={content.user.displayName}
                       category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -457,7 +461,7 @@ export default function Sidebar(props) {
                   cateViewCount={12727}
                   categoryName={content.categoryName}
                   categoryId={content.categoryId}
-                  categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                  categoryPic={content.imagePath? CategoryRoutes.IMAGE_PATH + content.imagePath : Assets.defaultCategory}
                 />
               ))
               :
@@ -582,8 +586,8 @@ export default function Sidebar(props) {
                    <VideoContent
                          key={index}
                          title={content.streamTitle}
-                         thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
-                         profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                         thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
+                         profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                          displayName={content.user.displayName}
                          category={categoryList.filter((item) => item.categoryId == content.streamCategories[0].categoryId)[0].categoryName}
                          tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -610,9 +614,9 @@ export default function Sidebar(props) {
                       }}
                       type={"default"}
                       key={index}
-                      profilePic={user.ProfilePic? user.ProfilePic : "https://i.imgur.com/neHVP5j.jpg"}
+                      profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                       userName={user.DisplayName}
-                      userBg={user.UserBg? user.UserBg : "https://i.imgur.com/rbuyoEE.jpg"}
+                      userBg={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                     />
                   ))
                   :
@@ -716,7 +720,7 @@ export default function Sidebar(props) {
                           cateViewCount={12727}
                           categoryName={content.categoryName}
                           categoryId={content.categoryId}
-                          categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                          categoryPic={content.imagePath? CategoryRoutes.IMAGE_PATH + content.imagePath : Assets.defaultCategory}
                         />
                       ))
                    : 
@@ -734,8 +738,8 @@ export default function Sidebar(props) {
                     <VideoContent
                       key={index}
                       title={content.streamTitle}
-                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
-                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
+                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       displayName={content.user.displayName}
                       category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -793,7 +797,7 @@ export default function Sidebar(props) {
                   cateViewCount={12727}
                   type={"default"}
                   categoryName={currentCategory.categoryName}
-                  categoryPic="https://i.imgur.com/tbmr3e8.jpg"
+                  categoryPic={currentCategory.imagePath? CategoryRoutes.IMAGE_PATH + currentCategory.imagePath : Assets.defaultCategory}
                   categoryDesc={currentCategory.categoryDesc}
                 />
                 <span className="fl__title fs__title-1 league-spartan-semibold citizenship fill__container def-pad-2 no__padding-lr">
@@ -807,8 +811,8 @@ export default function Sidebar(props) {
                     <VideoContent
                       key={index}
                       title={content.streamTitle}
-                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
-                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
+                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       userName={content.user.userName}
                       category={currentCategory.categoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -905,7 +909,7 @@ export default function Sidebar(props) {
                 
                       <ChannelComp type="search"
                         key={index}
-                        profilePic={user.ProfilePic? user.ProfilePic : defaultImage}
+                        profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                         userName={user.UserName}
                         followers={user.followers? user.followers : 0}
                         onClick={() => {
@@ -938,8 +942,8 @@ export default function Sidebar(props) {
                     <VideoContent
                       key={index}
                       title={content.streamTitle}
-                      thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
-                      profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                      thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
+                      profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                       userName={content.user.userName}
                       category={currentCategory.CategoryName}
                       tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -969,7 +973,7 @@ export default function Sidebar(props) {
                         cateViewCount={12727}
                         categoryName={content.categoryName}
                         categoryId={content.categoryId}
-                        categoryPic={content.categoryPic? content.categoryPic : "https://i.imgur.com/tbmr3e8.jpg"}
+                        categoryPic={content.imagePath? CategoryRoutes.IMAGE_PATH + content.imagePath : Assets.defaultCategory}
                     />
                       )):
                       <span className="fs__normal-2 league-spartan-semibold citizenship fill__container ta__left">
@@ -1049,8 +1053,8 @@ export default function Sidebar(props) {
                       <VideoContent
                         key={index}
                         title={content.streamTitle}
-                        thumbnail={content.thumbnail? content.thumbnail : "https://i.imgur.com/mUaz2eC.jpg"}
-                        profilePic={content.user.profilePic? content.profilePic : "https://i.imgur.com/JcLIDUe.jpg"}
+                        thumbnail={content.streamThumbnail? ApiConstants.BASE_URL + content.streamThumbnail : Assets.defaultThumbnail}
+                        profilePic={content.user.profilePic? ApiConstants.BASE_URL + content.user.profilePic : Assets.defaultAvatar}
                         userName={content.user.userName}
                         category={categoryList.filter((item) => item.categoryId === content.streamCategories[0].categoryId)[0].categoryName}
                         tags={tagList.filter((item) => content.streamTags.map((item) => item.tagId).includes(item.tagId))}
@@ -1076,8 +1080,7 @@ export default function Sidebar(props) {
           </div>
       </>
     )
-  }
-  else {
+  } else {
     // const LazyJWPlayer = lazy(() => import("@jwplayer/jwplayer-react"));
     const [messages, setMessages] = useState([]);
     const [userList, setUserList] = useState([]);
@@ -1087,6 +1090,14 @@ export default function Sidebar(props) {
     const [user, setUser] = useState("");
     const [currentCategory, setCurrentCategory] = useState("");
     const [currentTags, setCurrentTags] = useState([]);
+    const [modList, setModList] = useState([]);
+    const moderatorCheck = (username) => {
+      let check = false;
+      ModCheck(user.UserId, username).then((res) => {
+        check = res;
+      });
+      return check;
+    }
     useEffect(() => {
       try{
         UserRoutes.getUserByName(userRoute).then((res) => {
@@ -1097,6 +1108,7 @@ export default function Sidebar(props) {
             console.log(res);
             setUser(res);
             console.log(JSON.stringify(user));
+            
             StreamRoutes.getMostRecentStreamByUser(res.UserId).then((res1) => {
               console.log(res1);
               TagRoutes.getAllTags().then((res2) => {
@@ -1138,7 +1150,7 @@ export default function Sidebar(props) {
             userName: username,
             chatContext: message,
             timeStamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }),
-            badge: badge,
+            badge: badge != "" ? badge : moderatorCheck(username) ? "moderator" : null,
           }
         ]);
       });
@@ -1155,21 +1167,31 @@ export default function Sidebar(props) {
     return (
       <>
         <div className="main__position">
-          <div className="sidebar bg__color-2 rr__flex-row">
+          <div className="sidebar bg__color-2 rr__flex-row" style={{
+            flex: 1,
+          }}>
           <UserChannelList user={userGlobal} />
             <div className="main__content bg__color-vid">
               {/* <img className="bg__img" src={smBackground} alt="background"/> */}
               <div className="video__holder rr__flex-col rrf__jc-center rrf__ai-center bg__color-00">
-                {/* <span className="fs__title-5 league-spartan-regular citizenship ta__center fill__container">
+                {!streamData.isLive && 
+                <span className="fs__title-5 league-spartan-regular citizenship ta__center fill__container"
+                style={{
+                  // marginTop: "1em",
+                  // width: "16em",
+                }}
+                >
                   Stream is offline
-                </span> */}
-
+                </span>}
                   <video style={{
                       width: "100%",
                       height: "100%",
-                    }
-                  } id="remote__stream" autoPlay={true} controls={true} preload="metadata"></video>
+                      display: streamData.isLive? "block" : "none",
+                    }}
+                  id="remote__stream" autoPlay={true} controls={true} preload="metadata">
 
+                
+                  </video>
               </div>
 
               <StreamUserInfo
@@ -1179,15 +1201,19 @@ export default function Sidebar(props) {
                 qname={userRoute}
                 title={streamData.streamTitle}
                 desc={streamData.streamDesc}
+                date={streamData.streamDate}
                 category={currentCategory || "error"}
                 tagList={currentTags}
-                profilePic="https://i.imgur.com/neHVP5j.jpg"
+                profilePic={user.ProfilePic? ApiConstants.BASE_URL + user.ProfilePic : Assets.defaultAvatar}
                 viewCount={userList.length}
                 flCount={12342}
                 status={streamData.isLive !== undefined ? streamData.isLive : false}
               />
             </div>
-            <StreamChat messages={messages} userList={userList}/>
+            
+            {streamData.isLive ? 
+            <StreamChat messages={messages} userList={userList}/> 
+            : <></>}
           </div>
         </div>
       </>
